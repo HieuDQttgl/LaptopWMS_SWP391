@@ -25,11 +25,11 @@ public class DBContext {
      */
     public static void main(String args[]) {
         try {
-            // connnect to database 'testdb'
-            Connection conn = getConnection(DB_URL, USER_NAME, PASSWORD);
-            // crate statement
+            // connect to database
+            Connection conn = getConnection();
+            // create statement
             Statement stmt = conn.createStatement();
-            // get data from table 'student'
+            // get data from table 'users'
             ResultSet rs = stmt.executeQuery("select * from users");
             // show data
             while (rs.next()) {
@@ -48,17 +48,13 @@ public class DBContext {
      * create connection 
      * 
      * @author viettuts.vn
-     * @param dbURL: database's url
-     * @param userName: username is used to login
-     * @param password: password is used to login
      * @return connection
      */
-    public static Connection getConnection(String dbURL, String userName, 
-            String password) {
+    public static Connection getConnection() {
         Connection conn = null;
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
-            conn = DriverManager.getConnection(dbURL, userName, password);
+            conn = DriverManager.getConnection(DB_URL, USER_NAME, PASSWORD);
             System.out.println("connect successfully!");
         } catch (Exception ex) {
             System.out.println("connect failure!");
