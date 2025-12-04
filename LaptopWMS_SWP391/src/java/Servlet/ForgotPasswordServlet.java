@@ -49,11 +49,10 @@ public class ForgotPasswordServlet extends HttpServlet {
                 + request.getContextPath() + "/login";
 
         String content = ""
-                + "<h3>Your new password</h3>"
-                + "<p>Your new password is: <b>" + newPass + "</b></p>"
-                + "<p>You can login here: <a href=\"" + loginUrl + "\">Login Now</a></p>"
-                + "<br>"
-                + "<p>Regards,<br>Support Team</p>";
+                + "Your new password"
+                + "Your new password is: " + newPass + ""
+                + "You can login here:" + loginUrl
+                + "Regards, Support Team";
 
         SendMail.send(email, "Your new password", content);
 
