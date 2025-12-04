@@ -9,13 +9,12 @@ import java.util.List;
 import java.sql.Timestamp;
 
 public class UserDAO extends DBContext {
-    
-    public List<Users> getListUsers(){
+
+    public List<Users> getListUsers() {
         List<Users> users = new ArrayList<>();
         String sql = "SELECT * FROM users";
-        try (Connection conn = getConnection();
-                PreparedStatement ps = conn.prepareStatement(sql)) {
-            try (ResultSet rs = ps.executeQuery()){
+        try (Connection conn = getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+            try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
                     int userId = rs.getInt("user_id");
                     String username = rs.getString("username");
@@ -29,18 +28,18 @@ public class UserDAO extends DBContext {
                     Timestamp lastloginat = rs.getTimestamp("last_login_at");
                     Timestamp createdat = rs.getTimestamp("created_at");
                     Timestamp updatedat = rs.getTimestamp("updated_at");
-                    Integer createdby =rs.getObject("created_by", Integer.class);
-                    
+                    Integer createdby = rs.getObject("created_by", Integer.class);
+
                     Users user = new Users(
-                    userId, username, password, fullname, email, phonenumber, 
-                    gender, roleId, status, lastloginat, 
-                    createdat, updatedat, createdby
-                );
-                
-                users.add(user);
+                            userId, username, password, fullname, email, phonenumber,
+                            gender, roleId, status, lastloginat,
+                            createdat, updatedat, createdby
+                    );
+
+                    users.add(user);
                 }
             }
-            
+
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -50,8 +49,7 @@ public class UserDAO extends DBContext {
     public Users findByUsernameAndPassword(String username, String password) {
         String sql = "SELECT * FROM users WHERE username = ? AND password = ?";
 
-        try (Connection conn = getConnection();
-                PreparedStatement ps = conn.prepareStatement(sql)) {
+        try (Connection conn = getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, username);
             ps.setString(2, password);
             try (ResultSet rs = ps.executeQuery()) {
@@ -79,7 +77,58 @@ public class UserDAO extends DBContext {
         }
         return null;
     }
-    
+
+    public Users getUserByEmail(String email) {
+        try {
+            String sql = "SELECT * FROM users WHERE email = ?";
+            Connection con = getConnection();
+            PreparedStatement ps = con.prepareStatement(sql);
+            ps.setString(1, email);
+
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                Users u = new Users();
+                u.setUserId(rs.getInt("userId"));
+                u.setEmail(rs.getString("email"));
+                u.setPassword(rs.getString("password"));
+                return u;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public boolean updatePassword(int userId, String newPass) {
+        try {
+            String sql = "UPDATE users SET password=? WHERE userId=?";
+            Connection con = getConnection();
+            PreparedStatement ps = con.prepareStatement(sql);
+
+            ps.setString(1, newPass);
+            ps.setInt(2, userId);
+
+            return ps.executeUpdate() > 0;
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public void updateUserRole(int userId, int newRoleId) {
+        String sql = "UPDATE users SET role_id = ? WHERE user_id = ?";
+
+        try {
+            PreparedStatement ps = getConnection().prepareStatement(sql);
+            ps.setInt(1, newRoleId);
+            ps.setInt(2, userId);
+            ps.executeUpdate();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     //Test method
     public static void main(String[] args) {
         UserDAO userDAO = new UserDAO();
@@ -92,5 +141,3 @@ public class UserDAO extends DBContext {
         }
     }
 }
-
-

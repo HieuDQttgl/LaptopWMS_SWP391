@@ -166,9 +166,9 @@
                 %>
 
                 <% if (error != null) { %>
-                    <div class="error-message">
-                        <%= error %>
-                    </div>
+                <div class="error-message">
+                    <%= error %>
+                </div>
                 <% } %>
 
                 <form method="post" action="<%= request.getContextPath() %>/login">
@@ -191,6 +191,13 @@
                     <div class="actions">
                         <button type="submit" class="btn-primary">Sign in</button>
                     </div>
+                    <div class="meta">
+                        <a href="<%= request.getContextPath() %>/forgot" 
+                           style="color: var(--primary-color); text-decoration: none;">
+                            Forgot password?
+                        </a>
+                    </div>
+
 
                 </form>
             </div>

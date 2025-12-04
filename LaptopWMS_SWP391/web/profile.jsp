@@ -188,6 +188,10 @@
                     <form method="get" action="<%= request.getContextPath() %>/home">
                         <button type="submit" class="btn-link">Back to home</button>
                     </form>
+                    <form method="get" action="<%= request.getContextPath() %>/change-password">
+                        <button type="submit" class="btn-primary">Change password</button>
+                    </form>
+
                     <form method="get" action="<%= request.getContextPath() %>/logout">
                         <button type="submit" class="btn-primary">Sign out</button>
                     </form>
