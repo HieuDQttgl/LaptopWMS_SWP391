@@ -4,7 +4,7 @@
  */
 package Model;
 
-import java.security.Timestamp;
+import java.sql.Timestamp;
 
 /**
  *
@@ -150,4 +150,9 @@ public class Users {
         this.createdBy = createdBy;
     }
 
+    @Override
+    public String toString() {
+        return "Users{" + "userId=" + userId + ", username=" + username + ", password=" + password + ", fullName=" + fullName + ", email=" + email + ", phoneNumber=" + phoneNumber + ", gender=" + gender + ", roleId=" + roleId + ", status=" + status + ", lastLoginAt=" + lastLoginAt + ", createdAt=" + createdAt + ", updatedAt=" + updatedAt + ", createdBy=" + createdBy + '}';
+    }
+    
 }

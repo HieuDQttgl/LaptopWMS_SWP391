@@ -176,7 +176,7 @@
                         <label for="username">Username</label>
                         <div class="input-field">
                             <input type="text" id="username" name="username"
-                                   value="<%= usernameVal != null ? usernameVal : \"\" %>"
+                                   value="<%= usernameVal != null ? usernameVal : "" %>"
                                    required>
                         </div>
                     </div>
