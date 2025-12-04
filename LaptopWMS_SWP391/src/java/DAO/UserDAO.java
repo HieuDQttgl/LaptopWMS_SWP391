@@ -80,12 +80,13 @@ public class UserDAO extends DBContext {
         return null;
     }
     
+    //Test method
     public static void main(String[] args) {
         UserDAO userDAO = new UserDAO();
 
         System.out.println("=== Testing listAllRooms ===");
         List<Users> allUsers = userDAO.getListUsers();
-        System.out.println("Tìm thấy " + allUsers.size() + " Users:");
+        System.out.println("Found " + allUsers.size() + " Users:");
         for (Users user : allUsers) {
             System.out.println(user);
         }
