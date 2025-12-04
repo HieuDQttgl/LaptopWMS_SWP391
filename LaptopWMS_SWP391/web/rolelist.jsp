@@ -1,4 +1,5 @@
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <!DOCTYPE html>
 <html>
 <head>
@@ -103,38 +104,38 @@
                 <th>Action</th>
             </tr>
 
-            <%
-                List<Role> roles = (List<Role>) request.getAttribute("roles");
-                for (Role role : roles) {
-            %>
+            <c:forEach var="role" items="${roles}">
+                <tr>
+                    <td>${role.roleId}</td>
+                    <td>${role.roleName}</td>
 
-            <tr>
-                <td><%= role.getRoleId() %></td>
-                <td><%= role.getName() %></td>
+                    <td>
+                        <c:if test="${role.status eq 'active'}">
+                            <span class="status-active">Active</span>
+                        </c:if>
 
-                <td>
-                    <% if ("active".equals(role.getStatus())) { %>
-                        <span class="status-active">Active</span>
-                    <% } else { %>
-                        <span class="status-inactive">Inactive</span>
-                    <% } %>
-                </td>
+                        <c:if test="${role.status ne 'active'}">
+                            <span class="status-inactive">Inactive</span>
+                        </c:if>
+                    </td>
 
-                <td>
-                    <form action="role-status" method="post">
-                        <input type="hidden" name="roleId" value="<%= role.getRoleId() %>">
-                        <input type="hidden" name="status" value="<%= role.getStatus() %>">
+                    <td>
+                        <form action="role-status" method="post">
+                            <input type="hidden" name="roleId" value="${role.roleId}">
+                            <input type="hidden" name="status" value="${role.status}">
 
-                        <% if(role.getStatus().equals("active")) { %>
-                            <button class="btn-inactive" type="submit">Deactivate</button>
-                        <% } else { %>
-                            <button class="btn-active" type="submit">Activate</button>
-                        <% } %>
-                    </form>
-                </td>
-            </tr>
+                            <c:if test="${role.status eq 'active'}">
+                                <button class="btn-inactive" type="submit">Deactivate</button>
+                            </c:if>
 
-            <% } %>
+                            <c:if test="${role.status ne 'active'}">
+                                <button class="btn-active" type="submit">Activate</button>
+                            </c:if>
+                        </form>
+                    </td>
+                </tr>
+            </c:forEach>
+
         </table>
     </div>
 

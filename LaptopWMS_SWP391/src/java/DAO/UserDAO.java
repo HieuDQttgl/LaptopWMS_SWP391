@@ -88,7 +88,29 @@ public class UserDAO extends DBContext {
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
                 Users u = new Users();
-                u.setUserId(rs.getInt("userId"));
+                u.setUserId(rs.getInt("user_id"));
+                u.setEmail(rs.getString("email"));
+                u.setPassword(rs.getString("password"));
+                return u;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+    
+    public Users getUserById(int userId) {
+        try {
+            String sql = "SELECT * FROM users WHERE user_id = ?";
+            Connection con = getConnection();
+            PreparedStatement ps = con.prepareStatement(sql);
+            ps.setInt(1, userId);
+
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                Users u = new Users();
+                u.setUserId(rs.getInt("user_id"));
+                u.setUsername(rs.getString("username"));
                 u.setEmail(rs.getString("email"));
                 u.setPassword(rs.getString("password"));
                 return u;
@@ -101,7 +123,7 @@ public class UserDAO extends DBContext {
 
     public boolean updatePassword(int userId, String newPass) {
         try {
-            String sql = "UPDATE users SET password=? WHERE userId=?";
+            String sql = "UPDATE users SET password=? WHERE user_id=?";
             Connection con = getConnection();
             PreparedStatement ps = con.prepareStatement(sql);
 
