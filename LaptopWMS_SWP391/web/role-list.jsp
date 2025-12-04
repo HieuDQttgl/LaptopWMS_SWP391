@@ -1,14 +1,101 @@
-
-
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
 <html>
-    <head>
-        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <title>JSP Page</title>
-    </head>
-    <body>
-        <table border="1" cellpadding="10">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <title>Role Management</title>
+
+    <style>
+        body {
+            margin: 0;
+            font-family: "Segoe UI", sans-serif;
+            background: #f5f6fa;
+        }
+
+        .container {
+            width: 90%;
+            margin: 40px auto;
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.07);
+        }
+
+        h2 {
+            text-align: center;
+            margin-bottom: 25px;
+            color: #2c3e50;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        th {
+            background: #2c3e50;
+            color: white;
+            padding: 12px;
+            text-align: left;
+            font-size: 15px;
+        }
+
+        td {
+            padding: 12px;
+            font-size: 15px;
+            border-bottom: 1px solid #e1e1e1;
+        }
+
+        tr:hover td {
+            background: #f0f3f7;
+        }
+
+        .status-active {
+            color: #27ae60;
+            font-weight: bold;
+        }
+
+        .status-inactive {
+            color: #e74c3c;
+            font-weight: bold;
+        }
+
+        button {
+            padding: 8px 14px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            color: white;
+            transition: 0.2s;
+        }
+
+        .btn-active {
+            background: #27ae60;
+        }
+
+        .btn-active:hover {
+            background: #1f8f4f;
+        }
+
+        .btn-inactive {
+            background: #e74c3c;
+        }
+
+        .btn-inactive:hover {
+            background: #c0392b;
+        }
+    </style>
+
+</head>
+<body>
+
+    <div class="container">
+        <h2>Role Management</h2>
+
+        <table>
             <tr>
                 <th>ID</th>
                 <th>Role Name</th>
@@ -24,24 +111,32 @@
             <tr>
                 <td><%= role.getRoleId() %></td>
                 <td><%= role.getName() %></td>
+
                 <td>
-                    <%= "active".equals(role.getStatus()) 
-                        ? "<span style='color:green'>Active</span>" 
-                        : "<span style='color:red'>Inactive</span>" %>
+                    <% if ("active".equals(role.getStatus())) { %>
+                        <span class="status-active">Active</span>
+                    <% } else { %>
+                        <span class="status-inactive">Inactive</span>
+                    <% } %>
                 </td>
+
                 <td>
                     <form action="role-status" method="post">
                         <input type="hidden" name="roleId" value="<%= role.getRoleId() %>">
                         <input type="hidden" name="status" value="<%= role.getStatus() %>">
-                        <button type="submit">
-                            <%= role.getStatus().equals("active") ? "Deactivate" : "Activate" %>
-                        </button>
+
+                        <% if(role.getStatus().equals("active")) { %>
+                            <button class="btn-inactive" type="submit">Deactivate</button>
+                        <% } else { %>
+                            <button class="btn-active" type="submit">Activate</button>
+                        <% } %>
                     </form>
                 </td>
             </tr>
 
             <% } %>
         </table>
+    </div>
 
-    </body>
+</body>
 </html>
