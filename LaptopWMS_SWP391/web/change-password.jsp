@@ -111,6 +111,7 @@
 
         <button type="submit">Update Password</button>
     </form>
+    <a href="landing">Back to Home</a>
 
     <% if(request.getAttribute("error") != null){ %>
         <div class="msg-error"><%= request.getAttribute("error") %></div>
