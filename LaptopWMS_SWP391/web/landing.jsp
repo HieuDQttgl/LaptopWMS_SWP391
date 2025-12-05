@@ -104,6 +104,7 @@
             <a href="<%= request.getContextPath() %>/profile">Profile</a>
             <a href="<%= request.getContextPath() %>/user">User</a>
             <a href="<%= request.getContextPath() %>/role-list">Role</a>
+            <a href="<%= request.getContextPath() %>/logout">Logout</a>
         </div>
     </div>
 
