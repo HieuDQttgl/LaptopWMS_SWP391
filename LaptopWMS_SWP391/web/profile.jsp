@@ -100,11 +100,85 @@
                 font-weight: 400;
             }
 
+            .field-input {
+                width: 200px;
+                padding: 6px 10px;
+                border: 1px solid var(--border-color);
+                border-radius: 6px;
+                font-size: 14px;
+                font-family: inherit;
+            }
+
+            .field-input:focus {
+                outline: none;
+                border-color: var(--primary-color);
+                box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+            }
+
+            .field-select {
+                width: 200px;
+                padding: 6px 10px;
+                border: 1px solid var(--border-color);
+                border-radius: 6px;
+                font-size: 14px;
+                font-family: inherit;
+                background: white;
+            }
+
+            .field-select:focus {
+                outline: none;
+                border-color: var(--primary-color);
+                box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+            }
+
+            .edit-mode {
+                display: none;
+            }
+
+            .view-mode {
+                display: flex;
+            }
+
+            .message {
+                padding: 12px 16px;
+                border-radius: 8px;
+                margin-bottom: 16px;
+                font-size: 14px;
+            }
+
+            .message.success {
+                background-color: #d1fae5;
+                color: #065f46;
+                border: 1px solid #6ee7b7;
+            }
+
+            .message.error {
+                background-color: #fee2e2;
+                color: #991b1b;
+                border: 1px solid #fca5a5;
+            }
+
             .actions {
                 margin-top: 18px;
                 display: flex;
                 justify-content: flex-end;
                 gap: 8px;
+            }
+
+            .btn-secondary {
+                padding: 7px 14px;
+                border-radius: 999px;
+                border: 1px solid var(--border-color);
+                background: white;
+                color: var(--text-main);
+                font-weight: 500;
+                font-size: 13px;
+                cursor: pointer;
+                transition: background 0.15s ease;
+            }
+
+            .btn-secondary:hover {
+                background: var(--bg-color);
             }
 
             .btn-link {
