@@ -159,8 +159,18 @@ public class UserDAO extends DBContext {
                 Users u = new Users();
                 u.setUserId(rs.getInt("user_id"));
                 u.setUsername(rs.getString("username"));
-                u.setEmail(rs.getString("email"));
                 u.setPassword(rs.getString("password"));
+                u.setFullName(rs.getString("full_name"));
+                u.setEmail(rs.getString("email"));
+                u.setPhoneNumber(rs.getString("phone_number"));
+                u.setGender(rs.getString("gender"));
+                u.setRoleId(rs.getInt("role_id"));
+                u.setStatus(rs.getString("status"));
+                u.setLastLoginAt(rs.getTimestamp("last_login_at"));
+                u.setCreatedAt(rs.getTimestamp("created_at"));
+                u.setUpdatedAt(rs.getTimestamp("updated_at"));
+                Integer createdBy = (Integer) rs.getObject("created_by");
+                u.setCreatedBy(createdBy);
                 return u;
             }
         } catch (Exception e) {
@@ -196,6 +206,24 @@ public class UserDAO extends DBContext {
             ps.executeUpdate();
         } catch (Exception e) {
             e.printStackTrace();
+        }
+    }
+
+    public boolean updateProfile(int userId, String fullName, String email, String phoneNumber, String gender) {
+        String sql = "UPDATE users SET full_name = ?, email = ?, phone_number = ?, gender = ?, updated_at = CURRENT_TIMESTAMP WHERE user_id = ?";
+
+        try (Connection conn = getConnection(); 
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, fullName);
+            ps.setString(2, email);
+            ps.setString(3, phoneNumber);
+            ps.setString(4, gender);
+            ps.setInt(5, userId);
+
+            return ps.executeUpdate() > 0;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
         }
     }
 

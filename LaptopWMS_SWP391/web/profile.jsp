@@ -145,6 +145,29 @@
                 }
             }
         </style>
+        <script>
+            function enableEditMode() {
+                document.querySelectorAll('.view-mode').forEach(el => el.style.display = 'none');
+                document.querySelectorAll('.edit-mode').forEach(el => {
+                    if (el.classList.contains('field-group')) {
+                        el.style.display = 'flex';
+                    } else {
+                        el.style.display = 'block';
+                    }
+                });
+            }
+
+            function cancelEdit() {
+                document.querySelectorAll('.edit-mode').forEach(el => el.style.display = 'none');
+                document.querySelectorAll('.view-mode').forEach(el => {
+                    if (el.classList.contains('field-group')) {
+                        el.style.display = 'flex';
+                    } else {
+                        el.style.display = 'block';
+                    }
+                });
+            }
+        </script>
     </head>
     <body>
         <div class="profile-wrapper">
@@ -157,42 +180,87 @@
                     <span class="badge">Signed in</span>
                 </div>
 
-                <div class="profile-body">
-                    <div class="field-group">
-                        <span class="field-label">Full name</span>
-                        <span class="field-value"><%= request.getSession().getAttribute("fullName") != null ? request.getSession().getAttribute("fullName") : "—" %></span>
-                    </div>
-                    <div class="field-group">
-                        <span class="field-label">Username</span>
-                        <span class="field-value"><%= request.getSession().getAttribute("username") %></span>
-                    </div>
-                    <div class="field-group">
-                        <span class="field-label">Email</span>
-                        <span class="field-value">
-                            <%= request.getSession().getAttribute("currentUser") != null 
-                                    ? ((Model.Users) request.getSession().getAttribute("currentUser")).getEmail() 
-                                    : "" %>
-                        </span>
-                    </div>
-                    <div class="field-group">
-                        <span class="field-label">Phone</span>
-                        <span class="field-value">
-                            <%= request.getSession().getAttribute("currentUser") != null 
-                                    ? ((Model.Users) request.getSession().getAttribute("currentUser")).getPhoneNumber() 
-                                    : "" %>
-                        </span>
-                    </div>
-                </div>
+                <% 
+                    String successMsg = (String) request.getAttribute("success");
+                    String errorMsg = (String) request.getAttribute("error");
+                    Model.Users currentUser = (Model.Users) request.getSession().getAttribute("currentUser");
+                    String fullName = currentUser != null ? (currentUser.getFullName() != null ? currentUser.getFullName() : "") : "";
+                    String email = currentUser != null ? (currentUser.getEmail() != null ? currentUser.getEmail() : "") : "";
+                    String phoneNumber = currentUser != null ? (currentUser.getPhoneNumber() != null ? currentUser.getPhoneNumber() : "") : "";
+                    String gender = currentUser != null ? (currentUser.getGender() != null ? currentUser.getGender() : "") : "";
+                %>
 
-                <div class="actions">
-                    <form method="get" action="<%= request.getContextPath() %>/home">
+                <% if (successMsg != null) { %>
+                    <div class="message success"><%= successMsg %></div>
+                <% } %>
+                <% if (errorMsg != null) { %>
+                    <div class="message error"><%= errorMsg %></div>
+                <% } %>
+
+                <form method="post" action="<%= request.getContextPath() %>/profile" id="profileForm">
+                    <div class="profile-body">
+                        <div class="field-group view-mode">
+                            <span class="field-label">Full name</span>
+                            <span class="field-value"><%= fullName.isEmpty() ? "—" : fullName %></span>
+                        </div>
+                        <div class="field-group edit-mode">
+                            <span class="field-label">Full name</span>
+                            <input type="text" name="fullName" class="field-input" value="<%= fullName %>" required>
+                        </div>
+
+                        <div class="field-group">
+                            <span class="field-label">Username</span>
+                            <span class="field-value"><%= request.getSession().getAttribute("username") %></span>
+                        </div>
+
+                        <div class="field-group view-mode">
+                            <span class="field-label">Email</span>
+                            <span class="field-value"><%= email.isEmpty() ? "—" : email %></span>
+                        </div>
+                        <div class="field-group edit-mode">
+                            <span class="field-label">Email</span>
+                            <input type="email" name="email" class="field-input" value="<%= email %>" required>
+                        </div>
+
+                        <div class="field-group view-mode">
+                            <span class="field-label">Phone</span>
+                            <span class="field-value"><%= phoneNumber.isEmpty() ? "—" : phoneNumber %></span>
+                        </div>
+                        <div class="field-group edit-mode">
+                            <span class="field-label">Phone</span>
+                            <input type="text" name="phoneNumber" class="field-input" value="<%= phoneNumber %>">
+                        </div>
+
+                        <div class="field-group view-mode">
+                            <span class="field-label">Gender</span>
+                            <span class="field-value"><%= gender.isEmpty() ? "—" : gender %></span>
+                        </div>
+                        <div class="field-group edit-mode">
+                            <span class="field-label">Gender</span>
+                            <select name="gender" class="field-select">
+                                <option value="" <%= gender.isEmpty() ? "selected" : "" %>>—</option>
+                                <option value="Male" <%= "Male".equals(gender) ? "selected" : "" %>>Male</option>
+                                <option value="Female" <%= "Female".equals(gender) ? "selected" : "" %>>Female</option>
+                                <option value="Other" <%= "Other".equals(gender) ? "selected" : "" %>>Other</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="actions edit-mode">
+                        <button type="button" onclick="cancelEdit()" class="btn-secondary">Cancel</button>
+                        <button type="submit" class="btn-primary">Save Changes</button>
+                    </div>
+                </form>
+
+                <div class="actions view-mode">
+                    <form method="get" action="<%= request.getContextPath() %>/landing" style="display: inline;">
                         <button type="submit" class="btn-link">Back to home</button>
                     </form>
-                    <form method="get" action="<%= request.getContextPath() %>/change-password">
+                    <button type="button" onclick="enableEditMode()" class="btn-primary">Edit Profile</button>
+                    <form method="get" action="<%= request.getContextPath() %>/change-password" style="display: inline;">
                         <button type="submit" class="btn-primary">Change password</button>
                     </form>
-
-                    <form method="get" action="<%= request.getContextPath() %>/logout">
+                    <form method="get" action="<%= request.getContextPath() %>/logout" style="display: inline;">
                         <button type="submit" class="btn-primary">Sign out</button>
                     </form>
                 </div>
