@@ -13,7 +13,8 @@ public class UserDAO extends DBContext {
     public List<Users> getListUsers() {
         List<Users> users = new ArrayList<>();
         String sql = "SELECT * FROM users";
-        try (Connection conn = getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+        try (Connection conn = getConnection(); 
+                PreparedStatement ps = conn.prepareStatement(sql)) {
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
                     int userId = rs.getInt("user_id");
@@ -43,6 +44,53 @@ public class UserDAO extends DBContext {
         } catch (Exception e) {
             e.printStackTrace();
         }
+        return users;
+    }
+    
+    public List<Users> searchUsers(String keyword) {
+        List<Users> users = new ArrayList<>();
+
+        String sql = "SELECT * FROM users WHERE full_name LIKE ? OR email LIKE ? OR phone_number LIKE ?";
+
+        String wildcardKeyword = "%" + keyword + "%";
+
+        try (Connection conn = getConnection(); 
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, wildcardKeyword);
+            ps.setString(2, wildcardKeyword);
+            ps.setString(3, wildcardKeyword);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    int userId = rs.getInt("user_id");
+                    String username = rs.getString("username");
+                    String password = rs.getString("password"); 
+                    String fullname = rs.getString("full_name");
+                    String email = rs.getString("email");
+                    String phonenumber = rs.getString("phone_number");
+                    String gender = rs.getString("gender");
+                    int roleId = rs.getInt("role_id");
+                    String status = rs.getString("status");
+                    Timestamp lastloginat = rs.getTimestamp("last_login_at");
+                    Timestamp createdat = rs.getTimestamp("created_at");
+                    Timestamp updatedat = rs.getTimestamp("updated_at");
+                    Integer createdby = rs.getObject("created_by", Integer.class);
+
+                    Users user = new Users(
+                        userId, username, password, fullname, email, phonenumber,
+                        gender, roleId, status, lastloginat,
+                        createdat, updatedat, createdby
+                    );
+
+                    users.add(user);
+                }
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
         return users;
     }
 
@@ -155,10 +203,14 @@ public class UserDAO extends DBContext {
     public static void main(String[] args) {
         UserDAO userDAO = new UserDAO();
 
-        System.out.println("=== Testing listAllRooms ===");
+        System.out.println("=== Testing ===");
         List<Users> allUsers = userDAO.getListUsers();
+        List<Users> search = userDAO.searchUsers("ystem");
         System.out.println("Found " + allUsers.size() + " Users:");
         for (Users user : allUsers) {
+            System.out.println(user);
+        }
+        for (Users user : search) {
             System.out.println(user);
         }
     }
