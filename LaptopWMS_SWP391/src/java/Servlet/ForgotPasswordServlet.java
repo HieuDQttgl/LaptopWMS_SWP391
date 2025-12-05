@@ -50,9 +50,9 @@ public class ForgotPasswordServlet extends HttpServlet {
 
         String content = ""
                 + "Your new password"
-                + "Your new password is: " + newPass + ""
-                + "You can login here:" + loginUrl
-                + "Regards, Support Team";
+                + ". Your new password is: " + newPass + ""
+                + ". You can login here:" + loginUrl
+                + " Regards, Support Team";
 
         SendMail.send(email, "Your new password", content);
 
