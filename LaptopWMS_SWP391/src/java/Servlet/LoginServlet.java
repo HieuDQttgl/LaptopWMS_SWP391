@@ -42,6 +42,7 @@ public class LoginServlet extends HttpServlet {
                     request.getRequestDispatcher("login.jsp").forward(request, response);
                     return;
                 }
+                userDao.updateLastLogin(user.getUserId());
                 HttpSession session = request.getSession();
                 session.setAttribute("username", user.getUsername());
                 session.setAttribute("fullName", user.getFullName());

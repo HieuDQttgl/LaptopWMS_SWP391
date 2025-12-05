@@ -227,6 +227,19 @@ public class UserDAO extends DBContext {
         }
     }
 
+    public boolean updateLastLogin(int userId) {
+        String sql = "UPDATE users SET last_login_at = CURRENT_TIMESTAMP WHERE user_id = ?";
+
+        try (Connection conn = getConnection(); 
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, userId);
+            return ps.executeUpdate() > 0;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
     //Test method
     public static void main(String[] args) {
         UserDAO userDAO = new UserDAO();

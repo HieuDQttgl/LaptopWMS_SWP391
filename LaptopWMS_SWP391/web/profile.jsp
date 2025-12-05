@@ -320,7 +320,7 @@
                         </div>
                     </div>
 
-                    <div class="actions edit-mode">
+                    <div class="actions edit-mode" style="display: none;">
                         <button type="button" onclick="cancelEdit()" class="btn-secondary">Cancel</button>
                         <button type="submit" class="btn-primary">Save Changes</button>
                     </div>
