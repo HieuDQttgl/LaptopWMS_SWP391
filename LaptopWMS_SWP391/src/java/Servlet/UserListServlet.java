@@ -18,8 +18,8 @@ import java.util.List;
  *
  * @author ASUS
  */
-@WebServlet(name = "UserServlet", urlPatterns = {"/user"})
-public class UserServlet extends HttpServlet {
+@WebServlet(name = "UserListServlet", urlPatterns = {"/user-list"})
+public class UserListServlet extends HttpServlet {
 
     
     @Override
