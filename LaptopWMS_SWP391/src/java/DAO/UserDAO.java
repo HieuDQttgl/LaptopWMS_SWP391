@@ -12,7 +12,7 @@ public class UserDAO extends DBContext {
 
     public List<Users> getListUsers() {
         List<Users> users = new ArrayList<>();
-        String sql = "SELECT * FROM users";
+        String sql = "SELECT u.*, r.role_name FROM users u JOIN roles r on u.role_id = r.role_id";
         try (Connection conn = getConnection(); 
                 PreparedStatement ps = conn.prepareStatement(sql)) {
             try (ResultSet rs = ps.executeQuery()) {
@@ -36,7 +36,7 @@ public class UserDAO extends DBContext {
                             gender, roleId, status, lastloginat,
                             createdat, updatedat, createdby
                     );
-
+                    user.setRoleName(rs.getString("role_name"));
                     users.add(user);
                 }
             }
@@ -46,6 +46,7 @@ public class UserDAO extends DBContext {
         }
         return users;
     }
+    
     
     public List<Users> searchUsers(String keyword) {
         List<Users> users = new ArrayList<>();
@@ -92,6 +93,30 @@ public class UserDAO extends DBContext {
         }
 
         return users;
+    }
+    
+    public boolean addNew(Users user) {
+        String sql = "INSERT INTO users (username, password, full_name, email, phone_number, gender, role_id, status, created_at, created_by) VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW(), ?)";
+        try (Connection conn = getConnection(); 
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, user.getUsername());
+            ps.setString(2, user.getPassword()); 
+            ps.setString(3, user.getFullName());
+            ps.setString(4, user.getEmail());
+            ps.setString(5, user.getPhoneNumber());
+            ps.setString(6, user.getGender());
+            ps.setInt(7, user.getRoleId());
+            ps.setString(8, user.getStatus() != null ? user.getStatus() : "active"); 
+            ps.setObject(9, user.getCreatedBy()); // Có thể null
+
+            int rowsAffected = ps.executeUpdate();
+            return rowsAffected > 0;
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
     }
 
     public Users findByUsernameAndPassword(String username, String password) {

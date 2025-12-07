@@ -26,6 +26,8 @@ public class Users {
     private Timestamp createdAt;
     private Timestamp updatedAt;
     private Integer createdBy;   
+    
+    private String roleName;
 
     public Users(int userId, String username, String password, String fullName, String email, String phoneNumber, String gender, int roleId, String status, Timestamp lastLoginAt, Timestamp createdAt, Timestamp updatedAt, Integer createdBy) {
         this.userId = userId;
@@ -150,6 +152,16 @@ public class Users {
         this.createdBy = createdBy;
     }
 
+    public String getRoleName() {
+        return roleName;
+    }
+
+    public void setRoleName(String roleName) {
+        this.roleName = roleName;
+    }
+
+    
+    
     @Override
     public String toString() {
         return "Users{" + "userId=" + userId + ", username=" + username + ", password=" + password + ", fullName=" + fullName + ", email=" + email + ", phoneNumber=" + phoneNumber + ", gender=" + gender + ", roleId=" + roleId + ", status=" + status + ", lastLoginAt=" + lastLoginAt + ", createdAt=" + createdAt + ", updatedAt=" + updatedAt + ", createdBy=" + createdBy + '}';

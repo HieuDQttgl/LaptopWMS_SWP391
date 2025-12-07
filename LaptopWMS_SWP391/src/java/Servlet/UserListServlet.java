@@ -35,7 +35,37 @@ public class UserListServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        request.setCharacterEncoding("UTF-8");
+        UserDAO userDAO = new UserDAO();
 
+
+        String action = request.getParameter("action");
+
+        if ("add".equals(action)) { 
+            // Lấy các tham số cần thiết cho việc thêm mới
+            String username = request.getParameter("username");
+            String password = request.getParameter("password");
+            String fullname = request.getParameter("fullName");
+            String email = request.getParameter("email");
+            String phonenumber = request.getParameter("phoneNumber");
+            String gender = request.getParameter("gender");
+            int roleId = Integer.parseInt(request.getParameter("roleId")); // Cần try-catch
+
+            Users newUser = new Users(
+                0, username, password, fullname, email, phonenumber, gender, roleId, 
+                "active", null, null, null, null 
+            );
+
+            boolean success = userDAO.addNew(newUser);
+
+            if (success) {
+                response.sendRedirect(request.getContextPath() + "/user-list?message=Success");
+            } else {
+                request.getSession().setAttribute("error", "Error.");
+
+                response.sendRedirect(request.getContextPath() + "/user-list");
+            }
+        }
     }
 
 }
