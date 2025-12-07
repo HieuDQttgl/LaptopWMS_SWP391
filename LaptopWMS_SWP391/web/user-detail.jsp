@@ -269,7 +269,7 @@
                 </div>
 
                 <div class="actions">
-                    <a href="<%= request.getContextPath() %>/user" class="btn-secondary">Back to User List</a>
+                    <a href="<%= request.getContextPath() %>/user-list" class="btn-secondary">Back to User List</a>
                     <a href="<%= request.getContextPath() %>/edit-role?id=<%= user.getUserId() %>" class="btn-primary">Edit Role</a>
                 </div>
 

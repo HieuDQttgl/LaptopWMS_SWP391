@@ -2,7 +2,6 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
          pageEncoding="UTF-8"%>
 <%@ page import="java.util.List" %>
-<%@ page import="Model.Users" %>
 <%@ page import="java.sql.Timestamp" %>
 <%@ page import="java.text.SimpleDateFormat" %>
 <!DOCTYPE html>
@@ -10,236 +9,322 @@
     <head>
         <meta charset="UTF-8">
         <title>User Management</title>
+        
         <style>
+            /* BASE STYLES */
             body {
                 font-family: Arial, sans-serif;
-                margin: 20px;
+                background-color: #f5f5f5;
+                margin: 0;
+                padding: 20px;
             }
+
+            .container {
+                max-width: 1200px;
+                margin: 0 auto;
+                background-color: white;
+                padding: 30px;
+                border-radius: 10px;
+                box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            }
+
             h1 {
                 color: #333;
+                margin-bottom: 10px;
             }
+            
             table {
                 width: 100%;
                 border-collapse: collapse;
-                margin-top: 15px;
-            }
-            th, td {
-                border: 1px solid #ddd;
-                padding: 10px;
-                text-align: left;
+                margin-top: 20px;
             }
             th {
-                background-color: #f2f2f2;
-                color: #333;
+                background-color: #f9f9f9;
+                padding: 15px 12px;
+                text-align: left;
+                border-bottom: 3px solid #e5e5e5;
+                color: #666;
+                font-size: 13px;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
             }
+            td {
+                padding: 15px 12px;
+                border-bottom: 1px solid #f0f0f0;
+                font-size: 14px;
+            }
+            tr:hover {
+                background-color: #f7f9fb;
+            }
+
+            .status-badge {
+                display: inline-block;
+                padding: 5px 10px;
+                border-radius: 20px;
+                font-weight: 600;
+                font-size: 12px;
+                text-transform: capitalize;
+            }
+            .status-active {
+                background-color: #e6f7ed;
+                color: #27ae60;
+                border: 1px solid #27ae60;
+            }
+            .status-inactive {
+                background-color: #fbebeb;
+                color: #e74c3c;
+                border: 1px solid #e74c3c;
+            }
+
             .action-links a {
-                margin-right: 10px;
+                margin-right: 15px;
                 text-decoration: none;
-                color: #007bff;
+                color: #2980b9;
+                font-weight: 600;
+                transition: color 0.3s;
             }
             .action-links a:hover {
+                color: #3498db;
                 text-decoration: underline;
             }
-            
+
             .btn-add {
-                 background-color: #28a745;
-                 color: white;
-                 padding: 10px 15px;
-                 border: none;
-                 border-radius: 5px;
-                 text-decoration: none;
-                 display: inline-block;
-                 margin-bottom: 20px;
-                 cursor: pointer;
+                background-color: #2ecc71;
+                color: white;
+                padding: 10px 18px;
+                border: none;
+                border-radius: 6px;
+                text-decoration: none;
+                display: inline-flex;
+                align-items: center;
+                margin-bottom: 25px;
+                cursor: pointer;
+                font-size: 15px;
+                font-weight: 600;
+                transition: background-color 0.3s;
+            }
+            .btn-add:hover {
+                background-color: #27ae60;
             }
             .btn-close {
-                 background-color: #6c757d;
-                 color: white;
-                 padding: 8px 12px;
-                 border: none;
-                 border-radius: 4px;
-                 cursor: pointer;
-                 margin-top: 10px;
+                background-color: #95a5a6;
+                color: white;
+                padding: 8px 15px;
+                border: none;
+                border-radius: 4px;
+                cursor: pointer;
+                margin-top: 15px;
+                transition: background-color 0.3s;
             }
+            .btn-close:hover {
+                background-color: #7f8c8d;
+            }
+            
+            /* ADD FORM */
             .add-form-container {
                 display: none;
-                border: 1px solid #ccc;
-                padding: 20px;
+                border: 1px solid #bdc3c7;
+                padding: 25px;
                 margin-bottom: 30px;
-                border-radius: 5px;
-                background-color: #f9f9f9;
+                border-radius: 8px;
+                background-color: #ffffff;
+                box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            }
+            .add-form-container h3 {
+                margin-top: 0;
+                color: #2ecc71;
+                border-bottom: 1px dashed #ecf0f1;
+                padding-bottom: 10px;
+            }
+            .add-form-container label {
+                display: block;
+                margin-top: 10px;
+                margin-bottom: 5px;
+                font-weight: 600;
+                color: #34495e;
             }
             .add-form-container input[type="text"],
             .add-form-container input[type="password"],
             .add-form-container input[type="email"],
             .add-form-container select {
-                padding: 8px;
+                padding: 10px;
                 margin-bottom: 10px;
-                border: 1px solid #ddd;
+                border: 1px solid #ccc;
                 border-radius: 4px;
                 width: 100%;
                 box-sizing: border-box;
             }
             .add-form-container input[type="submit"] {
-                background-color: #28a745;
+                background-color: #3498db;
                 color: white;
                 padding: 10px 15px;
                 border: none;
                 border-radius: 5px;
                 cursor: pointer;
+                font-weight: 600;
+                transition: background-color 0.3s;
+                width: auto;
             }
             .add-form-container input[type="submit"]:hover {
-                background-color: #218838;
+                background-color: #2980b9;
             }
 
-            .status-active {
-                color: green;
-                font-weight: bold;
-            }
-            .status-inactive {
-                color: red;
-            }
+            /* NOTIFICATION */
             .notification { 
-                padding: 10px;
-                border-radius: 4px;
-                margin-bottom: 15px;
+                padding: 12px;
+                border-radius: 6px;
+                margin-bottom: 20px;
+                font-weight: 600;
+                border-left: 5px solid;
             }
             .message-success {
-                color: #155724;
+                color: #1a7d3f;
                 background-color: #d4edda;
-                border: 1px solid #c3e6cb;
+                border-left-color: #2ecc71;
             }
             .message-error {
-                color: #721c24;
+                color: #8c2a35;
                 background-color: #f8d7da;
-                border: 1px solid #f5c6cb;
+                border-left-color: #e74c3c;
             }
         </style>
     </head>
     <body>
 
-        <h1>User List</h1>
+        <div class="container">
+            <h1>User Management List</h1>
 
-        <%
-            String successMessage = request.getParameter("message");
-            String errorMessage = (String) request.getSession().getAttribute("error");
-            if (errorMessage != null) {
-                out.println("<p id='notification' class='message-error notification'> " + errorMessage + "</p>");
-                request.getSession().removeAttribute("error");
-            } else if (successMessage != null) {
-                out.println("<p id='notification' class='message-success notification' " + successMessage + "</p>");
-            }
-        %>
-        
-        <button id="showAddFormBtn" class="btn-add">➕ Add new User</button>
+            <%
+                String successMessage = request.getParameter("message");
+                String errorMessage = (String) request.getSession().getAttribute("error");              
+                if (errorMessage != null) {
+                    out.println("<p id='notification' class='message-error notification'>" + errorMessage + "</p>");
+                    request.getSession().removeAttribute("error"); 
+                } else if (successMessage != null) {
+                    out.println("<p id='notification' class='message-success notification'>" + successMessage + "</p>");
+                }
+            %>
+            
+            <button id="showAddFormBtn" class="btn-add">➕ Add new User</button>
 
-        <div id="addFormContainer" class="add-form-container">
-            <h3>➕ Add New User</h3>
-            <form action="user-list" method="post">
-                <input type="hidden" name="action" value="add"> 
+            <div id="addFormContainer" class="add-form-container">
+                <h3>➕ Add New User</h3>
+                <form action="user-list" method="post">
+                    <input type="hidden" name="action" value="add"> 
 
-                <label for="username">Username:</label>
-                <input type="text" id="username" name="username" required><br>
+                    <label for="username">Username:</label>
+                    <input type="text" id="username" name="username" required><br>
 
-                <label for="password">Password:</label>
-                <input type="password" id="password" name="password" required><br>
+                    <label for="password">Password:</label>
+                    <input type="password" id="password" name="password" required><br>
 
-                <label for="fullName">Full Name:</label>
-                <input type="text" id="fullName" name="fullName"><br>
+                    <label for="fullName">Full Name:</label>
+                    <input type="text" id="fullName" name="fullName"><br>
 
-                <label for="email">Email:</label>
-                <input type="email" id="email" name="email" required><br>
+                    <label for="email">Email:</label>
+                    <input type="email" id="email" name="email" required><br>
 
-                <label for="phoneNumber">Phone Number:</label>
-                <input type="text" id="phoneNumber" name="phoneNumber"><br>
+                    <label for="phoneNumber">Phone Number:</label>
+                    <input type="text" id="phoneNumber" name="phoneNumber"><br>
 
-                <label for="gender">Gender:</label>
-                <select id="gender" name="gender">
-                    <option value="Male">Male</option>
-                    <option value="Female">Female</option>
-                    <option value="Other">Other</option>
-                </select><br>
+                    <label for="gender">Gender:</label>
+                    <select id="gender" name="gender">
+                        <option value="Male">Male</option>
+                        <option value="Female">Female</option>
+                        <option value="Other">Other</option>
+                    </select><br>
 
-                <label>Role:</label>
-                <select name="roleId">
-                    <option value="1">Administrator</option>
-                    <option value="2">Warehouse Keeper</option>
-                    <option value="3">Sale</option>
-                </select>
+                    <label>Role:</label>
+                    <select name="roleId">
+                        <option value="1">Administrator</option>
+                        <option value="2">Warehouse Keeper</option>
+                        <option value="3">Sale</option>
+                    </select>
 
-                <input type="submit" value="Add">
-            </form>
-            <button type="button" class="btn-close" onclick="hideAddForm()">Close Form</button>
-        </div>
+                    <input type="submit" value="Add User">
+                </form>
+                <button type="button" class="btn-close" onclick="hideAddForm()">Close Form</button>
+            </div>
 
-        <table>
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Username</th>
-                    <th>Full Name</th>
-                    <th>Email</th>
-                    <th>Phone Number</th>
-                    <th>Role Name</th>
-                    <th>Status</th>
-                    <th>Last Login At</th>
-                    <th>Action</th>
-                </tr>
-            </thead>
-            <tbody>
-                <%
-                    List<Users> users = (List<Users>) request.getAttribute("users");
-                    SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm");
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Username</th>
+                        <th>Full Name</th>
+                        <th>Email</th>
+                        <th>Phone Number</th>
+                        <th>Role Name</th>
+                        <th>Status</th>
+                        <th>Last Login At</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <%
+                        List<Users> users = (List<Users>) request.getAttribute("users");
+                        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm");
 
-                    if (users != null) {
-                        for (Users user : users) {
-                %>
+                        if (users != null && !users.isEmpty()) {
+                            for (Users user : users) {
+                    %>
 
-                <tr>
-                    <td><%= user.getUserId()%></td>
-                    <td><%= user.getUsername()%></td>
-                    <td><%= user.getFullName()%></td>
-                    <td><%= user.getEmail()%></td>
-                    <td><%= user.getPhoneNumber()%></td>
-                    <td><%= user.getRoleName()%></td>
+                    <tr>
+                        <td><%= user.getUserId()%></td>
+                        <td><%= user.getUsername()%></td>
+                        <td><%= user.getFullName()%></td>
+                        <td><%= user.getEmail()%></td>
+                        <td><%= user.getPhoneNumber()%></td>
+                        <td><%= user.getRoleName() != null ? user.getRoleName() : "N/A" %></td> 
 
-                    <td>
-                        <%
-                            if ("active".equalsIgnoreCase(user.getStatus())) {
-                        %>
-                        <span class="status-active">Active</span>
-                        <% } else { %>
-                        <span class="status-inactive">Inactive</span>
-                        <% } %>
-                    </td>
+                        <td>
+                            <%
+                                if ("active".equalsIgnoreCase(user.getStatus())) {
+                            %>
+                            <span class="status-badge status-active">Active</span>
+                            <% } else { %>
+                            <span class="status-badge status-inactive">Inactive</span>
+                            <% } %>
+                        </td>
 
-                    <td>
-                        <%
-                            if (user.getLastLoginAt() != null) {
-                                out.print(sdf.format(user.getLastLoginAt()));
-                            } else {
-                                out.print("Never logged in");
+                        <td>
+                            <%
+                                if (user.getLastLoginAt() != null) {
+                                    out.print(sdf.format(user.getLastLoginAt()));
+                                } else {
+                                    out.print("—");
+                                }
+                            %>
+                        </td>
+
+                        <td class="action-links">
+                            <a href="user-detail?id=<%= user.getUserId()%>">View Detail</a> |
+                            <a href="user-status?id=<%= user.getUserId()%>">
+                                <% 
+                                    String currentStatus = user.getStatus();
+                                    if ("active".equalsIgnoreCase(currentStatus)) {
+                                        out.print("Deactivate");
+                                    } else {
+                                        out.print("Activate");
+                                    }
+                                %>
+                            </a>
+                        </td>
+                    </tr>
+
+                    <%
                             }
-                        %>
-                    </td>
-
-                    <td class="action-links">
-                        <a href="user-detail?id=<%= user.getUserId()%>">View</a> |
-                        <a href="edit-user?id=<%= user.getUserId()%>">Edit</a>
-                    </td>
-
-                </tr>
-
-                <%
-                        }
-                    } else {
-                %>
-                <tr>
-                    <td colspan="9">No users found or error retrieving data.</td>
-                </tr>
-                <% }%>
-            </tbody>
-        </table>
+                        } else {
+                    %>
+                    <tr>
+                        <td colspan="9" style="text-align: center; color: #7f8c8d;">No users found. Please add a new user.</td>
+                    </tr>
+                    <% }%>
+                </tbody>
+            </table>
+            
+            <p style="margin-top: 20px; color: #7f8c8d;">Total Users: <%= users != null ? users.size() : 0 %></p>
+        </div>
         
         <script>
             var button = document.getElementById('showAddFormBtn');
@@ -251,18 +336,14 @@
             }
 
             button.addEventListener('click', function () {
-                if (formContainer.style.display === 'none' || formContainer.style.display === '') {
-                    formContainer.style.display = 'block';
-                } else {
-                    formContainer.style.display = 'none';
-                }
+                var isHidden = formContainer.style.display === 'none' || formContainer.style.display === '';
+                formContainer.style.display = isHidden ? 'block' : 'none';
             });
             
             if (notificationElement) {
                 if (notificationElement.classList.contains('message-error')) {
-                     formContainer.style.display = 'block';
+                    formContainer.style.display = 'block';
                 }
-                
                 setTimeout(function() {
                     notificationElement.remove(); 
                 }, 5000);

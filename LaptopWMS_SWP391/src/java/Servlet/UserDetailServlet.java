@@ -27,7 +27,7 @@ public class UserDetailServlet extends HttpServlet {
 
         String idParam = request.getParameter("id");
         if (idParam == null || idParam.isEmpty()) {
-            response.sendRedirect(request.getContextPath() + "/user");
+            response.sendRedirect(request.getContextPath() + "/user-list");
             return;
         }
 
@@ -56,7 +56,7 @@ public class UserDetailServlet extends HttpServlet {
 
         } catch (Exception e) {
             e.printStackTrace();
-            response.sendRedirect(request.getContextPath() + "/user");
+            response.sendRedirect(request.getContextPath() + "/user-list");
         }
     }
 

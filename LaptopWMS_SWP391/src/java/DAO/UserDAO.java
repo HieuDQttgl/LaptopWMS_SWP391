@@ -264,37 +264,54 @@ public class UserDAO extends DBContext {
             return false;
         }
     }
+    
+    public String updateStatus(int userId, String newStatus) throws java.sql.SQLException {
+        String username = null;
 
-    //Test method
-    public static void main(String[] args) {
-        UserDAO userDAO = new UserDAO();
+        String selectSql = "SELECT username FROM users WHERE user_id = ?";
+        try (Connection con = DBContext.getConnection();
+             PreparedStatement psSelect = con.prepareStatement(selectSql)) {
 
-        System.out.println("=== Testing ===");
-        List<Users> allUsers = userDAO.getListUsers();
-        List<Users> search = userDAO.searchUsers("ystem");
-        System.out.println("Found " + allUsers.size() + " Users:");
-        for (Users user : allUsers) {
-            System.out.println(user);
-        }
-        for (Users user : search) {
-            System.out.println(user);
+            psSelect.setInt(1, userId);
+            try (java.sql.ResultSet rs = psSelect.executeQuery()) {
+                if (rs.next()) {
+                    username = rs.getString("username");
+                } else {
+                    return null;
+                }
+            }
+        } 
+
+        String updateSql = "UPDATE users SET status = ? WHERE user_id = ?";
+        try (Connection con = DBContext.getConnection();
+             PreparedStatement psUpdate = con.prepareStatement(updateSql)) {
+
+            psUpdate.setString(1, newStatus);
+            psUpdate.setInt(2, userId);
+
+            int rowsAffected = psUpdate.executeUpdate();
+
+            if (rowsAffected > 0) {
+                return username;
+            } else {
+                return null;
+            }
         }
     }
 
     public boolean isUsernameExists(String username) {
         String sql = "SELECT COUNT(*) FROM Users WHERE username = ?";
-        try (Connection con = DBContext.getConnection(); // Giả định DBContext là lớp kết nối của bạn
+        try (Connection con = DBContext.getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
 
             ps.setString(1, username);
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
-                    // Nếu COUNT > 0, username đã tồn tại
                     return rs.getInt(1) > 0;
                 }
             }
         } catch (Exception e) {
-            System.err.println("Error checking username existence: " + e.getMessage());
+            e.printStackTrace();
             return true; 
         }
         return false;
@@ -312,9 +329,25 @@ public class UserDAO extends DBContext {
                 }
             }
         } catch (Exception e) {
-            System.err.println("Error checking email existence: " + e.getMessage());
+            e.printStackTrace();
             return true; 
         }
         return false;
+    }
+
+    //Test method
+    public static void main(String[] args) {
+        UserDAO userDAO = new UserDAO();
+
+        System.out.println("=== Testing ===");
+        List<Users> allUsers = userDAO.getListUsers();
+        List<Users> search = userDAO.searchUsers("ystem");
+        System.out.println("Found " + allUsers.size() + " Users:");
+        for (Users user : allUsers) {
+            System.out.println(user);
+        }
+        for (Users user : search) {
+            System.out.println(user);
+        }
     }
 }
