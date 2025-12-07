@@ -19,12 +19,6 @@ public class DBContext {
     private static String USER_NAME = "root";
     private static String PASSWORD = "";
  
-    /**
-     * main
-     * 
-     * @author viettuts.vn
-     * @param args
-     */
     public static void main(String args[]) {
         try {
             // connect to database
@@ -46,12 +40,6 @@ public class DBContext {
     }
  
  
-    /**
-     * create connection 
-     * 
-     * @author viettuts.vn
-     * @return connection
-     */
     public static Connection getConnection() {
         Connection conn = null;
         try {

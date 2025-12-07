@@ -1,6 +1,6 @@
 <%@page import="Model.Users"%>
 <%@ page language="java" contentType="text/html; charset=UTF-8"
-         pageEncoding="UTF-8"%>
+             pageEncoding="UTF-8"%>
 <%@ page import="java.util.List" %>
 <%@ page import="java.sql.Timestamp" %>
 <%@ page import="java.text.SimpleDateFormat" %>
@@ -11,7 +11,6 @@
         <title>User Management</title>
         
         <style>
-            /* BASE STYLES */
             body {
                 font-family: Arial, sans-serif;
                 background-color: #f5f5f5;
@@ -106,21 +105,29 @@
             .btn-add:hover {
                 background-color: #27ae60;
             }
+            
+            .form-actions {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                gap: 10px;
+                margin-top: 20px;
+            }
+
             .btn-close {
                 background-color: #95a5a6;
                 color: white;
-                padding: 8px 15px;
+                padding: 10px 15px;
                 border: none;
-                border-radius: 4px;
+                border-radius: 5px;
                 cursor: pointer;
-                margin-top: 15px;
                 transition: background-color 0.3s;
+                font-weight: 600;
             }
             .btn-close:hover {
                 background-color: #7f8c8d;
             }
             
-            /* ADD FORM */
             .add-form-container {
                 display: none;
                 border: 1px solid #bdc3c7;
@@ -163,13 +170,13 @@
                 cursor: pointer;
                 font-weight: 600;
                 transition: background-color 0.3s;
-                width: auto;
+                width: 50%;
+                box-sizing: border-box;
             }
             .add-form-container input[type="submit"]:hover {
                 background-color: #2980b9;
             }
 
-            /* NOTIFICATION */
             .notification { 
                 padding: 12px;
                 border-radius: 6px;
@@ -241,12 +248,16 @@
                         <option value="3">Sale</option>
                     </select>
 
-                    <input type="submit" value="Add User">
+                    <%-- Tạo div để chứa nút nằm ngang --%>
+                    <div class="form-actions">
+                        <input type="submit" value="Add User">
+                        <button type="button" class="btn-close" onclick="hideAddForm()">Close Form</button>
+                    </div>
                 </form>
-                <button type="button" class="btn-close" onclick="hideAddForm()">Close Form</button>
             </div>
 
-            <table>
+            <%-- Thêm ID cho bảng để dễ dàng truy cập bằng JavaScript --%>
+            <table id="userTable"> 
                 <thead>
                     <tr>
                         <th>ID</th>
@@ -323,27 +334,47 @@
                 </tbody>
             </table>
             
-            <p style="margin-top: 20px; color: #7f8c8d;">Total Users: <%= users != null ? users.size() : 0 %></p>
+            <p id="totalUsers" style="margin-top: 20px; color: #7f8c8d;">Total Users: <%= users != null ? users.size() : 0 %></p>
         </div>
         
         <script>
             var button = document.getElementById('showAddFormBtn');
             var formContainer = document.getElementById('addFormContainer');
             var notificationElement = document.getElementById('notification');
+            var userTable = document.getElementById('userTable');
+            var totalUsersParagraph = document.getElementById('totalUsers');
 
             function hideAddForm() {
                 formContainer.style.display = 'none';
+                userTable.style.display = 'table';
+                if (totalUsersParagraph) {
+                    totalUsersParagraph.style.display = 'block';
+                }
             }
 
             button.addEventListener('click', function () {
                 var isHidden = formContainer.style.display === 'none' || formContainer.style.display === '';
-                formContainer.style.display = isHidden ? 'block' : 'none';
+                
+                if (isHidden) {
+                    formContainer.style.display = 'block';
+                    userTable.style.display = 'none';
+                    if (totalUsersParagraph) {
+                        totalUsersParagraph.style.display = 'none';
+                    }
+                } else {
+                    hideAddForm();
+                }
             });
             
             if (notificationElement) {
                 if (notificationElement.classList.contains('message-error')) {
                     formContainer.style.display = 'block';
+                    userTable.style.display = 'none';
+                    if (totalUsersParagraph) {
+                        totalUsersParagraph.style.display = 'none';
+                    }
                 }
+                
                 setTimeout(function() {
                     notificationElement.remove(); 
                 }, 5000);
