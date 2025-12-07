@@ -89,9 +89,9 @@
 
             <label>Role:</label>
             <select name="roleId">
-                <option value="1" <%= user.getRoleId() == 1 ? "selected" : "" %>>Admin</option>
-                <option value="2" <%= user.getRoleId() == 2 ? "selected" : "" %>>Manager</option>
-                <option value="3" <%= user.getRoleId() == 3 ? "selected" : "" %>>Staff</option>
+                <option value="1" <%= user.getRoleId() == 1 ? "selected" : "" %>>Administrator</option>
+                <option value="2" <%= user.getRoleId() == 2 ? "selected" : "" %>>Warehouse Keeper</option>
+                <option value="3" <%= user.getRoleId() == 3 ? "selected" : "" %>>Sale</option>
             </select>
 
             <button type="submit">Save</button>

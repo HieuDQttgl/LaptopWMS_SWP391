@@ -280,4 +280,41 @@ public class UserDAO extends DBContext {
             System.out.println(user);
         }
     }
+
+    public boolean isUsernameExists(String username) {
+        String sql = "SELECT COUNT(*) FROM Users WHERE username = ?";
+        try (Connection con = DBContext.getConnection(); // Giả định DBContext là lớp kết nối của bạn
+             PreparedStatement ps = con.prepareStatement(sql)) {
+
+            ps.setString(1, username);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    // Nếu COUNT > 0, username đã tồn tại
+                    return rs.getInt(1) > 0;
+                }
+            }
+        } catch (Exception e) {
+            System.err.println("Error checking username existence: " + e.getMessage());
+            return true; 
+        }
+        return false;
+    }
+    
+    public boolean isEmailExists(String email) {
+        String sql = "SELECT COUNT(*) FROM Users WHERE email = ?";
+        try (Connection con = DBContext.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+
+            ps.setString(1, email);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1) > 0;
+                }
+            }
+        } catch (Exception e) {
+            System.err.println("Error checking email existence: " + e.getMessage());
+            return true; 
+        }
+        return false;
+    }
 }

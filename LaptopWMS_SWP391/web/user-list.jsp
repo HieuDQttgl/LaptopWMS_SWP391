@@ -41,7 +41,6 @@
                 text-decoration: underline;
             }
             
-            /* CÁC STYLE MỚI CHO FORM */
             .btn-add {
                  background-color: #28a745;
                  color: white;
@@ -100,7 +99,6 @@
             .status-inactive {
                 color: red;
             }
-            /* Cập nhật style cho thông báo để dễ chọn bằng JS */
             .notification { 
                 padding: 10px;
                 border-radius: 4px;
@@ -126,10 +124,10 @@
             String successMessage = request.getParameter("message");
             String errorMessage = (String) request.getSession().getAttribute("error");
             if (errorMessage != null) {
-                out.println("<p id='notification' class='message-error notification'>🚨 " + errorMessage + "</p>");
+                out.println("<p id='notification' class='message-error notification'> " + errorMessage + "</p>");
                 request.getSession().removeAttribute("error");
             } else if (successMessage != null) {
-                out.println("<p id='notification' class='message-success notification'>✅ " + successMessage + "</p>");
+                out.println("<p id='notification' class='message-success notification' " + successMessage + "</p>");
             }
         %>
         
@@ -246,18 +244,17 @@
         <script>
             var button = document.getElementById('showAddFormBtn');
             var formContainer = document.getElementById('addFormContainer');
-            var notificationElement = document.getElementById('notification'); // Lấy phần tử thông báo
+            var notificationElement = document.getElementById('notification');
 
             function hideAddForm() {
                 formContainer.style.display = 'none';
             }
 
             button.addEventListener('click', function () {
-                // Toggle trạng thái hiển thị
                 if (formContainer.style.display === 'none' || formContainer.style.display === '') {
-                    formContainer.style.display = 'block'; // Hiển thị form
+                    formContainer.style.display = 'block';
                 } else {
-                    formContainer.style.display = 'none'; // Ẩn form
+                    formContainer.style.display = 'none';
                 }
             });
             
