@@ -4,12 +4,16 @@
  */
 package DAO;
 
+import Model.Permission;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.Timestamp;      
 import Model.Role;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class RoleDAO extends DBContext {
 
@@ -56,5 +60,60 @@ public class RoleDAO extends DBContext {
 
         return null; 
     }
+ public List<Permission> getAllPermissions() throws Exception {
+    List<Permission> list = new ArrayList<>();
+    String sql = "SELECT * FROM permissions";
 
+    PreparedStatement ps = getConnection().prepareStatement(sql);
+    ResultSet rs = ps.executeQuery();
+
+    while (rs.next()) {
+        Permission p = new Permission(
+                rs.getInt("permission_id"),
+                rs.getString("permission_name"),
+                rs.getString("permission_description"),
+                rs.getString("module"),
+                rs.getTimestamp("created_at"),
+                rs.getTimestamp("updated_at")
+        );
+        list.add(p);
+    }
+    return list;
 }
+
+    
+    public Set<Integer> getPermissionIdsByRole(int roleId) throws Exception {
+        Set<Integer> set = new HashSet<>();
+
+        String sql = "SELECT permission_id FROM role_permissions WHERE role_id = ?";
+        PreparedStatement ps = getConnection().prepareStatement(sql);
+        ps.setInt(1, roleId);
+
+        ResultSet rs = ps.executeQuery();
+        while (rs.next()) {
+            set.add(rs.getInt("permission_id"));
+        }
+        return set;
+    }
+
+    
+    public void updateRolePermissions(int roleId, List<Integer> permissionIds) throws Exception {
+
+        String deleteSQL = "DELETE FROM role_permissions WHERE role_id = ?";
+        PreparedStatement psDel = getConnection().prepareStatement(deleteSQL);
+        psDel.setInt(1, roleId);
+        psDel.executeUpdate();
+
+        String insertSQL = "INSERT INTO role_permissions (role_id, permission_id) VALUES (?, ?)";
+        PreparedStatement psIns = getConnection().prepareStatement(insertSQL);
+
+        for (Integer pid : permissionIds) {
+            psIns.setInt(1, roleId);
+            psIns.setInt(2, pid);
+            psIns.addBatch();
+        }
+
+        psIns.executeBatch();
+    } 
+}
+
