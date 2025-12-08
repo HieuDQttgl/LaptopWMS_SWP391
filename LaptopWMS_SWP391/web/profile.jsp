@@ -254,7 +254,7 @@
                     <span class="badge">Signed in</span>
                 </div>
 
-                <% 
+                <%
                     String successMsg = (String) request.getAttribute("success");
                     String errorMsg = (String) request.getAttribute("error");
                     Model.Users currentUser = (Model.Users) request.getSession().getAttribute("currentUser");
@@ -264,58 +264,58 @@
                     String gender = currentUser != null ? (currentUser.getGender() != null ? currentUser.getGender() : "") : "";
                 %>
 
-                <% if (successMsg != null) { %>
-                    <div class="message success"><%= successMsg %></div>
+                <% if (successMsg != null) {%>
+                <div class="message success"><%= successMsg%></div>
                 <% } %>
-                <% if (errorMsg != null) { %>
-                    <div class="message error"><%= errorMsg %></div>
-                <% } %>
+                <% if (errorMsg != null) {%>
+                <div class="message error"><%= errorMsg%></div>
+                <% }%>
 
-                <form method="post" action="<%= request.getContextPath() %>/profile" id="profileForm">
+                <form method="post" action="<%= request.getContextPath()%>/profile" id="profileForm">
                     <div class="profile-body">
                         <div class="field-group view-mode">
                             <span class="field-label">Full name</span>
-                            <span class="field-value"><%= fullName.isEmpty() ? "—" : fullName %></span>
+                            <span class="field-value"><%= fullName.isEmpty() ? "—" : fullName%></span>
                         </div>
                         <div class="field-group edit-mode">
                             <span class="field-label">Full name</span>
-                            <input type="text" name="fullName" class="field-input" value="<%= fullName %>" required>
+                            <input type="text" name="fullName" class="field-input" value="<%= fullName%>" required>
                         </div>
 
                         <div class="field-group">
                             <span class="field-label">Username</span>
-                            <span class="field-value"><%= request.getSession().getAttribute("username") %></span>
+                            <span class="field-value"><%= request.getSession().getAttribute("username")%></span>
                         </div>
 
                         <div class="field-group view-mode">
                             <span class="field-label">Email</span>
-                            <span class="field-value"><%= email.isEmpty() ? "—" : email %></span>
+                            <span class="field-value"><%= email.isEmpty() ? "—" : email%></span>
                         </div>
                         <div class="field-group edit-mode">
                             <span class="field-label">Email</span>
-                            <input type="email" name="email" class="field-input" value="<%= email %>" required>
+                            <input type="email" name="email" class="field-input" value="<%= email%>" required>
                         </div>
 
                         <div class="field-group view-mode">
                             <span class="field-label">Phone</span>
-                            <span class="field-value"><%= phoneNumber.isEmpty() ? "—" : phoneNumber %></span>
+                            <span class="field-value"><%= phoneNumber.isEmpty() ? "—" : phoneNumber%></span>
                         </div>
                         <div class="field-group edit-mode">
                             <span class="field-label">Phone</span>
-                            <input type="text" name="phoneNumber" class="field-input" value="<%= phoneNumber %>">
+                            <input type="text" name="phoneNumber" class="field-input" value="<%= phoneNumber%>" required>
                         </div>
 
                         <div class="field-group view-mode">
                             <span class="field-label">Gender</span>
-                            <span class="field-value"><%= gender.isEmpty() ? "—" : gender %></span>
+                            <span class="field-value"><%= gender.isEmpty() ? "—" : gender%></span>
                         </div>
                         <div class="field-group edit-mode">
                             <span class="field-label">Gender</span>
                             <select name="gender" class="field-select">
-                                <option value="" <%= gender.isEmpty() ? "selected" : "" %>>—</option>
-                                <option value="Male" <%= "Male".equals(gender) ? "selected" : "" %>>Male</option>
-                                <option value="Female" <%= "Female".equals(gender) ? "selected" : "" %>>Female</option>
-                                <option value="Other" <%= "Other".equals(gender) ? "selected" : "" %>>Other</option>
+                                <option value="" <%= gender.isEmpty() ? "selected" : ""%>>—</option>
+                                <option value="Male" <%= "Male".equals(gender) ? "selected" : ""%>>Male</option>
+                                <option value="Female" <%= "Female".equals(gender) ? "selected" : ""%>>Female</option>
+                                <option value="Other" <%= "Other".equals(gender) ? "selected" : ""%>>Other</option>
                             </select>
                         </div>
                     </div>
@@ -327,20 +327,52 @@
                 </form>
 
                 <div class="actions view-mode">
-                    <form method="get" action="<%= request.getContextPath() %>/landing" style="display: inline;">
+                    <form method="get" action="<%= request.getContextPath()%>/landing" style="display: inline;">
                         <button type="submit" class="btn-link">Back to home</button>
                     </form>
                     <button type="button" onclick="enableEditMode()" class="btn-primary">Edit Profile</button>
-                    <form method="get" action="<%= request.getContextPath() %>/change-password" style="display: inline;">
+                    <form method="get" action="<%= request.getContextPath()%>/change-password" style="display: inline;">
                         <button type="submit" class="btn-primary">Change password</button>
                     </form>
-                    <form method="get" action="<%= request.getContextPath() %>/logout" style="display: inline;">
+                    <form method="get" action="<%= request.getContextPath()%>/logout" style="display: inline;">
                         <button type="submit" class="btn-primary">Sign out</button>
                     </form>
                 </div>
             </div>
         </div>
     </body>
+    <script>
+        function validateProfileForm(event) {
+            const email = document.querySelector('input[name="email"]').value.trim();
+            const phone = document.querySelector('input[name="phoneNumber"]').value.trim();
+
+            // Email regex (RFC-compliant simplified)
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+            // Vietnamese phone format: 10 digits starting with 03,05,07,08,09
+            const phoneRegex = /^(03|05|07|08|09)\d{8}$/;
+
+            // Validate email
+            if (!emailRegex.test(email)) {
+                alert("❌ Invalid email format.");
+                event.preventDefault();
+                return false;
+            }
+
+            // Validate phone (optional field)
+            if (phone.length > 0 && !phoneRegex.test(phone)) {
+                alert("❌ Phone number must be 10 digits and start with 03, 05, 07, 08 or 09.");
+                event.preventDefault();
+                return false;
+            }
+
+            return true;
+        }
+
+        window.onload = function () {
+            document.getElementById("profileForm").addEventListener("submit", validateProfileForm);
+        };
+    </script>
 </html>
 
 

@@ -46,6 +46,24 @@ public class ProfileServlet extends HttpServlet {
         String phoneNumber = request.getParameter("phoneNumber");
         String gender = request.getParameter("gender");
 
+        // Email regex
+        String emailRegex = "^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$";
+
+        // VN phone regex
+        String phoneRegex = "^(03|05|07|08|09)\\d{8}$";
+
+        if (email == null || !email.matches(emailRegex)) {
+            request.setAttribute("error", "Invalid email format.");
+            request.getRequestDispatcher("/profile.jsp").forward(request, response);
+            return;
+        }
+
+        if (phoneNumber != null && !phoneNumber.isEmpty() && !phoneNumber.matches(phoneRegex)) {
+            request.setAttribute("error", "Phone number must be 10 digits and start with 03, 05, 07, 08, or 09.");
+            request.getRequestDispatcher("/profile.jsp").forward(request, response);
+            return;
+        }
+
         UserDAO userDAO = new UserDAO();
         boolean success = userDAO.updateProfile(userId, fullName, email, phoneNumber, gender);
 
@@ -65,5 +83,3 @@ public class ProfileServlet extends HttpServlet {
         request.getRequestDispatcher("/profile.jsp").forward(request, response);
     }
 }
-
-
