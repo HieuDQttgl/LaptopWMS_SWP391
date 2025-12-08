@@ -335,6 +335,7 @@
             </table>
             
             <p id="totalUsers" style="margin-top: 20px; color: #7f8c8d;">Total Users: <%= users != null ? users.size() : 0 %></p>
+            <a href="<%= request.getContextPath() %>/landing" class="btn-secondary">Back to Landing Page</a>
         </div>
         
         <script>
