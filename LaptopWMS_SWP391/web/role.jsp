@@ -118,10 +118,6 @@
         <table>
             <thead>
                 <tr>
-                    <th>User ID</th>
-                    <th>Full Name</th>
-                    <th>Email</th>
-                    <th>User Status</th>
                     <th>Role Name</th>
                     <th>Role Status</th>
                 </tr>
@@ -140,16 +136,6 @@
                         }
                 %>
                     <tr>
-                        <td><%= user.getUserId() %></td>
-                        <td><%= user.getFullName() %></td>
-                        <td><%= user.getEmail() %></td>
-                        <td>
-                            <% if ("active".equals(user.getStatus())) { %>
-                                <span class="badge badge-active">Active</span>
-                            <% } else { %>
-                                <span class="badge badge-inactive">Inactive</span>
-                            <% } %>
-                        </td>
                         <td><%= user.getRoleName() != null ? user.getRoleName() : "No Role" %></td>
                         <td>
                             <% if (userRole != null && "active".equals(userRole.getStatus())) { %>

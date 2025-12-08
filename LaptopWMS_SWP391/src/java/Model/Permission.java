@@ -12,7 +12,7 @@ import java.sql.Timestamp;
  */
 public class Permission {
     private int permissionId;
-    private String permissionName;
+    private String permissionURL;
     private String permissionDescription;
     private String module;
     private Timestamp createdAt;
@@ -23,7 +23,7 @@ public class Permission {
 
     public Permission(int permissionId, String permissionName, String permissionDescription, String module, Timestamp createdAt, Timestamp updatedAt) {
         this.permissionId = permissionId;
-        this.permissionName = permissionName;
+        this.permissionURL = permissionName;
         this.permissionDescription = permissionDescription;
         this.module = module;
         this.createdAt = createdAt;
@@ -38,12 +38,12 @@ public class Permission {
         this.permissionId = permissionId;
     }
 
-    public String getPermissionName() {
-        return permissionName;
+    public String getPermissionURL() {
+        return permissionURL;
     }
 
-    public void setPermissionName(String permissionName) {
-        this.permissionName = permissionName;
+    public void setPermissionURL(String permissionURL) {
+        this.permissionURL = permissionURL;
     }
 
     public String getPermissionDescription() {

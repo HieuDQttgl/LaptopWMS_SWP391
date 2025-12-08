@@ -70,7 +70,7 @@ public class RoleDAO extends DBContext {
     while (rs.next()) {
         Permission p = new Permission(
                 rs.getInt("permission_id"),
-                rs.getString("permission_name"),
+                rs.getString("permission_url"),
                 rs.getString("permission_description"),
                 rs.getString("module"),
                 rs.getTimestamp("created_at"),
