@@ -251,6 +251,25 @@ public class UserDAO extends DBContext {
             return false;
         }
     }
+    
+    public boolean updateProfilebyAdmin(int userId, String fullName, String email, String phoneNumber, String gender, int roleId) {
+        String sql = "UPDATE users SET full_name = ?, email = ?, phone_number = ?, gender = ?, role_id = ?, updated_at = CURRENT_TIMESTAMP WHERE user_id = ?";
+
+        try (Connection conn = getConnection(); 
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, fullName);
+            ps.setString(2, email);
+            ps.setString(3, phoneNumber);
+            ps.setString(4, gender);
+            ps.setInt(5, roleId);
+            ps.setInt(6, userId);
+
+            return ps.executeUpdate() > 0;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
 
     public boolean updateLastLogin(int userId) {
         String sql = "UPDATE users SET last_login_at = CURRENT_TIMESTAMP WHERE user_id = ?";

@@ -37,7 +37,7 @@ public class UserDetailServlet extends HttpServlet {
             Users user = userDAO.getUserById(userId);
 
             if (user == null) {
-                response.sendRedirect(request.getContextPath() + "/user");
+                response.sendRedirect(request.getContextPath() + "/user-list");
                 return;
             }
 
