@@ -48,14 +48,11 @@
             font-weight: 600;
             text-align: center;
         }
-        /* Sticky Header for long lists */
         thead th { position: sticky; top: 0; background: #e9ecef; z-index: 1; }
-        
-        /* Zebra striping and hover effects */
         tbody tr:nth-child(even) { background-color: #f9f9f9; }
         tbody tr:hover { background-color: #e2e6ea; }
         
-        /* Center checkboxes */
+        
         td.check-col { text-align: center; }
         input[type="checkbox"] { cursor: pointer; width: 18px; height: 18px; }
 
@@ -110,7 +107,7 @@
             <% } %>
             </tbody>
         </table>
-
+        <a href="javascript:history.back()" class="btn-back"> Back</a>
         <button type="submit" class="btn">Update Permissions</button>
         <div style="clear:both;"></div>
     </form>

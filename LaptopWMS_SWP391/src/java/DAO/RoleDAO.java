@@ -8,7 +8,7 @@ import Model.Permission;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.Timestamp;      
+import java.sql.Timestamp;
 import Model.Role;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -58,30 +58,30 @@ public class RoleDAO extends DBContext {
             );
         }
 
-        return null; 
+        return null;
     }
- public List<Permission> getAllPermissions() throws Exception {
-    List<Permission> list = new ArrayList<>();
-    String sql = "SELECT * FROM permissions";
 
-    PreparedStatement ps = getConnection().prepareStatement(sql);
-    ResultSet rs = ps.executeQuery();
+    public List<Permission> getAllPermissions() throws Exception {
+        List<Permission> list = new ArrayList<>();
+        String sql = "SELECT * FROM permissions";
 
-    while (rs.next()) {
-        Permission p = new Permission(
-                rs.getInt("permission_id"),
-                rs.getString("permission_url"),
-                rs.getString("permission_description"),
-                rs.getString("module"),
-                rs.getTimestamp("created_at"),
-                rs.getTimestamp("updated_at")
-        );
-        list.add(p);
+        PreparedStatement ps = getConnection().prepareStatement(sql);
+        ResultSet rs = ps.executeQuery();
+
+        while (rs.next()) {
+            Permission p = new Permission(
+                    rs.getInt("permission_id"),
+                    rs.getString("permission_url"),
+                    rs.getString("permission_description"),
+                    rs.getString("module"),
+                    rs.getTimestamp("created_at"),
+                    rs.getTimestamp("updated_at")
+            );
+            list.add(p);
+        }
+        return list;
     }
-    return list;
-}
 
-    
     public Set<Integer> getPermissionIdsByRole(int roleId) throws Exception {
         Set<Integer> set = new HashSet<>();
 
@@ -96,7 +96,6 @@ public class RoleDAO extends DBContext {
         return set;
     }
 
-    
     public void updateRolePermissions(int roleId, List<Integer> permissionIds) throws Exception {
 
         String deleteSQL = "DELETE FROM role_permissions WHERE role_id = ?";
@@ -114,6 +113,49 @@ public class RoleDAO extends DBContext {
         }
 
         psIns.executeBatch();
-    } 
-}
+    }
 
+    public Role getRoleByName(String roleName) throws Exception {
+        String sql = "SELECT * FROM roles WHERE role_name = ?";
+
+        try (Connection conn = getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, roleName);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return new Role(
+                            rs.getInt("role_id"),
+                            rs.getString("role_name"),
+                            rs.getString("status")
+                    );
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw e;
+        }
+        return null;
+    }
+
+    public boolean addRole(String roleName, String roleDescription) throws Exception {
+        if (getRoleByName(roleName) != null) {
+            return false;
+        }
+        
+        String sql = "INSERT INTO roles (role_name, role_description, status) VALUES (?, ?, 'active')";
+        
+        try (Connection conn = getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            
+            ps.setString(1, roleName);
+            ps.setString(2, roleDescription);
+            
+            return ps.executeUpdate() > 0;
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw e;
+        }
+    }
+}

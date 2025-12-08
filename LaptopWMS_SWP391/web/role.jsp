@@ -111,6 +111,7 @@
         <h1>User Role Management</h1>
         
         <div class="button-group">
+            <a href="add-role" class="btn"> Add New Role</a>
             <a href="role-list" class="btn">Change Role Status</a>
             <a href="role-permission" class="btn">Change Role Permission</a>
         </div>
@@ -157,7 +158,7 @@
         </table>
         
         <p>Total Users: <%= userList != null ? userList.size() : 0 %></p>
-        
+        <a href="javascript:history.back()" class="btn-back"> Back</a>
     </div>
 </body>
 </html>
