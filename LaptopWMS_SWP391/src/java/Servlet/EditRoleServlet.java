@@ -45,7 +45,7 @@ public class EditRoleServlet extends HttpServlet {
         UserDAO dao = new UserDAO();
         dao.updateUserRole(userId, roleId);
 
-        response.sendRedirect("user");
+        response.sendRedirect("user-detail");
     }
 }
 

@@ -54,7 +54,6 @@ public class UserListServlet extends HttpServlet {
 
         request.setCharacterEncoding("UTF-8");
         String action = request.getParameter("action");
-
         HttpSession session = request.getSession(false);
 
         if (session == null || session.getAttribute("currentUser") == null) {
@@ -72,63 +71,79 @@ public class UserListServlet extends HttpServlet {
         }
 
         if ("add".equals(action)) {
- 
             String username = request.getParameter("username");
             String password = request.getParameter("password");
             String fullName = request.getParameter("fullName");
             String email = request.getParameter("email");
             String phoneNumber = request.getParameter("phoneNumber");
             String gender = request.getParameter("gender");
+            String roleIdStr = request.getParameter("roleId");
 
-            int roleId;
-            try {
-                roleId = Integer.parseInt(request.getParameter("roleId"));
-            } catch (NumberFormatException e) {
-                session.setAttribute("error", "Invalid Role ID format during user addition.");
-                response.sendRedirect(request.getContextPath() + "/user-list");
-                return;
+            int roleId = -1;
+
+            java.util.Map<String, String> errors = new java.util.HashMap<>();
+
+            if (username == null || username.trim().isEmpty()) {
+                errors.put("username", "Username is required.");
+            } else if (username.length() < 3 || username.length() > 50) {
+                errors.put("username", "Username must be between 3 and 50 characters.");
             }
 
-            String validationError = null;
-
-            if (username == null || username.trim().isEmpty()
-                    || password == null || password.trim().isEmpty()
-                    || email == null || email.trim().isEmpty()) {
-                validationError = "Username, Password, and Email are required fields.";
-            }
-            else if (username.length() < 3 || username.length() > 50) {
-                validationError = "Username must be between 3 and 50 characters.";
+            if (password == null || password.trim().isEmpty()) {
+                errors.put("password", "Password is required.");
             } else if (password.length() < 6) {
-                validationError = "Password must be at least 6 characters long.";
-            } else if (phoneNumber != null && !phoneNumber.trim().isEmpty() && !phoneNumber.matches("^[0-9]{8,15}$")) {
-                validationError = "Phone number must contain only digits and be between 8-15 digits.";
+                errors.put("password", "Password must be at least 6 characters long.");
+            }
+
+            if (email == null || email.trim().isEmpty()) {
+                errors.put("email", "Email is required.");
             } else if (!email.matches("^[\\w.-]+@[\\w.-]+\\.[A-Za-z]{2,6}$")) {
-                validationError = "Invalid email format.";
+                errors.put("email", "Invalid email format.");
             }
 
-            if (validationError == null) {
-                if (userDAO.isUsernameExists(username)) {
-                    validationError = "Username is already taken. Please choose another one.";
-                } else if (userDAO.isEmailExists(email)) {
-                    validationError = "Email is already registered by another user.";
-                }
+            if (phoneNumber != null && !phoneNumber.trim().isEmpty() && !phoneNumber.matches("^[0-9]{8,15}$")) {
+                errors.put("phoneNumber", "Phone number must contain only digits and be between 8-15 digits.");
             }
 
-            if (validationError != null) {
-                session.setAttribute("error", " " + validationError);
-                response.sendRedirect(request.getContextPath() + "/user-list");
+            try {
+                roleId = Integer.parseInt(roleIdStr);
+            } catch (NumberFormatException e) {
+                errors.put("roleId", "Invalid Role ID format.");
+            }
+
+            if (!errors.containsKey("username") && userDAO.isUsernameExists(username)) {
+                errors.put("username", "Username is already taken. Please choose another one.");
+            }
+            if (!errors.containsKey("email") && userDAO.isEmailExists(email)) {
+                errors.put("email", "Email is already registered by another user.");
+            }
+
+            if (!errors.isEmpty()) {
+                request.setAttribute("errors", errors); 
+
+                Users tempUser = new Users(
+                        0, username, password, fullName, email, phoneNumber, gender, roleId,
+                        "active", null, null, null, null
+                );
+                request.setAttribute("tempUser", tempUser);
+
+                List<Users> users = userDAO.getListUsers();
+                request.setAttribute("users", users);
+
+                request.getRequestDispatcher("/user-list.jsp").forward(request, response);
                 return;
             }
 
             Users newUser = new Users(
                     0, username, password, fullName, email, phoneNumber, gender, roleId,
-                    "active", null, null, null, null 
+                    "active", null, null, null, null
             );
+            newUser.setCreatedBy(currentUser.getUserId());
 
             boolean success = userDAO.addNew(newUser);
 
             if (success) {
-                response.sendRedirect(request.getContextPath() + "/user-list?message= User added successfully!");
+                response.sendRedirect(request.getContextPath() + "/user-list?message=User added successfully!");
             } else {
                 session.setAttribute("error", "Database operation failed during user creation.");
                 response.sendRedirect(request.getContextPath() + "/user-list");

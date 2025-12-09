@@ -4,6 +4,7 @@
 <%@ page import="java.util.List" %>
 <%@ page import="java.sql.Timestamp" %>
 <%@ page import="java.text.SimpleDateFormat" %>
+<%@ page import="java.util.Map" %>
 <!DOCTYPE html>
 <html>
     <head>
@@ -194,6 +195,25 @@
                 background-color: #f8d7da;
                 border-left-color: #e74c3c;
             }
+            .field-error {
+                color: #e74c3c;
+                font-size: 11px;
+                margin-top: 2px;
+                margin-bottom: 5px;
+                display: block;
+                font-weight: 500;
+            }
+            .btn-secondary {
+                /* Sửa style cho Back to Landing Page */
+                /* Đảm bảo style này tồn tại hoặc thêm vào */
+                background-color: #f1f2f6; 
+                color: #34495e; 
+                padding: 8px 15px; 
+                border-radius: 6px; 
+                text-decoration: none; 
+                font-weight: 600;
+                border: 1px solid #ccc;
+            }
         </style>
     </head>
     <body>
@@ -202,53 +222,90 @@
             <h1>User Management List</h1>
 
             <%
+                // Lấy thông báo lỗi/thành công từ request/session
                 String successMessage = request.getParameter("message");
-                String errorMessage = (String) request.getSession().getAttribute("error");              
+                String errorMessage = (String) request.getSession().getAttribute("error");
+                
+                // Lấy các biến mới cho việc giữ lại dữ liệu và hiển thị lỗi chi tiết
+                Map<String, String> errors = (Map<String, String>) request.getAttribute("errors");
+                Users tempUser = (Users) request.getAttribute("tempUser");
+                
+                // Kiểm tra xem form có cần được mở tự động không
+                boolean showFormOnLoad = errors != null || tempUser != null;
+                
                 if (errorMessage != null) {
                     out.println("<p id='notification' class='message-error notification'>" + errorMessage + "</p>");
-                    request.getSession().removeAttribute("error"); 
+                    request.getSession().removeAttribute("error");
                 } else if (successMessage != null) {
                     out.println("<p id='notification' class='message-success notification'>" + successMessage + "</p>");
                 }
             %>
-            
-            <button id="showAddFormBtn" class="btn-add">➕ Add new User</button>
 
-            <div id="addFormContainer" class="add-form-container">
-                <h3>➕ Add New User</h3>
+            <button id="showAddFormBtn" class="btn-add">Add new User</button>
+
+            <div id="addFormContainer" class="add-form-container" style="display: <%= showFormOnLoad ? "block" : "none" %>;">
+                <h3>Add New User</h3>
                 <form action="user-list" method="post">
-                    <input type="hidden" name="action" value="add"> 
+                    <input type="hidden" name="action" value="add">
+
+                    <% 
+                        String usernameValue = tempUser != null ? (tempUser.getUsername() != null ? tempUser.getUsername() : "") : "";
+                        String passwordValue = tempUser != null ? (tempUser.getPassword() != null ? tempUser.getPassword() : "") : "";
+                        String fullNameValue = tempUser != null ? (tempUser.getFullName() != null ? tempUser.getFullName() : "") : "";
+                        String emailValue = tempUser != null ? (tempUser.getEmail() != null ? tempUser.getEmail() : "") : "";
+                        String phoneNumberValue = tempUser != null ? (tempUser.getPhoneNumber() != null ? tempUser.getPhoneNumber() : "") : "";
+                        String genderValue = tempUser != null ? (tempUser.getGender() != null ? tempUser.getGender() : "Male") : "Male";
+                        Integer roleIdValue = tempUser != null ? tempUser.getRoleId() : 3; // Giả sử Role mặc định là 3 (Sale)
+                    %>
 
                     <label for="username">Username:</label>
-                    <input type="text" id="username" name="username" required><br>
+                    <input type="text" id="username" name="username" value="<%= usernameValue %>" required>
+                    <% if (errors != null && errors.containsKey("username")) { %>
+                        <span class="field-error"><%= errors.get("username") %></span>
+                    <% } %>
+                    <br>
 
                     <label for="password">Password:</label>
-                    <input type="password" id="password" name="password" required><br>
+                    <input type="password" id="password" name="password" value="<%= passwordValue %>" required>
+                    <% if (errors != null && errors.containsKey("password")) { %>
+                        <span class="field-error"><%= errors.get("password") %></span>
+                    <% } %>
+                    <br>
 
                     <label for="fullName">Full Name:</label>
-                    <input type="text" id="fullName" name="fullName"><br>
+                    <input type="text" id="fullName" name="fullName" value="<%= fullNameValue %>"><br>
 
                     <label for="email">Email:</label>
-                    <input type="email" id="email" name="email" required><br>
+                    <input type="email" id="email" name="email" value="<%= emailValue %>" required>
+                    <% if (errors != null && errors.containsKey("email")) { %>
+                        <span class="field-error"><%= errors.get("email") %></span>
+                    <% } %>
+                    <br>
 
                     <label for="phoneNumber">Phone Number:</label>
-                    <input type="text" id="phoneNumber" name="phoneNumber"><br>
+                    <input type="text" id="phoneNumber" name="phoneNumber" value="<%= phoneNumberValue %>">
+                    <% if (errors != null && errors.containsKey("phoneNumber")) { %>
+                        <span class="field-error"><%= errors.get("phoneNumber") %></span>
+                    <% } %>
+                    <br>
 
                     <label for="gender">Gender:</label>
                     <select id="gender" name="gender">
-                        <option value="Male">Male</option>
-                        <option value="Female">Female</option>
-                        <option value="Other">Other</option>
+                        <option value="Male" <%= "Male".equals(genderValue) ? "selected" : "" %>>Male</option>
+                        <option value="Female" <%= "Female".equals(genderValue) ? "selected" : "" %>>Female</option>
+                        <option value="Other" <%= "Other".equals(genderValue) ? "selected" : "" %>>Other</option>
                     </select><br>
 
                     <label>Role:</label>
                     <select name="roleId">
-                        <option value="1">Administrator</option>
-                        <option value="2">Warehouse Keeper</option>
-                        <option value="3">Sale</option>
+                        <option value="1" <%= roleIdValue.equals(1) ? "selected" : "" %>>Administrator</option>
+                        <option value="2" <%= roleIdValue.equals(2) ? "selected" : "" %>>Warehouse Keeper</option>
+                        <option value="3" <%= roleIdValue.equals(3) ? "selected" : "" %>>Sale</option>
                     </select>
+                     <% if (errors != null && errors.containsKey("roleId")) { %>
+                        <span class="field-error"><%= errors.get("roleId") %></span>
+                    <% } %>
 
-                    <%-- Tạo div để chứa nút nằm ngang --%>
                     <div class="form-actions">
                         <input type="submit" value="Add User">
                         <button type="button" class="btn-close" onclick="hideAddForm()">Close Form</button>
@@ -256,8 +313,7 @@
                 </form>
             </div>
 
-            <%-- Thêm ID cho bảng để dễ dàng truy cập bằng JavaScript --%>
-            <table id="userTable"> 
+            <table id="userTable" style="display: <%= showFormOnLoad ? "none" : "table" %>;"> 
                 <thead>
                     <tr>
                         <th>ID</th>
@@ -286,7 +342,7 @@
                         <td><%= user.getFullName()%></td>
                         <td><%= user.getEmail()%></td>
                         <td><%= user.getPhoneNumber()%></td>
-                        <td><%= user.getRoleName() != null ? user.getRoleName() : "N/A" %></td> 
+                        <td><%= user.getRoleName() != null ? user.getRoleName() : "N/A" %></td>
 
                         <td>
                             <%
@@ -334,23 +390,38 @@
                 </tbody>
             </table>
             
-            <p id="totalUsers" style="margin-top: 20px; color: #7f8c8d;">Total Users: <%= users != null ? users.size() : 0 %></p>
-            <a href="<%= request.getContextPath() %>/landing" class="btn-secondary">Back to Landing Page</a>
+            <p id="totalUsers" style="margin-top: 20px; color: #7f8c8d; display: <%= showFormOnLoad ? "none" : "block" %>;">Total Users: <%= users != null ? users.size() : 0 %></p>
+            <a id="backLanding" href="<%= request.getContextPath() %>/landing" class="btn-secondary" style="display: <%= showFormOnLoad ? "none" : "block" %>;">Back to Landing Page</a>
         </div>
         
         <script>
+            // Logic Javascript cần được cập nhật để phù hợp với việc ẩn/hiện bảng
             var button = document.getElementById('showAddFormBtn');
             var formContainer = document.getElementById('addFormContainer');
             var notificationElement = document.getElementById('notification');
             var userTable = document.getElementById('userTable');
             var totalUsersParagraph = document.getElementById('totalUsers');
+            var backLandingLink = document.getElementById('backLanding');
 
-            function hideAddForm() {
-                formContainer.style.display = 'none';
+            function hideTableElements() {
+                userTable.style.display = 'none';
+                if (totalUsersParagraph) {
+                    totalUsersParagraph.style.display = 'none';
+                }
+                backLandingLink.style.display = 'none';
+            }
+            
+            function showTableElements() {
                 userTable.style.display = 'table';
                 if (totalUsersParagraph) {
                     totalUsersParagraph.style.display = 'block';
                 }
+                backLandingLink.style.display = 'block';
+            }
+
+            function hideAddForm() {
+                formContainer.style.display = 'none';
+                showTableElements();
             }
 
             button.addEventListener('click', function () {
@@ -358,24 +429,13 @@
                 
                 if (isHidden) {
                     formContainer.style.display = 'block';
-                    userTable.style.display = 'none';
-                    if (totalUsersParagraph) {
-                        totalUsersParagraph.style.display = 'none';
-                    }
+                    hideTableElements();
                 } else {
                     hideAddForm();
                 }
             });
             
             if (notificationElement) {
-                if (notificationElement.classList.contains('message-error')) {
-                    formContainer.style.display = 'block';
-                    userTable.style.display = 'none';
-                    if (totalUsersParagraph) {
-                        totalUsersParagraph.style.display = 'none';
-                    }
-                }
-                
                 setTimeout(function() {
                     notificationElement.remove(); 
                 }, 5000);
