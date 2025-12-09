@@ -127,13 +127,10 @@ public class UserListServlet extends HttpServlet {
                 errors.put("username", "Username is required.");
             } else if (username.length() < 3 || username.length() > 50) {
                 errors.put("username", "Username must be between 3 and 50 characters.");
-            } else {
-                if (userDAO.isUsernameExists(username)) {
-                    errors.put("username", "This username is already taken. Please choose another one.");
-                } else {
-                    tempUser.setUsername(username);
-                }
+            } else if (userDAO.isUsernameExists(username)) {
+                errors.put("username", "This username is already taken. Please choose another one.");
             }
+            tempUser.setUsername(username);
 
             if (password == null || password.trim().isEmpty()) {
                 errors.put("password", "Password is required.");
@@ -146,13 +143,10 @@ public class UserListServlet extends HttpServlet {
                 errors.put("email", "Email is required.");
             } else if (!email.matches("^[\\w.-]+@[\\w.-]+\\.[A-Za-z]{2,6}$")) {
                 errors.put("email", "Invalid email format.");
-            } else {
-                if (userDAO.isEmailExists(email)) {
-                    errors.put("email", "This email is already taken. Please choose another one.");
-                } else {
-                    tempUser.setEmail(email);
-                }
+            } else if (userDAO.isEmailExists(email)) {
+                errors.put("email", "This email is already taken. Please choose another one.");
             }
+            tempUser.setEmail(email);
 
             if (phoneNumber != null && !phoneNumber.trim().isEmpty() && !phoneNumber.matches("^0[0-9]{9,10}$")) {
                 errors.put("phoneNumber", "Invalid phone number format (10-11 digits starting with 0).");
@@ -160,8 +154,10 @@ public class UserListServlet extends HttpServlet {
             tempUser.setPhoneNumber(phoneNumber);
 
             if (fullName == null || fullName.trim().isEmpty()) {
+                errors.put("fullName", "Full name is required.");
             }
             tempUser.setFullName(fullName);
+            
             tempUser.setGender(gender);
             try {
                 roleId = Integer.parseInt(roleIdStr);

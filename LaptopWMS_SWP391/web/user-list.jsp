@@ -418,28 +418,32 @@
                         String emailValue = (tempUser != null && tempUser.getEmail() != null) ? tempUser.getEmail() : "";
                         String phoneNumberValue = (tempUser != null && tempUser.getPhoneNumber() != null) ? tempUser.getPhoneNumber() : "";
                         String genderValue = (tempUser != null && tempUser.getGender() != null) ? tempUser.getGender() : "Male";
-                        Integer roleIdValue = (tempUser != null) ? tempUser.getRoleId() : 3;
+                        Integer roleIdValue = (tempUser != null) ? tempUser.getRoleId() : 2;
                     %>
 
                     <label for="username">Username:</label>
-                    <input type="text" id="username" name="username" value="<%= usernameValue%>" required>
+                    <input type="text" id="username" name="username" value="<%= usernameValue%>" >
                     <% if (errors != null && errors.containsKey("username")) {%>
                     <span class="field-error"><%= errors.get("username")%></span>
                     <% }%>
                     <br>
 
                     <label for="password">Password:</label>
-                    <input type="password" id="password" name="password" value="<%= passwordValue%>" required>
+                    <input type="password" id="password" name="password" value="<%= passwordValue%>" >
                     <% if (errors != null && errors.containsKey("password")) {%>
                     <span class="field-error"><%= errors.get("password")%></span>
                     <% }%>
                     <br>
 
                     <label for="fullName">Full Name:</label>
-                    <input type="text" id="fullName" name="fullName" value="<%= fullNameValue%>"><br>
+                    <input type="text" id="fullName" name="fullName" value="<%= fullNameValue%>">
+                    <% if (errors != null && errors.containsKey("fullName")) {%>
+                    <span class="field-error"><%= errors.get("fullName")%></span>
+                    <% }%>
+                    <br>
 
                     <label for="email">Email:</label>
-                    <input type="email" id="email" name="email" value="<%= emailValue%>" required>
+                    <input type="email" id="email" name="email" value="<%= emailValue%>" >
                     <% if (errors != null && errors.containsKey("email")) {%>
                     <span class="field-error"><%= errors.get("email")%></span>
                     <% }%>
