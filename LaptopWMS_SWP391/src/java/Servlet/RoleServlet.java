@@ -15,6 +15,7 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import java.util.List;
 
 /**
@@ -26,11 +27,24 @@ public class RoleServlet extends HttpServlet {
 
     private UserDAO userDAO = new UserDAO();
     private RoleDAO roleDAO = new RoleDAO();
-
+    private static final int ADMIN_ROLE_ID = 1;
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        HttpSession session = request.getSession(false);
+        if (session == null || session.getAttribute("currentUser") == null) {
+            response.sendRedirect(request.getContextPath() + "/login");
+            return;
+        }
+
+        Users currentUser = (Users) session.getAttribute("currentUser");
+
+        if (currentUser.getRoleId() != ADMIN_ROLE_ID) {
+            request.setAttribute("error", "Access denied: You must be an Administrator to view this page.");
+            request.getRequestDispatcher("/landing").forward(request, response);
+            return;
+        }
         try {
             
             List<Users> userList = userDAO.getListUsers();
