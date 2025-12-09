@@ -207,7 +207,7 @@
 
             .filter-container {
                 display: flex;
-                flex-direction: column; 
+                flex-direction: column;
                 gap: 15px;
                 margin-bottom: 25px;
                 padding: 15px;
@@ -219,20 +219,20 @@
             .filter-controls {
                 display: flex;
                 gap: 15px;
-                flex-wrap: wrap; 
+                flex-wrap: wrap;
                 align-items: center;
             }
-            
+
             .filter-actions {
                 display: flex;
-                justify-content: flex-end; 
+                justify-content: flex-end;
                 gap: 10px;
                 width: 100%;
-                padding-top: 10px; 
+                padding-top: 10px;
                 border-top: 1px dashed #eee;
             }
-            
-            .filter-group { 
+
+            .filter-group {
                 display: flex;
                 flex-wrap: nowrap;
                 gap: 10px;
@@ -241,7 +241,7 @@
             .filter-container label {
                 font-weight: 600;
                 color: #34495e;
-                white-space: nowrap; 
+                white-space: nowrap;
             }
             .filter-container input[type="text"],
             .filter-container select {
@@ -263,7 +263,7 @@
             .btn-filter:hover {
                 background-color: #2980b9;
             }
-            .btn-clear { 
+            .btn-clear {
                 background-color: #e74c3c;
                 color: white;
                 padding: 8px 15px;
@@ -303,17 +303,29 @@
 
                 String currentKeyword = (String) request.getAttribute("keyword");
                 String currentGender = (String) request.getAttribute("gender_filter");
-                String currentRole = (String) request.getAttribute("role_filter"); 
+                String currentRole = (String) request.getAttribute("role_filter");
                 String currentStatus = (String) request.getAttribute("status_filter");
                 String currentSortField = (String) request.getAttribute("sort_field");
                 String currentSortOrder = (String) request.getAttribute("sort_order");
 
-                if (currentKeyword == null) { currentKeyword = ""; }
-                if (currentGender == null) { currentGender = "all"; }
-                if (currentRole == null) { currentRole = "0"; } 
-                if (currentStatus == null) { currentStatus = "all"; }
-                if (currentSortField == null) { currentSortField = "user_id"; } // Giá trị mặc định
-                if (currentSortOrder == null) { currentSortOrder = "ASC"; }     // Giá trị mặc định
+                if (currentKeyword == null) {
+                    currentKeyword = "";
+                }
+                if (currentGender == null) {
+                    currentGender = "all";
+                }
+                if (currentRole == null) {
+                    currentRole = "0";
+                }
+                if (currentStatus == null) {
+                    currentStatus = "all";
+                }
+                if (currentSortField == null) {
+                    currentSortField = "user_id";
+                } // Giá trị mặc định
+                if (currentSortOrder == null) {
+                    currentSortOrder = "ASC";
+                }     // Giá trị mặc định
 
                 if (errorMessage != null) {
                     out.println("<p id='notification' class='message-error notification'>" + errorMessage + "</p>");
@@ -327,13 +339,13 @@
 
             <div class="filter-container" id="filterContainer" style="display: <%= showFormOnLoad ? "none" : "flex"%>;">
                 <form id="filterForm" action="user-list" method="get" style="width: 100%;">
-                    
+
                     <div class="filter-controls">
-                        
+
                         <div class="filter-group">
                             <input type="text" name="keyword" id="keywordFilter" placeholder="Search by name/email..." value="<%= currentKeyword%>">
                         </div>
-                        
+
                         <div class="filter-group">
                             <label for="genderFilter">Gender:</label>
                             <select name="gender_filter" id="genderFilter">
@@ -376,7 +388,7 @@
                                 <option value="last_login_at" <%= "last_login_at".equals(currentSortField) ? "selected" : ""%>>Last Login</option>
                             </select>
                         </div>
-                        
+
                         <div class="filter-group">
                             <label for="sortOrder">Order:</label>
                             <select name="sort_order" id="sortOrder">
@@ -406,7 +418,7 @@
                         String emailValue = (tempUser != null && tempUser.getEmail() != null) ? tempUser.getEmail() : "";
                         String phoneNumberValue = (tempUser != null && tempUser.getPhoneNumber() != null) ? tempUser.getPhoneNumber() : "";
                         String genderValue = (tempUser != null && tempUser.getGender() != null) ? tempUser.getGender() : "Male";
-                        Integer roleIdValue = (tempUser != null) ? tempUser.getRoleId() : 3; 
+                        Integer roleIdValue = (tempUser != null) ? tempUser.getRoleId() : 3;
                     %>
 
                     <label for="username">Username:</label>
@@ -493,7 +505,8 @@
                         <td><%= user.getFullName()%></td>
                         <td><%= user.getEmail()%></td>
                         <td><%= user.getPhoneNumber()%></td>
-                        <td><%= user.getGender()%></td> <td><%= user.getRoleName() != null ? user.getRoleName() : "N/A"%></td>
+                        <td><%= user.getGender()%></td> 
+                        <td><%= user.getRoleName() != null ? user.getRoleName() : "N/A"%></td>
 
                         <td>
                             <%
@@ -516,7 +529,12 @@
                         </td>
 
                         <td class="action-links">
-                            <a href="user-detail?id=<%= user.getUserId()%>">View Detail</a> |
+                            <a href="user-detail?id=<%= user.getUserId()%>">View Detail</a>
+
+                            <%
+                                if (user.getRoleId() != 1) {
+                            %>
+                            |
                             <a href="user-status?id=<%= user.getUserId()%>">
                                 <%
                                     String currentUserStatus = user.getStatus();
@@ -527,12 +545,13 @@
                                     }
                                 %>
                             </a>
+                            <% } %>
                         </td>
                     </tr>
 
                     <%
-                            }
-                        } else {
+                        }
+                    } else {
                     %>
                     <tr>
                         <td colspan="10" style="text-align: center; color: #7f8c8d;">No users found. Please add a new user.</td>
@@ -555,21 +574,30 @@
             var filterContainer = document.getElementById('filterContainer');
 
             function hideTableElements() {
-                if (userTable) userTable.style.display = 'none';
-                if (totalUsersParagraph) totalUsersParagraph.style.display = 'none';
-                if (backLandingLink) backLandingLink.style.display = 'none';
-                if (filterContainer) filterContainer.style.display = 'none'; 
+                if (userTable)
+                    userTable.style.display = 'none';
+                if (totalUsersParagraph)
+                    totalUsersParagraph.style.display = 'none';
+                if (backLandingLink)
+                    backLandingLink.style.display = 'none';
+                if (filterContainer)
+                    filterContainer.style.display = 'none';
             }
 
             function showTableElements() {
-                if (userTable) userTable.style.display = 'table';
-                if (totalUsersParagraph) totalUsersParagraph.style.display = 'block';
-                if (backLandingLink) backLandingLink.style.display = 'block';
-                if (filterContainer) filterContainer.style.display = 'flex'; 
+                if (userTable)
+                    userTable.style.display = 'table';
+                if (totalUsersParagraph)
+                    totalUsersParagraph.style.display = 'block';
+                if (backLandingLink)
+                    backLandingLink.style.display = 'block';
+                if (filterContainer)
+                    filterContainer.style.display = 'flex';
             }
 
             function hideAddForm() {
-                if (formContainer) formContainer.style.display = 'none';
+                if (formContainer)
+                    formContainer.style.display = 'none';
                 showTableElements();
             }
 
@@ -591,8 +619,8 @@
                 document.getElementById('statusFilter').value = 'all';
                 document.getElementById('sortField').value = 'user_id';
                 document.getElementById('sortOrder').value = 'ASC';
-                
-                document.getElementById('filterForm').submit(); 
+
+                document.getElementById('filterForm').submit();
             }
 
             if (notificationElement) {

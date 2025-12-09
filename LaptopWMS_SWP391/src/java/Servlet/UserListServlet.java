@@ -43,11 +43,11 @@ public class UserListServlet extends HttpServlet {
             return;
         }
 
-        String keyword = request.getParameter("keyword"); 
-        String genderFilter = request.getParameter("gender_filter"); 
-        String statusFilter = request.getParameter("status_filter"); 
-        
-        String roleIdFilterStr = request.getParameter("role_filter"); 
+        String keyword = request.getParameter("keyword");
+        String genderFilter = request.getParameter("gender_filter");
+        String statusFilter = request.getParameter("status_filter");
+
+        String roleIdFilterStr = request.getParameter("role_filter");
         Integer roleIdFilter = null;
         try {
             if (roleIdFilterStr != null && !roleIdFilterStr.isEmpty() && !roleIdFilterStr.equals("0")) {
@@ -55,9 +55,9 @@ public class UserListServlet extends HttpServlet {
             }
         } catch (NumberFormatException e) {
         }
-        
-        String sortField = request.getParameter("sort_field"); 
-        String sortOrder = request.getParameter("sort_order"); 
+
+        String sortField = request.getParameter("sort_field");
+        String sortOrder = request.getParameter("sort_order");
 
         if (sortField == null || sortField.isEmpty()) {
             sortField = "user_id";
@@ -67,14 +67,14 @@ public class UserListServlet extends HttpServlet {
         }
 
         List<Users> users = userDAO.getListUsers(
-            keyword, 
-            genderFilter, 
-            roleIdFilter, 
-            statusFilter, 
-            sortField, 
-            sortOrder
+                keyword,
+                genderFilter,
+                roleIdFilter,
+                statusFilter,
+                sortField,
+                sortOrder
         );
-        
+
         request.setAttribute("users", users);
 
         request.setAttribute("keyword", keyword);
@@ -121,72 +121,114 @@ public class UserListServlet extends HttpServlet {
             int roleId = -1;
 
             java.util.Map<String, String> errors = new java.util.HashMap<>();
+            Users tempUser = new Users();
 
+            // 1. Validation Logic
             if (username == null || username.trim().isEmpty()) {
                 errors.put("username", "Username is required.");
             } else if (username.length() < 3 || username.length() > 50) {
                 errors.put("username", "Username must be between 3 and 50 characters.");
             }
+            tempUser.setUsername(username);
 
             if (password == null || password.trim().isEmpty()) {
                 errors.put("password", "Password is required.");
             } else if (password.length() < 6) {
                 errors.put("password", "Password must be at least 6 characters long.");
             }
+            tempUser.setPassword(password);
 
             if (email == null || email.trim().isEmpty()) {
                 errors.put("email", "Email is required.");
             } else if (!email.matches("^[\\w.-]+@[\\w.-]+\\.[A-Za-z]{2,6}$")) {
                 errors.put("email", "Invalid email format.");
             }
+            tempUser.setEmail(email);
 
-            if (phoneNumber != null && !phoneNumber.trim().isEmpty() && !phoneNumber.matches("^[0-9]{10}$")) {
-                errors.put("phoneNumber", "Phone number must contain only digits and be 10 digits.");
+            if (phoneNumber != null && !phoneNumber.trim().isEmpty() && !phoneNumber.matches("^0[0-9]{9,10}$")) {
+                errors.put("phoneNumber", "Invalid phone number format (10-11 digits starting with 0).");
             }
+            tempUser.setPhoneNumber(phoneNumber);
+
+            if (fullName == null || fullName.trim().isEmpty()) {
+            }
+            tempUser.setFullName(fullName);
+            tempUser.setGender(gender);
 
             try {
                 roleId = Integer.parseInt(roleIdStr);
+                if (roleId < 1 || roleId > 3) {
+                    errors.put("roleId", "Invalid Role ID.");
+                }
             } catch (NumberFormatException e) {
-                errors.put("roleId", "Invalid Role ID format.");
+                errors.put("roleId", "Role ID is required.");
             }
-
-            if (!errors.containsKey("username") && userDAO.isUsernameExists(username)) {
-                errors.put("username", "Username is already taken. Please choose another one.");
-            }
-            if (!errors.containsKey("email") && userDAO.isEmailExists(email)) {
-                errors.put("email", "Email is already registered by another user.");
-            }
+            tempUser.setRoleId(roleId);
 
             if (!errors.isEmpty()) {
-                request.setAttribute("errors", errors); 
-
-                Users tempUser = new Users(
-                        0, username, password, fullName, email, phoneNumber, gender, roleId,
-                        "active", null, null, null, null
-                );
+                request.setAttribute("errors", errors);
                 request.setAttribute("tempUser", tempUser);
 
-                List<Users> users = userDAO.getListUsers();
+                String keyword = request.getParameter("keyword");
+                String genderFilter = request.getParameter("gender_filter");
+                String statusFilter = request.getParameter("status_filter");
+                String roleIdFilterStr = request.getParameter("role_filter");
+                Integer roleIdFilter = null;
+                try {
+                    if (roleIdFilterStr != null && !roleIdFilterStr.isEmpty() && !roleIdFilterStr.equals("0")) {
+                        roleIdFilter = Integer.valueOf(roleIdFilterStr);
+                    }
+                } catch (NumberFormatException e) {
+                }
+                String sortField = request.getParameter("sort_field");
+                String sortOrder = request.getParameter("sort_order");
+
+                List<Users> users = userDAO.getListUsers(keyword, genderFilter, roleIdFilter, statusFilter, sortField, sortOrder);
                 request.setAttribute("users", users);
+
+                request.setAttribute("keyword", keyword);
+                request.setAttribute("gender_filter", genderFilter);
+                request.setAttribute("role_filter", roleIdFilterStr);
+                request.setAttribute("status_filter", statusFilter);
+                request.setAttribute("sort_field", sortField);
+                request.setAttribute("sort_order", sortOrder);
 
                 request.getRequestDispatcher("/user-list.jsp").forward(request, response);
                 return;
             }
 
-            Users newUser = new Users(
-                    0, username, password, fullName, email, phoneNumber, gender, roleId,
-                    "active", null, null, null, null
-            );
-            newUser.setCreatedBy(currentUser.getUserId());
+            try {
+                Users newUser = new Users(
+                        0,
+                        username,
+                        password,
+                        fullName,
+                        email,
+                        phoneNumber,
+                        gender,
+                        roleId,
+                        "active",
+                        null,
+                        null,
+                        null,
+                        currentUser.getUserId()
+                );
 
-            boolean success = userDAO.addNew(newUser);
+                if (userDAO.addNew(newUser)) {
+                    session.setAttribute("message", "User " + username + " added successfully!");
+                } else {
+                    session.setAttribute("error", "Failed to add user. Check for duplicate username/email.");
+                }
 
-            if (success) {
-                response.sendRedirect(request.getContextPath() + "/user-list?message=User added successfully!");
-            } else {
-                session.setAttribute("error", "Database operation failed during user creation.");
-                response.sendRedirect(request.getContextPath() + "/user-list");
+            } catch (Exception e) {
+                e.printStackTrace();
+                session.setAttribute("error", "An unexpected error occurred during user creation.");
             }
+
+            response.sendRedirect(request.getContextPath() + "/user-list");
+            return;
         }
+
+        response.sendRedirect(request.getContextPath() + "/user-list");
     }
 }
