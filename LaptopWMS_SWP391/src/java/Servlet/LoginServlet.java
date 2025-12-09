@@ -37,8 +37,13 @@ public class LoginServlet extends HttpServlet {
         if (user != null) {
             try {
                 Role role = dao.getRoleById(user.getRoleId());
-                if (role.getStatus().equals("inactive")) {
+                if (role.getStatus().toLowerCase().equals("inactive")) {
                     request.setAttribute("error", "Your role is disabled. Contact admin.");
+                    request.getRequestDispatcher("login.jsp").forward(request, response);
+                    return;
+                }
+                if (user.getStatus().toLowerCase().equals("inactive")) {
+                    request.setAttribute("error", "Your account is disabled. Contact admin.");
                     request.getRequestDispatcher("login.jsp").forward(request, response);
                     return;
                 }
