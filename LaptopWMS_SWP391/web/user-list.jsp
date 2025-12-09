@@ -565,7 +565,6 @@
                 if (userTable) userTable.style.display = 'table';
                 if (totalUsersParagraph) totalUsersParagraph.style.display = 'block';
                 if (backLandingLink) backLandingLink.style.display = 'block';
-                 // Đảm bảo filter container hiện khi form Add ẩn
                 if (filterContainer) filterContainer.style.display = 'flex'; 
             }
 

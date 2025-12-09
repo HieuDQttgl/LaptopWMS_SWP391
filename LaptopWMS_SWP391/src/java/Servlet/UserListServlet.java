@@ -51,7 +51,7 @@ public class UserListServlet extends HttpServlet {
         Integer roleIdFilter = null;
         try {
             if (roleIdFilterStr != null && !roleIdFilterStr.isEmpty() && !roleIdFilterStr.equals("0")) {
-                roleIdFilter = Integer.parseInt(roleIdFilterStr);
+                roleIdFilter = Integer.valueOf(roleIdFilterStr);
             }
         } catch (NumberFormatException e) {
         }
@@ -105,7 +105,7 @@ public class UserListServlet extends HttpServlet {
 
         if (currentUser.getRoleId() != ADMIN_ROLE_ID) {
             session.setAttribute("error", "Access denied: You do not have permission to add users.");
-            response.sendRedirect(request.getContextPath() + "/user-list");
+            response.sendRedirect(request.getContextPath() + "/landing");
             return;
         }
 
@@ -140,8 +140,8 @@ public class UserListServlet extends HttpServlet {
                 errors.put("email", "Invalid email format.");
             }
 
-            if (phoneNumber != null && !phoneNumber.trim().isEmpty() && !phoneNumber.matches("^[0-9]{8,15}$")) {
-                errors.put("phoneNumber", "Phone number must contain only digits and be between 8-15 digits.");
+            if (phoneNumber != null && !phoneNumber.trim().isEmpty() && !phoneNumber.matches("^[0-9]{10}$")) {
+                errors.put("phoneNumber", "Phone number must contain only digits and be 10 digits.");
             }
 
             try {
