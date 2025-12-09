@@ -43,8 +43,47 @@ public class UserListServlet extends HttpServlet {
             return;
         }
 
-        List<Users> users = userDAO.getListUsers();
+        String keyword = request.getParameter("keyword"); 
+        String genderFilter = request.getParameter("gender_filter"); 
+        String statusFilter = request.getParameter("status_filter"); 
+        
+        String roleIdFilterStr = request.getParameter("role_filter"); 
+        Integer roleIdFilter = null;
+        try {
+            if (roleIdFilterStr != null && !roleIdFilterStr.isEmpty() && !roleIdFilterStr.equals("0")) {
+                roleIdFilter = Integer.parseInt(roleIdFilterStr);
+            }
+        } catch (NumberFormatException e) {
+        }
+        
+        String sortField = request.getParameter("sort_field"); 
+        String sortOrder = request.getParameter("sort_order"); 
+
+        if (sortField == null || sortField.isEmpty()) {
+            sortField = "user_id";
+        }
+        if (sortOrder == null || sortOrder.isEmpty()) {
+            sortOrder = "ASC";
+        }
+
+        List<Users> users = userDAO.getListUsers(
+            keyword, 
+            genderFilter, 
+            roleIdFilter, 
+            statusFilter, 
+            sortField, 
+            sortOrder
+        );
+        
         request.setAttribute("users", users);
+
+        request.setAttribute("keyword", keyword);
+        request.setAttribute("gender_filter", genderFilter);
+        request.setAttribute("role_filter", roleIdFilterStr);
+        request.setAttribute("status_filter", statusFilter);
+        request.setAttribute("sort_field", sortField);
+        request.setAttribute("sort_order", sortOrder);
+
         request.getRequestDispatcher("/user-list.jsp").forward(request, response);
     }
 
