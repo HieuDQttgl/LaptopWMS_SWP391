@@ -12,7 +12,6 @@
         <title>User Management</title>
 
         <style>
-            /* --- CSS CHUNG (GIỮ NGUYÊN) --- */
             body {
                 font-family: Arial, sans-serif;
                 background-color: #f5f5f5;
@@ -294,6 +293,7 @@
 
             <%
                 String successMessage = request.getParameter("message");
+                //String successMessage = (String) request.getSession().getAttribute("message");
                 String errorMessage = (String) request.getSession().getAttribute("error");
 
                 Map<String, String> errors = (Map<String, String>) request.getAttribute("errors");
@@ -322,16 +322,17 @@
                 }
                 if (currentSortField == null) {
                     currentSortField = "user_id";
-                } // Giá trị mặc định
+                }
                 if (currentSortOrder == null) {
                     currentSortOrder = "ASC";
-                }     // Giá trị mặc định
+                }
 
                 if (errorMessage != null) {
                     out.println("<p id='notification' class='message-error notification'>" + errorMessage + "</p>");
                     request.getSession().removeAttribute("error");
                 } else if (successMessage != null) {
                     out.println("<p id='notification' class='message-success notification'>" + successMessage + "</p>");
+                    //request.getSession().removeAttribute("message");
                 }
             %>
 
@@ -550,6 +551,22 @@
                                 %>
                             </a>
                             <% } %>
+                            
+<%--                        <%
+                                if (user.getRoleId() != 1) {
+                            %>
+                            |
+                            <a href="<%= request.getContextPath() %>/user-list?action=changeStatus&id=<%= user.getUserId()%>">
+                                <%
+                                    String currentUserStatus = user.getStatus();
+                                    if ("active".equalsIgnoreCase(currentUserStatus)) {
+                                        out.print("Deactivate");
+                                    } else {
+                                        out.print("Activate");
+                                    }
+                                %>
+                            </a>
+                            <% } %> --%>
                         </td>
                     </tr>
 
@@ -558,7 +575,7 @@
                     } else {
                     %>
                     <tr>
-                        <td colspan="10" style="text-align: center; color: #7f8c8d;">No users found. Please add a new user.</td>
+                        <td colspan="10" style="text-align: center; color: #7f8c8d;">No users found.</td>
                     </tr>
                     <% }%>
                 </tbody>

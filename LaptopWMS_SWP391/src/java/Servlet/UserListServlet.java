@@ -42,6 +42,14 @@ public class UserListServlet extends HttpServlet {
             request.getRequestDispatcher("/landing").forward(request, response);
             return;
         }
+        
+//        String action = request.getParameter("action");
+//        String userIdStr = request.getParameter("id");
+//        
+//        if ("changeStatus".equals(action) && userIdStr != null && !userIdStr.isEmpty()) {
+//            handleStatusChangeAndRedirect(request, response, session);
+//            return;
+//        }
 
         String keyword = request.getParameter("keyword");
         String genderFilter = request.getParameter("gender_filter");
@@ -235,4 +243,36 @@ public class UserListServlet extends HttpServlet {
 
         response.sendRedirect(request.getContextPath() + "/user-list");
     }
+    
+//    private void handleStatusChangeAndRedirect(HttpServletRequest request, HttpServletResponse response, HttpSession session)
+//            throws IOException {
+//        
+//        String userIdStr = request.getParameter("id");
+//        int userId = -1;
+//        
+//        try {
+//            userId = Integer.parseInt(userIdStr);
+//            Users userToChange = userDAO.getUserById(userId);
+//
+//            if (userToChange == null) {
+//                session.setAttribute("error", "User not found.");
+//            } else {
+//                String currentStatus = userToChange.getStatus();
+//                String newStatus = "active".equalsIgnoreCase(currentStatus) ? "inactive" : "active";
+//
+//                String username = userDAO.updateStatus(userId, newStatus); 
+//
+//                if (username != null) {
+//                    session.setAttribute("message", "Status for user " + username + " successfully changed to '" + newStatus + "'.");
+//                } else {
+//                    session.setAttribute("error", "Failed to update user status in the database.");
+//                }
+//            }
+//        } catch (NumberFormatException e) {
+//            session.setAttribute("error", "Invalid User ID format.");
+//        } catch (Exception ex) {
+//            session.setAttribute("error", "An unexpected error occurred during status update.");
+//        }
+//        response.sendRedirect(request.getContextPath() + "/user-list");
+//    }
 }
