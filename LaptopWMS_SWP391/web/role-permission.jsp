@@ -147,15 +147,20 @@
 <h2>Role Permission Management</h2>
 
 
-<select id="moduleSelect" onchange="filterModule()">
-    <option value="all">All Modules</option>
-    <% for (String m : modules) {%>
-    <option value="<%= m%>"><%= m%></option>
-    <% } %>
-</select>
+<div style="display: flex; gap: 10px; margin-bottom: 15px;">
+    <select id="moduleSelect" onchange="filterTable()" style="padding: 8px; border-radius: 4px; border: 1px solid #ccc;">
+        <option value="all">-- All Modules --</option>
+        <% for (String m : modules) {%>
+        <option value="<%= m%>"><%= m%></option>
+        <% } %>
+    </select>
 
-<br><br>
-
+    <input type="text" 
+           id="searchInput" 
+           onkeyup="filterTable()" 
+           placeholder="Search permission name..." 
+           style="padding: 8px; border-radius: 4px; border: 1px solid #ccc; width: 250px;">
+</div>
 
 <table>
     <thead>
@@ -166,38 +171,45 @@
                 <% } %>
         </tr>
     </thead>
-
     <tbody>
         <% for (Permission p : permissions) {%>
         <tr class="perm-row" data-module="<%= p.getModule()%>">
             <td>
-                <b><%= p.getPermissionDescription()%></b> 
+                <span class="perm-name"><b><%= p.getPermissionDescription()%></b></span>
                 <br>
-                <small>Module: <%= p.getModule()%></small>
+                <small style="color: #666;">Module: <%= p.getModule()%></small>
             </td>
 
             <% for (Role r : roles) {
                     Set<Integer> rolePerms = rolePermMap.get(r.getRoleId());
                     boolean checked = rolePerms != null && rolePerms.contains(p.getPermissionId());
+                    boolean isAdmin = r.getRoleId() == 1;
             %>
-            <td>
-                <input type="checkbox" name="perm_<%= r.getRoleId()%>_<%= p.getPermissionId()%>"
-                       <%= checked ? "checked" : ""%> />
+            <td style="text-align: center;">
+                <input type="checkbox" 
+                       name="perm_<%= r.getRoleId()%>_<%= p.getPermissionId()%>"
+                       <%= isAdmin ? "checked disabled" : (checked ? "checked" : "")%> 
+                       />
             </td>
             <% } %>
         </tr>
         <% }%>
     </tbody>
 </table>
-<a href="javascript:history.back()" class="btn-back"> Back</a>
+
 <script>
-    function filterModule() {
-        const selected = document.getElementById("moduleSelect").value;
-        const rows = document.querySelectorAll(".perm-row");
+    function filterTable() {
+
+        var input = document.getElementById("searchInput").value.toUpperCase();
+        var selectedModule = document.getElementById("moduleSelect").value;
+        var rows = document.querySelectorAll(".perm-row");
 
         rows.forEach(row => {
-            const module = row.getAttribute("data-module");
-            if (selected === "all" || selected === module) {
+            var text = row.querySelector(".perm-name").innerText.toUpperCase();
+            var module = row.getAttribute("data-module");
+            var matchKeyword = text.indexOf(input) > -1;
+            var matchModule = (selectedModule === "all" || selectedModule === module);
+            if (matchKeyword && matchModule) {
                 row.style.display = "";
             } else {
                 row.style.display = "none";

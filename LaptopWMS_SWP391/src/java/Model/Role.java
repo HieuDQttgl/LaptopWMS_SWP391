@@ -27,7 +27,6 @@ public class Role {
         this.status = status;
     }
     
-    
 
     public Role(int roleId, String roleName, String roleDescription, String status, Timestamp createdAt, Timestamp updatedAt) {
         this.roleId = roleId;
