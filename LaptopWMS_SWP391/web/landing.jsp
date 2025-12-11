@@ -10,7 +10,6 @@
 <head>
     <meta charset="UTF-8">
     <title>WMS Landing Page</title>
-
     <style>
         body {
             margin: 0;
@@ -81,14 +80,6 @@
         }
 
         
-        .footer {
-            text-align: center;
-            padding: 25px;
-            background: #f7f7f7;
-            margin-top: 40px;
-            font-size: 14px;
-            color: #444;
-        }
 
     </style>
 </head>
@@ -140,9 +131,7 @@
     </div>
 
     <!-- Footer -->
-    <div class="footer">
-        © 2025 Warehouse Management System - All rights reserved
-    </div>
-
+    <jsp:include page="footer.jsp"/>
 </body>
 </html>
+

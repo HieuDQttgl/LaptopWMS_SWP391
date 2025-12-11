@@ -4,6 +4,7 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <jsp:include page="header.jsp"/>
     <meta charset="UTF-8">
     <title>Change User Status</title>
 
@@ -140,6 +141,6 @@
             
         </form>
     </div>
-
+<jsp:include page="footer.jsp"/>
 </body>
 </html>

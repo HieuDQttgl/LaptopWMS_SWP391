@@ -2,6 +2,7 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <jsp:include page="header.jsp"/>
     <title>Forgot Password</title>
     <style>
         body {
@@ -119,6 +120,6 @@
     <% } %>
 
 </div>
-
+<jsp:include page="footer.jsp"/>
 </body>
 </html>

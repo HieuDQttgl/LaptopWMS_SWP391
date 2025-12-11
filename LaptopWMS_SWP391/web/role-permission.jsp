@@ -146,7 +146,7 @@
 
 <h2>Role Permission Management</h2>
 
-
+<head><jsp:include page="header.jsp"/></head>
 <div style="display: flex; gap: 10px; margin-bottom: 15px;">
     <select id="moduleSelect" onchange="filterTable()" style="padding: 8px; border-radius: 4px; border: 1px solid #ccc;">
         <option value="all">-- All Modules --</option>
@@ -164,6 +164,7 @@
 
 <table>
     <thead>
+        
         <tr>
             <th>Permission</th>
                 <% for (Role r : roles) {%>
@@ -196,7 +197,7 @@
         <% }%>
     </tbody>
 </table>
-
+    <body><jsp:include page="footer.jsp"/></body>
 <script>
     function filterTable() {
 
