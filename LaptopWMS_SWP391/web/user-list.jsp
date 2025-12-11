@@ -7,8 +7,9 @@
 <%@ page import="java.util.Map" %>
 <!DOCTYPE html>
 <html>
+    <h1><jsp:include page="header.jsp"/></h1>
     <head>
-        <jsp:include page="header.jsp"/>
+        
         <meta charset="UTF-8">
         <title>User Management</title>
 
