@@ -8,7 +8,10 @@
 <!DOCTYPE html>
 <style>
     .footer {
+        position: fixed;
+        width: 100%;
             text-align: center;
+            bottom: 0;
             padding: 25px;
             background: #f7f7f7;
             margin-top: 40px;
