@@ -4,6 +4,7 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <jsp:include page="header.jsp"/>
     <meta charset="UTF-8">
     <title>Edit User Role</title>
 
@@ -97,6 +98,6 @@
             <button type="submit">Save</button>
         </form>
     </div>
-
+<jsp:include page="footer.jsp"/>
 </body>
 </html>

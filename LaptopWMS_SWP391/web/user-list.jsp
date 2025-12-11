@@ -8,6 +8,7 @@
 <!DOCTYPE html>
 <html>
     <head>
+        <jsp:include page="header.jsp"/>
         <meta charset="UTF-8">
         <title>User Management</title>
 
@@ -650,5 +651,6 @@
                 }, 5000);
             }
         </script>
+        <jsp:include page="footer.jsp"/>
     </body>
 </html>

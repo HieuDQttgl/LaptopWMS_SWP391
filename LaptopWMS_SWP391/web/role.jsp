@@ -9,9 +9,10 @@
 <!DOCTYPE html>
 <html>
     <head>
+        <jsp:include page="header.jsp"/>
         <meta charset="UTF-8">
         <title>User Role Management</title>
-
+        
         <style>
             body {
                 font-family: Arial, sans-serif;
@@ -161,5 +162,6 @@
             <p>Total Users: <%= userList != null ? userList.size() : 0%></p>
             <a href="javascript:history.back()" class="btn-back"> Back</a>
         </div>
+            <jsp:include page="footer.jsp"/>
     </body>
 </html>

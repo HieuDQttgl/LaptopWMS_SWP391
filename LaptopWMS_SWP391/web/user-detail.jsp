@@ -5,9 +5,11 @@
 <!DOCTYPE html>
 <html>
     <head>
+        <jsp:include page="header.jsp"/>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>User Details</title>
+        
         <style>
             :root {
                 --primary-color: #2563eb;
@@ -287,6 +289,7 @@
 
             </div>
         </div>
+                <jsp:include page="footer.jsp"/>
     </body>
 </html>
 

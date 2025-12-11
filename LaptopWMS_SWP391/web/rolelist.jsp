@@ -3,6 +3,7 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <jsp:include page="header.jsp"/>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <title>Role Management</title>
 
@@ -138,6 +139,6 @@
 
         </table>
     </div>
-
+<jsp:include page="footer.jsp"/>
 </body>
 </html>
