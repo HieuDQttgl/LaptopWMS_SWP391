@@ -2,7 +2,7 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <jsp:include page="header.jsp"/>
+        
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>My Profile</title>
@@ -342,8 +342,9 @@
                 </div>
             </div>
         </div>
-                        <jsp:include page="footer.jsp"/>
+                        
     </body>
+    
     <script>
         function validateProfileForm(event) {
             const email = document.querySelector('input[name="email"]').value.trim();
