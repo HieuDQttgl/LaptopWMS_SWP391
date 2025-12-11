@@ -25,8 +25,9 @@ public class UserDAO extends DBContext {
 
         String sql = "SELECT u.*, r.role_name "
                 + "FROM users u JOIN roles r ON u.role_id = r.role_id "
-                + "WHERE 1=1 ";
-
+                + "WHERE 1=1";
+//        AND r.role_name NOT LIKE '%Administrator%'
+        
         List<Object> params = new ArrayList<>();
 
         if (keyword != null && !keyword.trim().isEmpty()) {
@@ -51,8 +52,16 @@ public class UserDAO extends DBContext {
             sql += "AND u.status = ? ";
             params.add(statusFilter);
         }
+        
+        String sortFieldName = safeSortField;
+        String sortFieldPrefix = "u";
 
-        sql += String.format(" ORDER BY u.%s %s", safeSortField, safeSortOrder);
+        if (safeSortField.equals("role_name")) {
+            sortFieldPrefix = "r";
+            sortFieldName = "role_name";
+        } 
+
+        sql += String.format(" ORDER BY %s.%s %s", sortFieldPrefix, sortFieldName, safeSortOrder);
 
         try (Connection conn = getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
 
