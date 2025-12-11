@@ -10,6 +10,10 @@ import java.sql.Timestamp;
 
 public class UserDAO extends DBContext {
 
+    public List<Users> getListUsers() {
+        return getListUsers(null, null, null, null, "user_id", "ASC");
+    }
+
     public List<Users> getListUsers(
             String keyword,
             String genderFilter,
