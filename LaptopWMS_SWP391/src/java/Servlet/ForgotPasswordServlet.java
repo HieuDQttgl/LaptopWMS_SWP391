@@ -30,7 +30,7 @@ public class ForgotPasswordServlet extends HttpServlet {
             throws ServletException, IOException {
 
         String email = request.getParameter("email");
-
+ 
         UserDAO dao = new UserDAO();
         Users user = dao.getUserByEmail(email);
 

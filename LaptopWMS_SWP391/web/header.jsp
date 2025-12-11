@@ -8,7 +8,10 @@
 <!DOCTYPE html>
 <style>
     .header {
-            display: flex;
+        position:  relative;
+        top: 0;
+        left: 0;
+            display: grid;
             justify-content: space-between;
             align-items: center;
             padding: 20px 60px;
