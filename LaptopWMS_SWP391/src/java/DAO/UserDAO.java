@@ -31,7 +31,7 @@ public class UserDAO extends DBContext {
                 + "FROM users u JOIN roles r ON u.role_id = r.role_id "
                 + "WHERE 1=1";
 //        AND r.role_name NOT LIKE '%Administrator%'
-        
+
         List<Object> params = new ArrayList<>();
 
         if (keyword != null && !keyword.trim().isEmpty()) {
@@ -56,14 +56,14 @@ public class UserDAO extends DBContext {
             sql += "AND u.status = ? ";
             params.add(statusFilter);
         }
-        
+
         String sortFieldName = safeSortField;
         String sortFieldPrefix = "u";
 
         if (safeSortField.equals("role_name")) {
             sortFieldPrefix = "r";
             sortFieldName = "role_name";
-        } 
+        }
 
         sql += String.format(" ORDER BY %s.%s %s", sortFieldPrefix, sortFieldName, safeSortOrder);
 
@@ -353,6 +353,36 @@ public class UserDAO extends DBContext {
             return true;
         }
         return false;
+    }
+
+    public List<String> getDistinctGenders() {
+        List<String> genders = new ArrayList<>();
+        String sql = "SELECT DISTINCT gender FROM users WHERE gender IS NOT NULL AND gender != '' ORDER BY gender ASC";
+
+        try (Connection conn = DBContext.getConnection(); PreparedStatement ps = conn.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
+
+            while (rs.next()) {
+                genders.add(rs.getString("gender"));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return genders;
+    }
+
+    public List<String> getDistinctStatuses() {
+        List<String> statuses = new ArrayList<>();
+        String sql = "SELECT DISTINCT status FROM users WHERE status IS NOT NULL AND status != '' ORDER BY status ASC";
+
+        try (Connection conn = DBContext.getConnection(); PreparedStatement ps = conn.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
+
+            while (rs.next()) {
+                statuses.add(rs.getString("status"));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return statuses;
     }
 
     //Test method
