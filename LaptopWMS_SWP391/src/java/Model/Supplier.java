@@ -1,46 +1,36 @@
 /*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
+ * Supplier Model for Laptop WMS
  */
 package Model;
 
-import java.sql.Timestamp;
-
 /**
- *
- * @author Admin
+ * Represents a supplier in the Laptop Warehouse Management System.
+ * Suppliers provide laptops and other products to the warehouse.
  */
 public class Supplier {
 
     private int supplierId;
     private String supplierName;
-    private String contactPerson;
-    private String email;
-    private String phoneNumber;
-    private String address;
+    private String supplierEmail;
+    private String supplierPhone;
     private String status;
-    private Timestamp createdAt;
-    private Timestamp updatedAt;
-    private Integer createdBy;
 
-    private String createdByName;
-
+    /**
+     * Default constructor
+     */
     public Supplier() {
     }
 
-    public Supplier(int supplierId, String supplierName, String contactPerson,
-            String email, String phoneNumber, String address, String status,
-            Timestamp createdAt, Timestamp updatedAt, Integer createdBy) {
+    /**
+     * Constructor with all fields
+     */
+    public Supplier(int supplierId, String supplierName, String supplierEmail,
+            String supplierPhone, String status) {
         this.supplierId = supplierId;
         this.supplierName = supplierName;
-        this.contactPerson = contactPerson;
-        this.email = email;
-        this.phoneNumber = phoneNumber;
-        this.address = address;
+        this.supplierEmail = supplierEmail;
+        this.supplierPhone = supplierPhone;
         this.status = status;
-        this.createdAt = createdAt;
-        this.updatedAt = updatedAt;
-        this.createdBy = createdBy;
     }
 
     // Getters and Setters
@@ -61,36 +51,20 @@ public class Supplier {
         this.supplierName = supplierName;
     }
 
-    public String getContactPerson() {
-        return contactPerson;
+    public String getSupplierEmail() {
+        return supplierEmail;
     }
 
-    public void setContactPerson(String contactPerson) {
-        this.contactPerson = contactPerson;
+    public void setSupplierEmail(String supplierEmail) {
+        this.supplierEmail = supplierEmail;
     }
 
-    public String getEmail() {
-        return email;
+    public String getSupplierPhone() {
+        return supplierPhone;
     }
 
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public String getPhoneNumber() {
-        return phoneNumber;
-    }
-
-    public void setPhoneNumber(String phoneNumber) {
-        this.phoneNumber = phoneNumber;
-    }
-
-    public String getAddress() {
-        return address;
-    }
-
-    public void setAddress(String address) {
-        this.address = address;
+    public void setSupplierPhone(String supplierPhone) {
+        this.supplierPhone = supplierPhone;
     }
 
     public String getStatus() {
@@ -101,51 +75,14 @@ public class Supplier {
         this.status = status;
     }
 
-    public Timestamp getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(Timestamp createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    public Timestamp getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public void setUpdatedAt(Timestamp updatedAt) {
-        this.updatedAt = updatedAt;
-    }
-
-    public Integer getCreatedBy() {
-        return createdBy;
-    }
-
-    public void setCreatedBy(Integer createdBy) {
-        this.createdBy = createdBy;
-    }
-
-    public String getCreatedByName() {
-        return createdByName;
-    }
-
-    public void setCreatedByName(String createdByName) {
-        this.createdByName = createdByName;
-    }
-
     @Override
     public String toString() {
         return "Supplier{" +
                 "supplierId=" + supplierId +
                 ", supplierName='" + supplierName + '\'' +
-                ", contactPerson='" + contactPerson + '\'' +
-                ", email='" + email + '\'' +
-                ", phoneNumber='" + phoneNumber + '\'' +
-                ", address='" + address + '\'' +
+                ", supplierEmail='" + supplierEmail + '\'' +
+                ", supplierPhone='" + supplierPhone + '\'' +
                 ", status='" + status + '\'' +
-                ", createdAt=" + createdAt +
-                ", updatedAt=" + updatedAt +
-                ", createdBy=" + createdBy +
                 '}';
     }
 }
