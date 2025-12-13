@@ -1,5 +1,6 @@
 /*
- * Supplier List Servlet for Laptop WMS
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Servlet.java to edit this template
  */
 package Servlet;
 
@@ -17,9 +18,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.HashMap;
 
-/**
- * Servlet for managing supplier list view and add functionality
- */
 @WebServlet(name = "SupplierListServlet", urlPatterns = { "/supplier-list" })
 public class SupplierListServlet extends HttpServlet {
 
