@@ -8,41 +8,45 @@ package Model;
  *
  * @author PC
  */
+import java.util.ArrayList;
+import java.util.List;
+
 public class Product {
 
-    private int id;
-    private String name;
+    private int productId;
+    private String productName;
     private String brand;
-    private double price;
-    private int quantity;
-
-    private String cpu;
-    private String ram;
-    private String storage;
-    private String card;
-    private String screen;
+    private String category;
+    private int supplierId;
+    private String unit;
+    private String status;
 
     private String imageUrl;
     private String description;
-    private String status;
+
+    private List<ProductDetail> detailsList = new ArrayList<>();
 
     public Product() {
     }
 
-    public int getId() {
-        return id;
+    public void addDetail(ProductDetail detail) {
+        this.detailsList.add(detail);
     }
 
-    public void setId(int id) {
-        this.id = id;
+    public int getProductId() {
+        return productId;
     }
 
-    public String getName() {
-        return name;
+    public void setProductId(int productId) {
+        this.productId = productId;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public String getProductName() {
+        return productName;
+    }
+
+    public void setProductName(String productName) {
+        this.productName = productName;
     }
 
     public String getBrand() {
@@ -53,60 +57,36 @@ public class Product {
         this.brand = brand;
     }
 
-    public double getPrice() {
-        return price;
+    public String getCategory() {
+        return category;
     }
 
-    public void setPrice(double price) {
-        this.price = price;
+    public void setCategory(String category) {
+        this.category = category;
     }
 
-    public int getQuantity() {
-        return quantity;
+    public int getSupplierId() {
+        return supplierId;
     }
 
-    public void setQuantity(int quantity) {
-        this.quantity = quantity;
+    public void setSupplierId(int supplierId) {
+        this.supplierId = supplierId;
     }
 
-    public String getCpu() {
-        return cpu;
+    public String getUnit() {
+        return unit;
     }
 
-    public void setCpu(String cpu) {
-        this.cpu = cpu;
+    public void setUnit(String unit) {
+        this.unit = unit;
     }
 
-    public String getRam() {
-        return ram;
+    public String getStatus() {
+        return status;
     }
 
-    public void setRam(String ram) {
-        this.ram = ram;
-    }
-
-    public String getStorage() {
-        return storage;
-    }
-
-    public void setStorage(String storage) {
-        this.storage = storage;
-    }
-
-    public String getCard() {
-        return card;
-    }
-
-    public void setCard(String card) {
-        this.card = card;
-    }
-
-    public String getScreen() {
-        return screen;
-    }
-
-    public void setScreen(String screen) {
-        this.screen = screen;
+    public void setStatus(String status) {
+        this.status = status;
     }
 
     public String getImageUrl() {
@@ -125,11 +105,11 @@ public class Product {
         this.description = description;
     }
 
-    public String getStatus() {
-        return status;
+    public List<ProductDetail> getDetailsList() {
+        return detailsList;
     }
 
-    public void setStatus(String status) {
-        this.status = status;
+    public void setDetailsList(List<ProductDetail> detailsList) {
+        this.detailsList = detailsList;
     }
 }

@@ -6,6 +6,7 @@ package DAO;
 
 import static DAO.DBContext.getConnection;
 import Model.Product;
+import Model.ProductDetail;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
@@ -17,60 +18,67 @@ import java.util.List;
  */
 public class ProductDAO extends DBContext {
 
-    public List<Product> getListProduct(String keyword, String brand, String sortField, String sortOrder) {
+    public List<Product> getAllProducts() {
         List<Product> list = new ArrayList<>();
 
-        StringBuilder sql = new StringBuilder("SELECT * FROM products WHERE 1=1");
-        List<Object> params = new ArrayList<>();
+        String sql = "SELECT p.product_id, p.product_name, p.category, p.unit, p.status, "
+                + "p.supplier_id, s.supplier_name "
+                + "FROM products p "
+                + "LEFT JOIN suppliers s ON p.supplier_id = s.supplier_id "
+                + "ORDER BY p.product_id DESC";
 
-        if (keyword != null && !keyword.trim().isEmpty()) {
-            sql.append(" AND name LIKE ?");
-            params.add("%" + keyword + "%");
-        }
+        try (PreparedStatement ps = getConnection().prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
 
-        if (brand != null && !brand.equals("all")) {
-            sql.append(" AND brand = ?");
-            params.add(brand);
-        }
+            while (rs.next()) {
+                Product p = new Product();
 
-        if (sortField == null || sortField.isEmpty()) {
-            sortField = "product_id";
-        }
-        if (sortOrder == null) {
-            sortOrder = "ASC";
-        }
+                p.setProductId(rs.getInt("product_id"));
+                p.setProductName(rs.getString("product_name"));
+                p.setCategory(rs.getString("category"));
+                p.setUnit(rs.getString("unit"));
+                p.setStatus(rs.getString("status"));
 
-        sql.append(" ORDER BY ").append(sortField).append(" ").append(sortOrder);
+                p.setSupplierId(rs.getInt("supplier_id"));
+                p.setBrand(rs.getString("supplier_name"));
 
-        try {
-            PreparedStatement ps = getConnection().prepareStatement(sql.toString());
+                List<ProductDetail> details = getDetailsByProductId(p.getProductId());
+                p.setDetailsList(details);
 
-            for (int i = 0; i < params.size(); i++) {
-                ps.setObject(i + 1, params.get(i));
-            }
-
-            try (ResultSet rs = ps.executeQuery()) {
-                while (rs.next()) {
-                    Product p = new Product();
-                    p.setId(rs.getInt("product_id"));
-                    p.setName(rs.getString("name"));
-                    p.setBrand(rs.getString("brand"));
-                    p.setPrice(rs.getDouble("price"));
-                    p.setQuantity(rs.getInt("quantity"));
-
-                    p.setCpu(rs.getString("cpu"));
-                    p.setRam(rs.getString("ram"));
-                    p.setStorage(rs.getString("storage"));
-                    p.setCard(rs.getString("card"));
-                    p.setScreen(rs.getString("screen"));
-                    p.setImageUrl(rs.getString("image_url"));
-                    p.setStatus(rs.getString("status"));
-                    list.add(p);
-                }
+                list.add(p);
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
         return list;
+    }
+
+    private List<ProductDetail> getDetailsByProductId(int productId) {
+        List<ProductDetail> details = new ArrayList<>();
+
+        String sql = "SELECT product_detail_id, product_id, ram, storage, cpu, gpu, screen, status "
+                + "FROM product_details WHERE product_id = ?";
+
+        try (PreparedStatement ps = getConnection().prepareStatement(sql)) {
+            ps.setInt(1, productId);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    ProductDetail d = new ProductDetail();
+
+                    d.setProductDetailId(rs.getInt("product_detail_id"));
+                    d.setProductId(rs.getInt("product_id"));
+                    d.setRam(rs.getString("ram"));
+                    d.setStorage(rs.getString("storage"));
+                    d.setCpu(rs.getString("cpu"));
+                    d.setGpu(rs.getString("gpu"));
+                    d.setScreen(rs.getDouble("screen"));
+                    d.setStatus(rs.getBoolean("status"));
+
+                    details.add(d);
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return details;
     }
 }
