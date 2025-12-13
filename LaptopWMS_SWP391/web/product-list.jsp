@@ -15,7 +15,6 @@
         <title>Laptop Inventory</title>
 
         <style>
-            /* --- GENERAL LAYOUT --- */
             body {
                 font-family: "Segoe UI", Arial, sans-serif;
                 background-color: #f5f6fa;
@@ -38,7 +37,6 @@
                 margin-bottom: 25px;
             }
 
-            /* --- BUTTONS --- */
             .btn-add {
                 background-color: #2ecc71;
                 color: white;
@@ -55,7 +53,6 @@
                 background-color: #27ae60;
             }
 
-            /* --- ACCORDION TABLE STYLES --- */
             table {
                 width: 100%;
                 border-collapse: separate;
@@ -84,7 +81,6 @@
                 background-color: white;
             }
 
-            /* Parent Row Styles */
             .parent-row {
                 cursor: pointer;
                 transition: background-color 0.2s;
@@ -164,13 +160,62 @@
     <body>
 
         <div class="container">
-            <h1>Laptop Inventory Management</h1>
+            <h1>Laptop Product Management</h1>
 
             <div style="display: flex; justify-content: space-between; align-items: center;">
                 <button class="btn-add">+ Add New Product</button>
                 <div style="color: #7f8c8d; font-size: 14px;">
                     Total Models: <strong>${not empty productList ? productList.size() : 0}</strong>
                 </div>
+            </div>
+
+            <div class="filter-container" style="margin-bottom: 20px; padding: 15px; background: #fff; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.05);">
+                <form action="products" method="get" style="display: flex; gap: 15px; align-items: center; flex-wrap: wrap;">
+
+                    <div class="filter-group">
+                        <input type="text" name="keyword" placeholder="Search model name..." 
+                               value="${currentKeyword}" 
+                               style="padding: 6px 12px; border: 1px solid #ccc; border-radius: 4px; width: 200px;">
+                    </div>
+                    <button type="submit" class="btn-filter" style="padding: 6px 12px; background: #3498db; color: white; border: none; border-radius: 4px; cursor: pointer;">Search</button>
+
+                    <div class="filter-group">
+                        <select name="status" onchange="this.form.submit()" style="padding: 6px; border: 1px solid #ccc; border-radius: 4px;">
+                            <option value="all" ${currentStatus == 'all' ? 'selected' : ''}>All Status</option>
+                            <option value="active" ${currentStatus == 'active' ? 'selected' : ''}>Active</option>
+                            <option value="inactive" ${currentStatus == 'inactive' ? 'selected' : ''}>Inactive</option>
+                        </select>
+                    </div>
+
+                    <div class="filter-group">
+                        <select name="category" onchange="this.form.submit()" style="padding: 6px; border: 1px solid #ccc; border-radius: 4px;">
+                            <option value="all" ${currentCategory == 'all' ? 'selected' : ''}>All Categories</option>
+                            <option value="Office" ${currentCategory == 'Office' ? 'selected' : ''}>Office</option>
+                            <option value="Gaming" ${currentCategory == 'Gaming' ? 'selected' : ''}>Gaming</option>
+                            <option value="Workstation" ${currentCategory == 'Workstation' ? 'selected' : ''}>Workstation</option>
+                        </select>
+                    </div>
+
+                    <div class="filter-group">
+                        <select name="brand" onchange="this.form.submit()" style="padding: 6px; border: 1px solid #ccc; border-radius: 4px;">
+                            <option value="all" ${currentBrand == 'all' ? 'selected' : ''}>All Brands</option>
+                            <option value="Dell" ${currentBrand == 'Dell' ? 'selected' : ''}>Dell</option>
+                            <option value="HP" ${currentBrand == 'HP' ? 'selected' : ''}>HP</option>
+                            <option value="ASUS" ${currentBrand == 'ASUS' ? 'selected' : ''}>Asus</option>
+                            <option value="Lenovo" ${currentBrand == 'Lenovo' ? 'selected' : ''}>Lenovo</option>
+                            <option value="Apple" ${currentBrand == 'Apple' ? 'selected' : ''}>Apple</option>
+                        </select>
+                    </div>
+
+                    <div class="filter-group">
+                        <select name="sort_order" onchange="this.form.submit()" style="padding: 6px; border: 1px solid #ccc; border-radius: 4px;">
+                            <option value="ASC" ${currentSortOrder == 'ASC' ? 'selected' : ''}>Oldest</option>
+                            <option value="DESC" ${currentSortOrder == 'DESC' ? 'selected' : ''}>Newest</option>
+                        </select>
+                    </div>
+
+                    <a href="products" class="btn-clear" style="padding: 6px 12px; background: #e74c3c; color: white; text-decoration: none; border-radius: 4px; font-size: 13px; font-weight: 600;">Clear</a>
+                </form>
             </div>
 
             <table id="productTable">
@@ -181,7 +226,6 @@
                         <th>Brand</th>
                         <th>Category</th>
                         <th>Supplier</th>
-                        <th>Base Unit</th>
                         <th>Status</th>
                     </tr>
                 </thead>
@@ -198,7 +242,7 @@
                                     <td><strong>${p.productName}</strong></td>
                                     <td>${p.brand}</td>
                                     <td>${p.category}</td>
-                                    <td>ID: ${p.supplierId}</td> <td>${p.unit}</td>
+                                    <td>${p.supplierName}</td>
                                     <td>
                                         <c:if test="${p.status eq 'active'}"><span class="status-badge status-active">Active</span></c:if>
                                         <c:if test="${p.status ne 'active'}"><span class="status-badge status-inactive">Inactive</span></c:if>
@@ -213,10 +257,10 @@
                                             <table class="inner-table">
                                                 <thead>
                                                     <tr>
-                                                        <th>RAM</th>
-                                                        <th>Storage</th>
                                                         <th>CPU</th>
                                                         <th>GPU</th>
+                                                        <th>Storage</th>
+                                                        <th>RAM</th>
                                                         <th>Screen</th>
                                                         <th>Status</th>
                                                         <th>Action</th>
@@ -227,15 +271,15 @@
                                                         <c:when test="${not empty p.detailsList}">
                                                             <c:forEach var="d" items="${p.detailsList}">
                                                                 <tr>
-                                                                    <td><b>${d.ram}</b></td>
-                                                                    <td><b>${d.storage}</b></td>
                                                                     <td>${d.cpu}</td>
                                                                     <td>${d.gpu}</td>
+                                                                    <td><b>${d.storage}</b></td>
+                                                                    <td><b>${d.ram}</b></td>
                                                                     <td>${d.screen}"</td>
                                                                     <td>
                                                                         <c:choose>
-                                                                            <c:when test="${d.status}"><span style="color: green;">✔ Active</span></c:when>
-                                                                            <c:otherwise><span style="color: red;">✖ Hidden</span></c:otherwise>
+                                                                            <c:when test="${d.status}"><span style="color: green;">Active</span></c:when>
+                                                                            <c:otherwise><span style="color: red;">Hidden</span></c:otherwise>
                                                                         </c:choose>
                                                                     </td>
                                                                     <td>
@@ -270,7 +314,6 @@
         </div>
 
         <script>
-            // Accordion Logic
             function toggleDetails(rowId, parentRow) {
                 var detailRow = document.getElementById(rowId);
 
@@ -278,8 +321,6 @@
                     detailRow.classList.remove('open');
                     parentRow.classList.remove('active');
                 } else {
-                    // Optional: Close others before opening? 
-                    // For now, let's allow multiple open for easier comparison
                     detailRow.classList.add('open');
                     parentRow.classList.add('active');
                 }

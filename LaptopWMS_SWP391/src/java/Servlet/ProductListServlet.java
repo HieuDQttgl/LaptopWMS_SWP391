@@ -61,11 +61,41 @@ public class ProductListServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        ProductDAO dao = new ProductDAO();
+        String keyword = request.getParameter("keyword");
+        String brand = request.getParameter("brand");
+        String sortOrder = request.getParameter("sort_order");
 
-        List<Product> list = dao.getAllProducts();
+        String status = request.getParameter("status");
+        String category = request.getParameter("category");
+
+        if (keyword == null) {
+            keyword = "";
+        }
+        if (brand == null) {
+            brand = "all";
+        }
+        if (sortOrder == null) {
+            sortOrder = "ASC";
+        }
+        if (status == null) {
+            status = "all";
+        }
+        if (category == null) {
+            category = "all";
+        }
+
+        ProductDAO dao = new ProductDAO();
+        List<Product> list = dao.getProducts(keyword, status, category, brand, sortOrder);
 
         request.setAttribute("productList", list);
+
+        request.setAttribute("currentKeyword", keyword);
+        request.setAttribute("currentBrand", brand);
+        request.setAttribute("currentSortOrder", sortOrder);
+        request.setAttribute("currentStatus", status);
+        request.setAttribute("currentCategory", category);
+
+        request.setAttribute("currentSortField", "product_id");
 
         request.getRequestDispatcher("product-list.jsp").forward(request, response);
     }

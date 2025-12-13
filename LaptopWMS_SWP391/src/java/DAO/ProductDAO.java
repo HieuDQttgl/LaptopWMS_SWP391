@@ -18,33 +18,64 @@ import java.util.List;
  */
 public class ProductDAO extends DBContext {
 
-    public List<Product> getAllProducts() {
+    public List<Product> getProducts(String keyword, String status, String category, String brand, String sortOrder) {
         List<Product> list = new ArrayList<>();
+        List<Object> params = new ArrayList<>();
 
-        String sql = "SELECT p.product_id, p.product_name, p.category, p.unit, p.status, "
+        StringBuilder sql = new StringBuilder(
+                "SELECT p.product_id, p.product_name, p.brand, p.category, p.unit, p.status, " // Added p.brand
                 + "p.supplier_id, s.supplier_name "
                 + "FROM products p "
                 + "LEFT JOIN suppliers s ON p.supplier_id = s.supplier_id "
-                + "ORDER BY p.product_id DESC";
+                + "WHERE 1=1 ");
 
-        try (PreparedStatement ps = getConnection().prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
+        if (keyword != null && !keyword.trim().isEmpty()) {
+            sql.append("AND p.product_name LIKE ? ");
+            params.add("%" + keyword.trim() + "%");
+        }
 
-            while (rs.next()) {
-                Product p = new Product();
+        if (status != null && !status.equals("all")) {
+            sql.append("AND p.status = ? ");
+            params.add(status);
+        }
 
-                p.setProductId(rs.getInt("product_id"));
-                p.setProductName(rs.getString("product_name"));
-                p.setCategory(rs.getString("category"));
-                p.setUnit(rs.getString("unit"));
-                p.setStatus(rs.getString("status"));
+        if (category != null && !category.equals("all")) {
+            sql.append("AND p.category = ? ");
+            params.add(category);
+        }
 
-                p.setSupplierId(rs.getInt("supplier_id"));
-                p.setBrand(rs.getString("supplier_name"));
+        if (brand != null && !brand.equals("all")) {
+            sql.append("AND s.supplier_name LIKE ? ");
+            params.add("%" + brand.trim() + "%");
+        }
 
-                List<ProductDetail> details = getDetailsByProductId(p.getProductId());
-                p.setDetailsList(details);
+        String order = (sortOrder != null && sortOrder.equalsIgnoreCase("DESC")) ? "DESC" : "ASC";
+        sql.append("ORDER BY p.product_id ").append(order);
 
-                list.add(p);
+        try (PreparedStatement ps = getConnection().prepareStatement(sql.toString())) {
+
+            for (int i = 0; i < params.size(); i++) {
+                ps.setObject(i + 1, params.get(i));
+            }
+
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    Product p = new Product();
+
+                    p.setProductId(rs.getInt("product_id"));
+                    p.setProductName(rs.getString("product_name"));
+                    p.setCategory(rs.getString("category"));
+                    p.setUnit(rs.getString("unit"));
+                    p.setStatus(rs.getString("status"));
+
+                    p.setSupplierName(rs.getString("supplier_name"));
+                    p.setBrand(rs.getString("brand"));
+
+                    List<ProductDetail> details = getDetailsByProductId(p.getProductId());
+                    p.setDetailsList(details);
+
+                    list.add(p);
+                }
             }
         } catch (Exception e) {
             e.printStackTrace();
