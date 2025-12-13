@@ -1,8 +1,10 @@
--- MySQL dump 10.13  Distrib 8.0.44, for Win64 (x86_64)
+CREATE DATABASE  IF NOT EXISTS `laptop_wms` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci */ /*!80016 DEFAULT ENCRYPTION='N' */;
+USE `laptop_wms`;
+-- MySQL dump 10.13  Distrib 8.0.42, for Win64 (x86_64)
 --
 -- Host: localhost    Database: laptop_wms
 -- ------------------------------------------------------
--- Server version	8.0.44
+-- Server version	8.0.42
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
@@ -24,10 +26,10 @@ DROP TABLE IF EXISTS `customers`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `customers` (
   `customer_id` int NOT NULL AUTO_INCREMENT,
-  `customer_name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `email` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `phone` varchar(20) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `address` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `customer_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `email` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `phone` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `address` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   PRIMARY KEY (`customer_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -82,12 +84,12 @@ DROP TABLE IF EXISTS `locations`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `locations` (
   `location_id` int NOT NULL AUTO_INCREMENT,
-  `location_name` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `description` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `zone` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `aisle` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `rack` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `bin` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `location_name` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `description` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `zone` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `aisle` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `rack` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `bin` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   PRIMARY KEY (`location_id`),
   UNIQUE KEY `location_name` (`location_name`)
 ) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -144,10 +146,10 @@ DROP TABLE IF EXISTS `orders`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `orders` (
   `order_id` int NOT NULL AUTO_INCREMENT,
-  `order_code` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `description` text COLLATE utf8mb4_unicode_ci,
+  `order_code` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
   `created_by` int NOT NULL,
-  `order_status` enum('pending','approved','shipping','completed','cancelled') COLLATE utf8mb4_unicode_ci DEFAULT 'pending',
+  `order_status` enum('pending','approved','shipping','completed','cancelled') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT 'pending',
   `customer_id` int DEFAULT NULL,
   `supplier_id` int DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
@@ -183,9 +185,9 @@ DROP TABLE IF EXISTS `permissions`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `permissions` (
   `permission_id` int NOT NULL AUTO_INCREMENT,
-  `permission_url` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'e.g., user.view, user.create, product.manage',
-  `permission_description` text COLLATE utf8mb4_unicode_ci,
-  `module` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'Module name: user, product, warehouse, order, etc.',
+  `permission_url` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'e.g., user.view, user.create, product.manage',
+  `permission_description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
+  `module` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'Module name: user, product, warehouse, order, etc.',
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`permission_id`),
@@ -206,6 +208,38 @@ INSERT INTO `permissions` VALUES (1,'/landing','User homepage','common','2025-12
 UNLOCK TABLES;
 
 --
+-- Table structure for table `product_details`
+--
+
+DROP TABLE IF EXISTS `product_details`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `product_details` (
+  `product_detail_id` int NOT NULL AUTO_INCREMENT,
+  `product_id` int NOT NULL,
+  `ram` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `storage` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `cpu` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `gpu` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `screen` double DEFAULT NULL,
+  `status` tinyint(1) DEFAULT '1',
+  PRIMARY KEY (`product_detail_id`),
+  KEY `fk_details_product` (`product_id`),
+  CONSTRAINT `fk_details_product` FOREIGN KEY (`product_id`) REFERENCES `products` (`product_id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=42 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `product_details`
+--
+
+LOCK TABLES `product_details` WRITE;
+/*!40000 ALTER TABLE `product_details` DISABLE KEYS */;
+INSERT INTO `product_details` VALUES (1,1,'16GB','512GB','Intel Core i7-1360P','Intel Iris Xe',13.4,1),(2,2,'16GB','512GB','Apple M3 Pro','14-core GPU',16.2,1),(3,3,'8GB','256GB','Intel Core i3-1115G4','Intel UHD',15.6,1),(4,4,'32GB','1TB','Intel Core i7-1355U','Intel Iris Xe',14,1),(5,5,'32GB','1TB','Intel Core i9-13980HX','NVIDIA RTX 4090',18,1),(6,6,'16GB','1TB','Intel Core i7-13700HX','NVIDIA RTX 4070',16,1),(7,7,'32GB','2TB','Intel Core i9-13980HX','NVIDIA RTX 4080',17,1),(8,7,'64GB','4TB','Intel Core i9-13980HX','NVIDIA RTX 4090',17,1),(9,8,'64GB','2TB','Intel Core i9-13950HX','NVIDIA RTX 5000 Ada',16,0),(10,8,'128GB','8TB','Intel Core i9-13950HX','NVIDIA RTX 5000 Ada',16,1),(11,9,'64GB','2TB','Intel Core i7-13850HX','NVIDIA RTX 3500 Ada',17.3,1),(12,1,'32GB','1TB','Intel Core i7-1360P','Intel Iris Xe',13.4,1),(13,2,'36GB','1TB','Apple M3 Pro','18-core GPU',16.2,1),(14,2,'96GB','4TB','Apple M3 Max','40-core GPU',16.2,1),(15,4,'16GB','512GB','Intel Core i5-1335U','Intel Iris Xe',14,0);
+/*!40000 ALTER TABLE `product_details` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `products`
 --
 
@@ -214,20 +248,16 @@ DROP TABLE IF EXISTS `products`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `products` (
   `product_id` int NOT NULL AUTO_INCREMENT,
-  `product_name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `category` text COLLATE utf8mb4_unicode_ci,
+  `product_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `brand` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `category` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
   `supplier_id` int DEFAULT NULL,
-  `unit` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT 'unit',
-  `status` enum('active','inactive') COLLATE utf8mb4_unicode_ci DEFAULT 'active',
-  `ram` varchar(50) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci DEFAULT NULL,
-  `storage` varchar(50) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci DEFAULT NULL,
-  `cpu` varchar(50) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci DEFAULT NULL,
-  `gpu` varchar(50) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci DEFAULT NULL,
-  `screen` double DEFAULT NULL,
+  `unit` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT 'unit',
+  `status` enum('active','inactive') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT 'active',
   PRIMARY KEY (`product_id`),
   KEY `fk_product_supplier` (`supplier_id`),
   CONSTRAINT `fk_product_supplier` FOREIGN KEY (`supplier_id`) REFERENCES `suppliers` (`supplier_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=15 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -236,7 +266,7 @@ CREATE TABLE `products` (
 
 LOCK TABLES `products` WRITE;
 /*!40000 ALTER TABLE `products` DISABLE KEYS */;
-INSERT INTO `products` VALUES (1,'Dell XPS 13 (Core i7, 16GB)','Office Laptop',1,'piece','active',NULL,NULL,NULL,NULL,NULL),(2,'Macbook Pro M3 (16 inch)','Office Laptop',2,'piece','active',NULL,NULL,NULL,NULL,NULL),(3,'Dell Vostro 3500 (Core i3)','Office Laptop',1,'piece','active',NULL,NULL,NULL,NULL,NULL),(4,'Lenovo ThinkPad X1 Carbon','Gaming Laptop',3,'piece','active',NULL,NULL,NULL,NULL,NULL);
+INSERT INTO `products` VALUES (1,'Dell XPS 13 (Core i7, 16GB)','Dell','Office',1,'piece','active'),(2,'Macbook Pro M3 (16 inch)','Apple','Office',2,'piece','active'),(3,'Dell Vostro 3500 (Core i3)','Dell','Office',1,'piece','active'),(4,'Lenovo ThinkPad X1 Carbon','Lenovo','Gaming',3,'piece','active'),(5,'ASUS ROG Strix Scar 18','ASUS','Gaming',4,'piece','active'),(6,'Acer Predator Helios 16','Acer','Gaming',5,'piece','inactive'),(7,'MSI Raider GE78','MSI','Gaming',6,'piece','active'),(8,'HP ZBook Fury 16 G10','HP','Workstation',7,'piece','active'),(9,'Dell Precision 7780','Dell','Workstation',1,'piece','active');
 /*!40000 ALTER TABLE `products` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -282,9 +312,9 @@ DROP TABLE IF EXISTS `roles`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `roles` (
   `role_id` int NOT NULL AUTO_INCREMENT,
-  `role_name` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'e.g., Administrator, Warehouse Keeper, Sale',
-  `role_description` text COLLATE utf8mb4_unicode_ci,
-  `status` enum('active','inactive') COLLATE utf8mb4_unicode_ci DEFAULT 'active',
+  `role_name` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'e.g., Administrator, Warehouse Keeper, Sale',
+  `role_description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
+  `status` enum('active','inactive') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT 'active',
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`role_id`),
@@ -313,12 +343,12 @@ DROP TABLE IF EXISTS `suppliers`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `suppliers` (
   `supplier_id` int NOT NULL AUTO_INCREMENT,
-  `supplier_name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `supplier_email` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `supplier_phone` varchar(20) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `status` enum('active','inactive') COLLATE utf8mb4_unicode_ci DEFAULT 'active',
+  `supplier_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `supplier_email` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `supplier_phone` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `status` enum('active','inactive') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT 'active',
   PRIMARY KEY (`supplier_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -327,7 +357,7 @@ CREATE TABLE `suppliers` (
 
 LOCK TABLES `suppliers` WRITE;
 /*!40000 ALTER TABLE `suppliers` DISABLE KEYS */;
-INSERT INTO `suppliers` VALUES (1,'Dell Global Technology VN','sale@dellglobal.vn','0912345678','active'),(2,'Apple Authorized Distributor','apple@distributor.com','0289876543','active'),(3,'Lenovo VietNam','support@lenovo.vn','0909999888','active');
+INSERT INTO `suppliers` VALUES (1,'Dell Global Technology VN','sale@dellglobal.vn','0912345678','active'),(2,'Apple Authorized Distributor','apple@distributor.com','0289876543','active'),(3,'Lenovo VietNam','support@lenovo.vn','0909999888','active'),(4,'ASUS Vietnam','contact@asus.com.vn','0912345678','active'),(5,'Acer Vietnam','support@acer.com.vn','0398765432','active'),(6,'MSI Gaming VN','sales@msi.com.vn','0905558888','active'),(7,'HP Vietnam','sales@hp.com.vn','0382223333','active');
 /*!40000 ALTER TABLE `suppliers` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -341,8 +371,8 @@ DROP TABLE IF EXISTS `transactions`;
 CREATE TABLE `transactions` (
   `transaction_id` int NOT NULL AUTO_INCREMENT,
   `order_id` int NOT NULL,
-  `status` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `description` text COLLATE utf8mb4_unicode_ci,
+  `status` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
   `updated_by` int DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`transaction_id`),
@@ -372,14 +402,14 @@ DROP TABLE IF EXISTS `users`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `users` (
   `user_id` int NOT NULL AUTO_INCREMENT,
-  `username` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `password` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'Hashed password',
-  `full_name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `email` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `phone_number` varchar(20) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `gender` enum('Male','Female','Other') COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `username` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `password` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'Hashed password',
+  `full_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `email` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `phone_number` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `gender` enum('Male','Female','Other') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `role_id` int NOT NULL,
-  `status` enum('active','inactive') COLLATE utf8mb4_unicode_ci DEFAULT 'active',
+  `status` enum('active','inactive') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT 'active',
   `last_login_at` timestamp NULL DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
@@ -403,9 +433,13 @@ CREATE TABLE `users` (
 
 LOCK TABLES `users` WRITE;
 /*!40000 ALTER TABLE `users` DISABLE KEYS */;
-INSERT INTO `users` VALUES (1,'admin','123','System Administrator','admin@laptopwms.com','0985290363','Male',1,'active','2025-12-11 15:39:40','2025-12-03 12:19:13','2025-12-11 15:39:40',NULL),(2,'keeper1','123','Nguyen Van A','aaa1@gmail.com','0123231233','Male',2,'active','2025-12-10 03:44:16','2025-12-07 14:12:07','2025-12-10 03:44:16',NULL);
+INSERT INTO `users` VALUES (1,'admin','123','System Administrator','admin@laptopwms.com','0985290363','Male',1,'active','2025-12-13 12:24:46','2025-12-03 12:19:13','2025-12-13 12:24:46',NULL),(2,'keeper1','123','Nguyen Van A','aaa1@gmail.com','0123231233','Male',2,'active','2025-12-13 11:45:37','2025-12-07 14:12:07','2025-12-13 11:45:37',NULL);
 /*!40000 ALTER TABLE `users` ENABLE KEYS */;
 UNLOCK TABLES;
+
+--
+-- Dumping events for database 'laptop_wms'
+--
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
@@ -416,4 +450,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-12-12 10:00:25
+-- Dump completed on 2025-12-13 23:39:19

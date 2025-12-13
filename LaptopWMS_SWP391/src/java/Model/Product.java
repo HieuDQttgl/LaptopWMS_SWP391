@@ -17,7 +17,7 @@ public class Product {
     private String productName;
     private String brand;
     private String category;
-    private int supplierId;
+    private String supplierName;
     private String unit;
     private String status;
 
@@ -65,12 +65,12 @@ public class Product {
         this.category = category;
     }
 
-    public int getSupplierId() {
-        return supplierId;
+    public String getSupplierName() {
+        return supplierName;
     }
 
-    public void setSupplierId(int supplierId) {
-        this.supplierId = supplierId;
+    public void setSupplierName(String supplierName) {
+        this.supplierName = supplierName;
     }
 
     public String getUnit() {
