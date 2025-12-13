@@ -1,6 +1,6 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
-    <!DOCTYPE html>
-    <html lang="en">
+<!DOCTYPE html>
+<html lang="en">
 
     <head>
         <jsp:include page="header.jsp" />
@@ -155,57 +155,54 @@
                 <p>Add a new supplier to the warehouse management system. Suppliers are used for product imports.</p>
             </div>
 
-            <% if (request.getAttribute("message") !=null) { %>
-                <div class="message">
-                    <%= request.getAttribute("message") %>
+            <% if (request.getAttribute("message") != null) {%>
+            <div class="message">
+                <%= request.getAttribute("message")%>
+            </div>
+            <% } %>
+
+            <% if (request.getAttribute("error") != null) {%>
+            <div class="error">
+                <%= request.getAttribute("error")%>
+            </div>
+            <% } %>
+
+            <% String supplierNameValue = request.getAttribute("supplierName") != null ? (String) request.getAttribute("supplierName") : "";
+                String supplierEmailValue = request.getAttribute("supplierEmail") != null ? (String) request.getAttribute("supplierEmail") : "";
+                String supplierPhoneValue = request.getAttribute("supplierPhone") != null ? (String) request.getAttribute("supplierPhone") : "";%>
+
+            <form method="post" action="add-supplier">
+                <div class="form-group">
+                    <label for="supplierName">Supplier Name <span class="required">*</span></label>
+                    <input type="text" id="supplierName" name="supplierName"
+                           value="<%= supplierNameValue%>"
+                           placeholder="e.g., Dell Vietnam, HP Official Distributor" required>
+                    <p class="help-text">Enter the official name of the supplier (2-255 characters)
+                    </p>
                 </div>
-                <% } %>
 
-                    <% if (request.getAttribute("error") !=null) { %>
-                        <div class="error">
-                            <%= request.getAttribute("error") %>
-                        </div>
-                        <% } %>
+                <div class="form-group">
+                    <label for="supplierEmail">Email</label>
+                    <input type="email" id="supplierEmail" name="supplierEmail"
+                           value="<%= supplierEmailValue%>" placeholder="e.g., contact@supplier.com">
+                    <p class="help-text">Business email address for communication</p>
+                </div>
 
-                            <% String supplierNameValue=request.getAttribute("supplierName") !=null ? (String)
-                                request.getAttribute("supplierName") : "" ; String
-                                supplierEmailValue=request.getAttribute("supplierEmail") !=null ? (String)
-                                request.getAttribute("supplierEmail") : "" ; String
-                                supplierPhoneValue=request.getAttribute("supplierPhone") !=null ? (String)
-                                request.getAttribute("supplierPhone") : "" ; %>
+                <div class="form-group">
+                    <label for="supplierPhone">Phone Number</label>
+                    <input type="text" id="supplierPhone" name="supplierPhone"
+                           value="<%= supplierPhoneValue%>" placeholder="e.g., 0901234567">
+                    <p class="help-text">10-11 digits starting with 0</p>
+                </div>
 
-                                <form method="post" action="add-supplier">
-                                    <div class="form-group">
-                                        <label for="supplierName">Supplier Name <span class="required">*</span></label>
-                                        <input type="text" id="supplierName" name="supplierName"
-                                            value="<%= supplierNameValue %>"
-                                            placeholder="e.g., Dell Vietnam, HP Official Distributor" required>
-                                        <p class="help-text">Enter the official name of the supplier (2-255 characters)
-                                        </p>
-                                    </div>
-
-                                    <div class="form-group">
-                                        <label for="supplierEmail">Email</label>
-                                        <input type="email" id="supplierEmail" name="supplierEmail"
-                                            value="<%= supplierEmailValue %>" placeholder="e.g., contact@supplier.com">
-                                        <p class="help-text">Business email address for communication</p>
-                                    </div>
-
-                                    <div class="form-group">
-                                        <label for="supplierPhone">Phone Number</label>
-                                        <input type="text" id="supplierPhone" name="supplierPhone"
-                                            value="<%= supplierPhoneValue %>" placeholder="e.g., 0901234567">
-                                        <p class="help-text">10-11 digits starting with 0</p>
-                                    </div>
-
-                                    <div class="button-group">
-                                        <a href="<%= request.getContextPath() %>/supplier-list" class="btn-back">← Back
-                                            to Supplier List</a>
-                                        <button type="submit" class="btn-submit">Add Supplier</button>
-                                    </div>
-                                </form>
+                <div class="button-group">
+                    <a href="<%= request.getContextPath()%>/supplier-list" class="btn-back">← Back
+                        to Supplier List</a>
+                    <button type="submit" class="btn-submit">Add Supplier</button>
+                </div>
+            </form>
         </div>
         <jsp:include page="footer.jsp" />
     </body>
 
-    </html>
+</html>
