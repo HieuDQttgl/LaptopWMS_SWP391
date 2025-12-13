@@ -4,32 +4,53 @@
     Author     : Admin
 --%>
 
+<%@page import="Model.Users"%>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
+<%
+    Users currentUser = (Users) session.getAttribute("currentUser");
+    
+    int roleId = -1;
+    if (currentUser != null) {
+        roleId = currentUser.getRoleId();
+    }
+%>
 <style>
     .header {
-        position:  relative;
-        top: 0;
-        left: 0;
-            display: grid;
-            justify-content: space-between;
-            align-items: center;
-            padding: 20px 60px;
-            border-bottom: 1px solid #eee;
-        }
-        .header-left {
-            font-size: 26px;
-            font-weight: bold;
-        }
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 20px 60px;
+        border-bottom: 1px solid #eee;
+    }
+
+    .header-left a{
+        font-size: 26px;
+        font-weight: bold;
+        text-decoration: none;
+        color: #333;
+    }
+
+    .header-right a {
+        margin: 0 20px;
+        color: black;
+        text-decoration: none;
+        font-size: 16px;
+    }
 </style>
-<html>
-    <head>
-        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        
-    </head>
-    <body>
-        <div class="header">
-        <div class="header-left">@ WMS</div>
+<div class="header">
+    <div class="header-left"><a href="<%= request.getContextPath() %>/landing">@ WMS</a></div>
+
+    <div class="header-right">
+        <a href="#features">Features</a>
+        <a href="#hero">About</a>
+        <a href="<%= request.getContextPath() %>/profile">Profile</a>
+        <a href="<%= request.getContextPath() %>/products">Products</a>
+        <% if(roleId == 1) {%>
+        <a href="<%= request.getContextPath() %>/user-list">User</a>
+        <a href="<%= request.getContextPath() %>/role">Role</a>
+        <% } %>
+        <a href="<%= request.getContextPath() %>/supplier-list">Supplier</a>
+        <a href="<%= request.getContextPath() %>/logout">Logout</a>
     </div>
-    </body>
-</html>
+</div>
