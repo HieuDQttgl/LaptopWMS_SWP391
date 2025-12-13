@@ -50,7 +50,6 @@
         <a href="<%= request.getContextPath()%>/logout">Logout</a>
         <% } else {%>
         <a href="<%= request.getContextPath()%>/login">Login</a>
-        <a href="<%= request.getContextPath()%>/register">Register</a>
         <% }%>
     </div>
 </div>

@@ -1,6 +1,7 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <!DOCTYPE html>
 <html>
+
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -109,6 +110,16 @@
                 font-size: 13px;
             }
 
+            .success-message {
+                margin-bottom: 12px;
+                padding: 8px 10px;
+                border-radius: 8px;
+                background-color: #dcfce7;
+                border: 1px solid #bbf7d0;
+                color: #16a34a;
+                font-size: 13px;
+            }
+
             .actions {
                 margin-top: 6px;
             }
@@ -152,6 +163,7 @@
             }
         </style>
     </head>
+
     <body>
         <div class="auth-wrapper">
             <div class="card">
@@ -160,24 +172,31 @@
                     <p>Please sign in to continue</p>
                 </div>
 
-                <%
-                    String error = (String) request.getAttribute("error");
+                <% String error = (String) request.getAttribute("error");
                     String usernameVal = (String) request.getAttribute("username");
-                %>
+                    String successMsg = (String) session.getAttribute("message");
+                    if (successMsg != null) {
+                        session.removeAttribute("message");
+                    } %>
 
-                <% if (error != null) { %>
-                <div class="error-message">
-                    <%= error %>
+                <% if (successMsg != null) {%>
+                <div class="success-message">
+                    <%= successMsg%>
                 </div>
                 <% } %>
 
-                <form method="post" action="<%= request.getContextPath() %>/login">
+                <% if (error != null) {%>
+                <div class="error-message">
+                    <%= error%>
+                </div>
+                <% }%>
+
+                <form method="post" action="<%= request.getContextPath()%>/login">
                     <div class="form-group">
                         <label for="username">Username</label>
                         <div class="input-field">
                             <input type="text" id="username" name="username"
-                                   value="<%= usernameVal != null ? usernameVal : "" %>"
-                                   required>
+                                   value="<%= usernameVal != null ? usernameVal : ""%>" required>
                         </div>
                     </div>
 
@@ -192,7 +211,7 @@
                         <button type="submit" class="btn-primary">Sign in</button>
                     </div>
                     <div class="meta">
-                        <a href="<%= request.getContextPath() %>/forgot" 
+                        <a href="<%= request.getContextPath()%>/forgot"
                            style="color: var(--primary-color); text-decoration: none;">
                             Forgot password?
                         </a>
@@ -203,6 +222,5 @@
             </div>
         </div>
     </body>
+
 </html>
-
-
