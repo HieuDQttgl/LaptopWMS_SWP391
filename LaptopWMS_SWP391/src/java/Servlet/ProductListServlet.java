@@ -60,27 +60,13 @@ public class ProductListServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        
-        String keyword = request.getParameter("keyword");
-        String brand = request.getParameter("brand");
-        String sortField = request.getParameter("sort_field");
-        String sortOrder = request.getParameter("sort_order");
-
-        if (keyword == null) keyword = "";
-        if (brand == null) brand = "all";
-        if (sortField == null) sortField = "product_id";
-        if (sortOrder == null) sortOrder = "ASC";
 
         ProductDAO dao = new ProductDAO();
-        List<Product> list = dao.getListProduct(keyword, brand, sortField, sortOrder);
+
+        List<Product> list = dao.getAllProducts();
 
         request.setAttribute("productList", list);
-        request.setAttribute("currentKeyword", keyword);
-        request.setAttribute("currentBrand", brand);
-        request.setAttribute("currentSortField", sortField);
-        request.setAttribute("currentSortOrder", sortOrder);
 
-        // Forward to the JSP page
         request.getRequestDispatcher("product-list.jsp").forward(request, response);
     }
 
@@ -105,7 +91,7 @@ public class ProductListServlet extends HttpServlet {
      */
     @Override
     public String getServletInfo() {
-        return "Short description";
+        return "Mama mia";
     }// </editor-fold>
 
 }
