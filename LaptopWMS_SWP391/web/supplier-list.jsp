@@ -237,7 +237,8 @@
             <% String successMessage = (String) request.getSession().getAttribute("message");
                 String errorMessage = (String) request.getSession().getAttribute("error");
                 Users currentUser = (Users) request.getAttribute("currentUser");
-                boolean isAdmin = currentUser != null && currentUser.getRoleId() == 1;
+                boolean isAdmin = currentUser
+                        != null && currentUser.getRoleId() == 1;
                 String currentKeyword = (String) request.getAttribute("keyword");
                 String currentStatus = (String) request.getAttribute("status_filter");
                 String currentSortField = (String) request.getAttribute("sort_field");
@@ -284,10 +285,13 @@
                         <div class="filter-group">
                             <label for="statusFilter">Status:</label>
                             <select name="status_filter" id="statusFilter">
-                                    <option value="all" <%="all".equals(currentStatus) ? "selected" : ""%>>All</option>
-                                <option value="active" <%="active".equals(currentStatus) ? "selected" : ""%>
+                                    <option value="all" <%="all".equals(currentStatus)
+                                                                            ? "selected" : ""%>>All</option>
+                                <option value="active" <%="active"
+                                                                            .equals(currentStatus) ? "selected" : ""%>
                                         >Active</option>
-                                <option value="inactive" <%="inactive".equals(currentStatus) ? "selected" : ""%>
+                                <option value="inactive" <%="inactive"
+                                                                            .equals(currentStatus) ? "selected" : ""%>
                                         >Inactive</option>
                             </select>
                         </div>
@@ -295,15 +299,20 @@
                         <div class="filter-group">
                             <label for="sortField">Sort By:</label>
                             <select name="sort_field" id="sortField">
-                                <option value="supplier_id" <%="supplier_id".equals(currentSortField) ? "selected" : ""%>
+                                <option value="supplier_id" <%="supplier_id"
+                                                                            .equals(currentSortField) ? "selected" : ""%>
                                         >ID</option>
-                                <option value="supplier_name" <%="supplier_name".equals(currentSortField) ? "selected" : ""%>
+                                <option value="supplier_name" <%="supplier_name"
+                                                                            .equals(currentSortField) ? "selected" : ""%>
                                         >Supplier Name</option>
-                                <option value="supplier_email" <%="supplier_email".equals(currentSortField) ? "selected" : ""%>
+                                <option value="supplier_email" <%="supplier_email"
+                                                                            .equals(currentSortField) ? "selected" : ""%>
                                         >Email</option>
-                                <option value="supplier_phone" <%="supplier_phone".equals(currentSortField) ? "selected" : ""%>
+                                <option value="supplier_phone" <%="supplier_phone"
+                                                                            .equals(currentSortField) ? "selected" : ""%>
                                         >Phone</option>
-                                <option value="status" <%="status".equals(currentSortField) ? "selected" : ""%>
+                                <option value="status" <%="status"
+                                                                            .equals(currentSortField) ? "selected" : ""%>
                                         >Status</option>
                             </select>
                         </div>
@@ -311,9 +320,11 @@
                         <div class="filter-group">
                             <label for="sortOrder">Order:</label>
                             <select name="sort_order" id="sortOrder">
-                                <option value="ASC" <%="ASC".equals(currentSortOrder) ? "selected" : ""%>
+                                <option value="ASC" <%="ASC"
+                                                                            .equals(currentSortOrder) ? "selected" : ""%>
                                         >Ascending</option>
-                                <option value="DESC" <%="DESC".equals(currentSortOrder) ? "selected" : ""%>
+                                <option value="DESC" <%="DESC"
+                                                                            .equals(currentSortOrder) ? "selected" : ""%>
                                         >Descending</option>
                             </select>
                         </div>
@@ -336,9 +347,7 @@
                         <th>Email</th>
                         <th>Phone</th>
                         <th>Status</th>
-                            <% if (isAdmin) { %>
                         <th>Action</th>
-                            <% } %>
                     </tr>
                 </thead>
                 <tbody>
@@ -354,10 +363,12 @@
                             <%= supplier.getSupplierName()%>
                         </td>
                         <td>
-                            <%= supplier.getSupplierEmail() != null ? supplier.getSupplierEmail() : "—"%>
+                            <%= supplier.getSupplierEmail() != null
+                                                                                ? supplier.getSupplierEmail() : "—"%>
                         </td>
                         <td>
-                            <%= supplier.getSupplierPhone() != null ? supplier.getSupplierPhone() : "—"%>
+                            <%= supplier.getSupplierPhone() != null
+                                                                                ? supplier.getSupplierPhone() : "—"%>
                         </td>
                         <td>
                             <% if ("active".equalsIgnoreCase(supplier.getStatus())) { %>
@@ -366,10 +377,13 @@
                             <% } else { %>
                             <span
                                 class="status-badge status-inactive">Inactive</span>
-                            <% } %>
+                            <% }%>
                         </td>
-                        <% if (isAdmin) {%>
                         <td class="action-links">
+                            <a
+                                href="<%= request.getContextPath()%>/supplier-detail?id=<%= supplier.getSupplierId()%>">View
+                                Detail</a>
+                                <% if (isAdmin) {%>
                             <form action="supplier-list" method="post"
                                   style="display: inline;">
                                 <input type="hidden" name="action"
@@ -386,12 +400,13 @@
                                     %>
                                 </a>
                             </form>
+                            <% } %>
                         </td>
-                        <% } %>
                     </tr>
-                    <% }} else {%>
+                    <% }
+                                                                } else {%>
                     <tr>
-                        <td colspan="<%= isAdmin ? 6 : 5%>"
+                        <td colspan="6"
                             style="text-align: center; color: #7f8c8d;">
                             No suppliers found.</td>
                     </tr>
