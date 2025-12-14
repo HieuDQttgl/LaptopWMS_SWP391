@@ -27,10 +27,8 @@ import java.util.Set;
 @WebServlet(name = "RolePermissionServlet", urlPatterns = {"/role-permission"})
 public class RolePermissionServlet extends HttpServlet {
 
-   
-    
-
     private RoleDAO roleDAO = new RoleDAO();
+
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -56,36 +54,33 @@ public class RolePermissionServlet extends HttpServlet {
         }
     }
 
-    
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-       
         try {
             List<Role> roles = roleDAO.getAllRoles();
+            List<Permission> permissions = roleDAO.getAllPermissions();
             for (Role r : roles) {
-                String[] selectedPermissions = request.getParameterValues("perm_" + r.getRoleId());
+                if (r.getRoleId() == 1) {
+                    continue;
+                }
+                List<Integer> selectedPermIds = new ArrayList<>();
+                for (Permission p : permissions) {
+                    String paramName = "perm_" + r.getRoleId() + "_" + p.getPermissionId();
+                    String isChecked = request.getParameter(paramName);
 
-                List<Integer> permIds = new ArrayList<>();
-                if (selectedPermissions != null) {
-                    for (String pid : selectedPermissions) {
-                        permIds.add(Integer.parseInt(pid));
+                    if (isChecked != null && isChecked.equals("true")) {
+                        selectedPermIds.add(p.getPermissionId());
                     }
                 }
-                roleDAO.updateRolePermissions(r.getRoleId(), permIds);
+                roleDAO.updateRolePermissions(r.getRoleId(), selectedPermIds);
             }
-
-            response.sendRedirect("role-permission");
+            response.sendRedirect("role-permission?success=true");
 
         } catch (Exception e) {
+            e.printStackTrace();
             throw new ServletException(e);
         }
-    }
 
-    
-    @Override
-    public String getServletInfo() {
-        return "Short description";
     }
-
 }
