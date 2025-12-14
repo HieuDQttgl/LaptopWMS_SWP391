@@ -180,10 +180,10 @@
                     <button type="submit" class="btn-filter" style="padding: 6px 12px; background: #3498db; color: white; border: none; border-radius: 4px; cursor: pointer;">Search</button>
 
                     <div class="filter-group">
-                        <select name="status" onchange="this.form.submit()" style="padding: 6px; border: 1px solid #ccc; border-radius: 4px;">
+                        <select name="status" onchange="this.form.submit()" ...>
                             <option value="all" ${currentStatus == 'all' ? 'selected' : ''}>All Status</option>
-                            <option value="active" ${currentStatus == 'active' ? 'selected' : ''}>Active</option>
-                            <option value="inactive" ${currentStatus == 'inactive' ? 'selected' : ''}>Inactive</option>
+                            <option value="1" ${currentStatus == '1' ? 'selected' : ''}>Active</option>
+                            <option value="0" ${currentStatus == '0' ? 'selected' : ''}>Inactive</option>
                         </select>
                     </div>
 
@@ -227,6 +227,7 @@
                         <th>Category</th>
                         <th>Supplier</th>
                         <th>Status</th>
+                        <th>Actions</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -244,12 +245,24 @@
                                     <td>${p.category}</td>
                                     <td>${p.supplierName}</td>
                                     <td>
-                                        <c:if test="${p.status eq 'active'}"><span class="status-badge status-active">Active</span></c:if>
-                                        <c:if test="${p.status ne 'active'}"><span class="status-badge status-inactive">Inactive</span></c:if>
-                                        </td>
-                                    </tr>
+                                        <c:choose>
+                                            <c:when test="${p.status}">
+                                                <span class="status-badge status-active">Active</span>
+                                            </c:when>
+                                            <c:otherwise>
+                                                <span class="status-badge status-inactive">Inactive</span>
+                                            </c:otherwise>
+                                        </c:choose>
+                                    </td>
+                                    <td onclick="event.stopPropagation();">
+                                        <a href="toggleProduct?id=${p.productId}" 
+                                           style="color: ${p.status ? '#e74c3c' : '#2ecc71'}; text-decoration: none; font-weight: 600; font-size: 13px;">
+                                            ${p.status ? 'Deactivate' : 'Activate'}
+                                        </a>
+                                    </td>
+                                </tr>
 
-                                    <tr id="row-${p.productId}" class="details-row">
+                                <tr id="row-${p.productId}" class="details-row">
                                     <td colspan="8" style="padding: 0;">
                                         <div class="details-container">
                                             <h4 style="margin: 0 0 10px 0; color: #555;">Available Configurations for ${p.productName}</h4>
@@ -271,19 +284,26 @@
                                                         <c:when test="${not empty p.detailsList}">
                                                             <c:forEach var="d" items="${p.detailsList}">
                                                                 <tr>
-                                                                    <td>${d.cpu}</td>
-                                                                    <td>${d.gpu}</td>
+                                                                    <td><b>${d.cpu}</b></td>
+                                                                    <td><b>${d.gpu}</b></td>
                                                                     <td><b>${d.storage}</b></td>
                                                                     <td><b>${d.ram}</b></td>
-                                                                    <td>${d.screen}"</td>
+                                                                    <td><b>${d.screen}"</b></td>
                                                                     <td>
                                                                         <c:choose>
                                                                             <c:when test="${d.status}"><span style="color: green;">Active</span></c:when>
                                                                             <c:otherwise><span style="color: red;">Hidden</span></c:otherwise>
                                                                         </c:choose>
                                                                     </td>
+
                                                                     <td>
-                                                                        <a href="#" style="color: #3498db; text-decoration: none;">Edit Spec</a>
+                                                                        <a href="editSpec?id=${d.productDetailId}" style="color: #3498db; text-decoration: none; font-weight: 600;">Edit</a>
+                                                                        <span style="color: #ccc; margin: 0 5px;">|</span>
+
+                                                                        <a href="toggleSpec?id=${d.productDetailId}" 
+                                                                           style="color: ${d.status ? '#e74c3c' : '#2ecc71'}; text-decoration: none; font-size: 12px;">
+                                                                            ${d.status ? 'Deactivate' : 'Activate'}
+                                                                        </a>
                                                                     </td>
                                                                 </tr>
                                                             </c:forEach>

@@ -19,7 +19,7 @@ public class Product {
     private String category;
     private String supplierName;
     private String unit;
-    private String status;
+    private boolean status;
 
     private String imageUrl;
     private String description;
@@ -81,11 +81,11 @@ public class Product {
         this.unit = unit;
     }
 
-    public String getStatus() {
+    public boolean getStatus() {
         return status;
     }
 
-    public void setStatus(String status) {
+    public void setStatus(boolean status) {
         this.status = status;
     }
 
