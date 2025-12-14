@@ -1,38 +1,40 @@
 <%@ page import="Model.Users"%>
+<%@ page import="Model.Role"%>
 <%@ page language="java" contentType="text/html; charset=UTF-8"
          pageEncoding="UTF-8"%>
 <%@ page import="java.util.List" %>
 <%@ page import="java.sql.Timestamp" %>
 <%@ page import="java.text.SimpleDateFormat" %>
 <%@ page import="java.util.Map" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <!DOCTYPE html>
 <html>
-    <h1><jsp:include page="header.jsp"/></h1>
     <head>
-        
+
         <meta charset="UTF-8">
         <title>User Management</title>
 
         <style>
             body {
-                font-family: Arial, sans-serif;
-                background-color: #f5f5f5;
+                font-family: "Segoe UI", Arial, sans-serif;
+                background-color: #f5f6fa; /* Màu nền nhẹ nhàng */
                 margin: 0;
-                padding: 20px;
+                padding: 0;
+                color: #2c3e50; /* Màu chữ chính */
             }
-
             .container {
                 max-width: 1200px;
-                margin: 0 auto;
+                margin: 40px auto;
                 background-color: white;
                 padding: 30px;
-                border-radius: 10px;
-                box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+                border-radius: 12px; /* Góc bo tròn lớn hơn */
+                box-shadow: 0 4px 20px rgba(0,0,0,0.07); /* Shadow nhẹ, chuyên nghiệp */
             }
-
             h1 {
-                color: #333;
-                margin-bottom: 10px;
+                text-align: center;
+                color: #2c3e50;
+                font-weight: 700;
+                margin-bottom: 25px;
             }
 
             table {
@@ -289,17 +291,20 @@
         </style>
     </head>
     <body>
-
+        <h1><jsp:include page="header.jsp"/></h1>
         <div class="container">
             <h1>User Management List</h1>
 
             <%
-                String successMessage = request.getParameter("message");
-                //String successMessage = (String) request.getSession().getAttribute("message");
+                String successMessage = (String) request.getSession().getAttribute("message");
                 String errorMessage = (String) request.getSession().getAttribute("error");
 
                 Map<String, String> errors = (Map<String, String>) request.getAttribute("errors");
                 Users tempUser = (Users) request.getAttribute("tempUser");
+
+                List<Role> allRoles = (List<Role>) request.getAttribute("allRoles");
+                List<String> genders = (List<String>) request.getAttribute("genders");
+                List<String> statuses = (List<String>) request.getAttribute("statuses");
 
                 boolean showFormOnLoad = errors != null || tempUser != null;
 
@@ -329,91 +334,74 @@
                     currentSortOrder = "ASC";
                 }
 
+                // Hiển thị thông báo
                 if (errorMessage != null) {
                     out.println("<p id='notification' class='message-error notification'>" + errorMessage + "</p>");
                     request.getSession().removeAttribute("error");
                 } else if (successMessage != null) {
                     out.println("<p id='notification' class='message-success notification'>" + successMessage + "</p>");
-                    //request.getSession().removeAttribute("message");
+                    request.getSession().removeAttribute("message");
                 }
             %>
 
             <button id="showAddFormBtn" class="btn-add">Add new User</button>
 
-            <div class="filter-container" id="filterContainer" style="display: <%= showFormOnLoad ? "none" : "flex"%>;">
-                <form id="filterForm" action="user-list" method="get" style="width: 100%;">
+            <div class="filter-container" id="filterContainer" style="margin-bottom: 20px; padding: 15px; background: #fff; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.05);">
+                <form action="user-list" method="get" id="filterForm" style="display: flex; gap: 15px; align-items: center; flex-wrap: wrap;">
 
-                    <div class="filter-controls">
+                    <input type="hidden" name="sort_field" value="${currentSortField}">
+                    <input type="hidden" name="sort_order" value="${currentSortOrder}">
 
-                        <div class="filter-group">
-                            <input type="text" name="keyword" id="keywordFilter" placeholder="Search by name/email..." value="<%= currentKeyword%>">
-                        </div>
-
-                        <div class="filter-group">
-                            <label for="genderFilter">Gender:</label>
-                            <select name="gender_filter" id="genderFilter">
-                                <option value="all" <%= "all".equals(currentGender) ? "selected" : ""%>>All</option>
-                                <option value="Male" <%= "Male".equals(currentGender) ? "selected" : ""%>>Male</option>
-                                <option value="Female" <%= "Female".equals(currentGender) ? "selected" : ""%>>Female</option>
-                                <option value="Other" <%= "Other".equals(currentGender) ? "selected" : ""%>>Other</option>
-                            </select>
-                        </div>
-
-                        <div class="filter-group">
-                            <label for="roleFilter">Role:</label>
-                            <select name="role_filter" id="roleFilter">
-                                <option value="0" <%= "0".equals(currentRole) ? "selected" : ""%>>All</option>
-                                <option value="1" <%= "1".equals(currentRole) ? "selected" : ""%>>Admin</option>
-                                <option value="2" <%= "2".equals(currentRole) ? "selected" : ""%>>Warehouse</option>
-                                <option value="3" <%= "3".equals(currentRole) ? "selected" : ""%>>Sale</option>
-                            </select>
-                        </div>
-
-                        <div class="filter-group">
-                            <label for="statusFilter">Status:</label>
-                            <select name="status_filter" id="statusFilter">
-                                <option value="all" <%= "all".equals(currentStatus) ? "selected" : ""%>>All</option>
-                                <option value="active" <%= "active".equals(currentStatus) ? "selected" : ""%>>Active</option>
-                                <option value="inactive" <%= "inactive".equals(currentStatus) ? "selected" : ""%>>Inactive</option>
-                            </select>
-                        </div>
-
-                        <div class="filter-group">
-                            <label for="sortField">Sort By:</label>
-                            <select name="sort_field" id="sortField">
-                                <option value="user_id" <%= "user_id".equals(currentSortField) ? "selected" : ""%>>ID</option>
-                                <option value="full_name" <%= "full_name".equals(currentSortField) ? "selected" : ""%>>Full Name</option>
-                                <option value="gender" <%= "gender".equals(currentSortField) ? "selected" : ""%>>Gender</option>
-                                <option value="email" <%= "email".equals(currentSortField) ? "selected" : ""%>>Email</option>
-                                <option value="phone_number" <%= "phone_number".equals(currentSortField) ? "selected" : ""%>>Phone Number</option>
-                                <option value="role_name" <%= "role_name".equals(currentSortField) ? "selected" : ""%>>Role Name</option>
-                                <option value="status" <%= "status".equals(currentSortField) ? "selected" : ""%>>Status</option>
-                                <option value="last_login_at" <%= "last_login_at".equals(currentSortField) ? "selected" : ""%>>Last Login</option>
-                            </select>
-                        </div>
-
-                        <div class="filter-group">
-                            <label for="sortOrder">Order:</label>
-                            <select name="sort_order" id="sortOrder">
-                                <option value="ASC" <%= "ASC".equals(currentSortOrder) ? "selected" : ""%>>Ascending</option>
-                                <option value="DESC" <%= "DESC".equals(currentSortOrder) ? "selected" : ""%>>Descending</option>
-                            </select>
-                        </div>
+                    <div class="filter-group">
+                        <input type="text" name="keyword" id="keywordFilter" placeholder="Search name, email or phone..." 
+                               value="${currentKeyword}" 
+                               style="padding: 6px 12px; border: 1px solid #ccc; border-radius: 4px; width: 220px;">
                     </div>
 
-                    <div class="filter-actions">
-                        <button type="submit" class="btn-filter">Apply Filter & Sort</button>
-                        <button type="button" class="btn-clear" onclick="clearFilters()">Clear Filter</button>
+                    <button type="submit" class="btn-filter" style="padding: 6px 12px; background: #3498db; color: white; border: none; border-radius: 4px; cursor: pointer;">
+                        Search
+                    </button>
+
+                    <div class="filter-group">
+                        <select name="gender_filter" id="genderFilter" onchange="this.form.submit()" style="padding: 6px; border: 1px solid #ccc; border-radius: 4px;">
+                            <option value="all" ${gender_filter == 'all' ? 'selected' : ''}>All Genders</option>
+                            <option value="Male" ${gender_filter == 'Male' ? 'selected' : ''}>Male</option>
+                            <option value="Female" ${gender_filter == 'Female' ? 'selected' : ''}>Female</option>
+                            <option value="Other" ${gender_filter == 'Other' ? 'selected' : ''}>Other</option>
+                        </select>
                     </div>
 
+                    <div class="filter-group">
+                        <select name="role_filter" id="roleFilter" onchange="this.form.submit()" style="padding: 6px; border: 1px solid #ccc; border-radius: 4px;">
+                            <option value="0" ${currentRole == '0' ? 'selected' : ''}>All Roles</option>
+                            <c:forEach var="r" items="${allRoles}">
+                                <c:if test="${r.status eq 'active'}">
+                                    <option value="${r.roleId}" ${currentRole == r.roleId ? 'selected' : ''}>
+                                        ${r.roleName}
+                                    </option>
+                                </c:if>
+                            </c:forEach>
+                        </select>
+                    </div>
+
+                    <div class="filter-group">
+                        <select name="status_filter" id="statusFilter" onchange="this.form.submit()" style="padding: 6px; border: 1px solid #ccc; border-radius: 4px;">
+                            <option value="all" ${status_filter == 'all' ? 'selected' : ''}>All Status</option>
+                            <option value="active" ${status_filter == 'active' ? 'selected' : ''}>Active</option>
+                            <option value="inactive" ${status_filter == 'inactive' ? 'selected' : ''}>Inactive</option>
+                        </select>
+                    </div>
+
+
+                    <a href="user-list" class="btn-clear" style="padding: 6px 12px; background: #e74c3c; color: white; text-decoration: none; border-radius: 4px; font-size: 13px; font-weight: 600;">Clear</a>
                 </form>
             </div>
+
 
             <div id="addFormContainer" class="add-form-container" style="display: <%= showFormOnLoad ? "block" : "none"%>;">
                 <h3>Add New User</h3>
                 <form action="user-list" method="post">
                     <input type="hidden" name="action" value="add">
-
                     <%
                         String usernameValue = (tempUser != null && tempUser.getUsername() != null) ? tempUser.getUsername() : "";
                         String passwordValue = (tempUser != null && tempUser.getPassword() != null) ? tempUser.getPassword() : "";
@@ -421,32 +409,36 @@
                         String emailValue = (tempUser != null && tempUser.getEmail() != null) ? tempUser.getEmail() : "";
                         String phoneNumberValue = (tempUser != null && tempUser.getPhoneNumber() != null) ? tempUser.getPhoneNumber() : "";
                         String genderValue = (tempUser != null && tempUser.getGender() != null) ? tempUser.getGender() : "Male";
-                        Integer roleIdValue = (tempUser != null) ? tempUser.getRoleId() : 2;
+                        Integer roleIdValue = (tempUser != null) ? tempUser.getRoleId() : 1;
                     %>
 
-                    <label for="username">Username:</label>
-                    <input type="text" id="username" name="username" value="<%= usernameValue%>" >
+                    <label for="username">Username *:</label>
+                    <input type="text" id="username" name="username" value="<%= usernameValue%>"> 
+                    <span class="field-error" id="usernameError"></span>
                     <% if (errors != null && errors.containsKey("username")) {%>
                     <span class="field-error"><%= errors.get("username")%></span>
                     <% }%>
                     <br>
 
-                    <label for="password">Password:</label>
-                    <input type="password" id="password" name="password" value="<%= passwordValue%>" >
+                    <label for="password">Password *:</label>
+                    <input type="password" id="password" name="password" value="<%= passwordValue%>">
+                    <span class="field-error" id="passwordError"></span>
                     <% if (errors != null && errors.containsKey("password")) {%>
                     <span class="field-error"><%= errors.get("password")%></span>
                     <% }%>
                     <br>
 
-                    <label for="fullName">Full Name:</label>
+                    <label for="fullName">Full Name *:</label>
                     <input type="text" id="fullName" name="fullName" value="<%= fullNameValue%>">
+                    <span class="field-error" id="fullNameError"></span>
                     <% if (errors != null && errors.containsKey("fullName")) {%>
                     <span class="field-error"><%= errors.get("fullName")%></span>
                     <% }%>
                     <br>
 
-                    <label for="email">Email:</label>
-                    <input type="email" id="email" name="email" value="<%= emailValue%>" >
+                    <label for="email">Email *:</label>
+                    <input type="email" id="email" name="email" value="<%= emailValue%>">
+                    <span class="field-error" id="emailError"></span>
                     <% if (errors != null && errors.containsKey("email")) {%>
                     <span class="field-error"><%= errors.get("email")%></span>
                     <% }%>
@@ -454,30 +446,39 @@
 
                     <label for="phoneNumber">Phone Number:</label>
                     <input type="text" id="phoneNumber" name="phoneNumber" value="<%= phoneNumberValue%>">
+                    <span class="field-error" id="phoneNumberError"></span>
                     <% if (errors != null && errors.containsKey("phoneNumber")) {%>
                     <span class="field-error"><%= errors.get("phoneNumber")%></span>
                     <% }%>
                     <br>
 
-                    <label for="gender">Gender:</label>
+                    <label for="gender">Gender *:</label>
                     <select id="gender" name="gender">
                         <option value="Male" <%= "Male".equals(genderValue) ? "selected" : ""%>>Male</option>
                         <option value="Female" <%= "Female".equals(genderValue) ? "selected" : ""%>>Female</option>
                         <option value="Other" <%= "Other".equals(genderValue) ? "selected" : ""%>>Other</option>
-                    </select><br>
-
-                    <label>Role:</label>
-                    <select name="roleId">
-                        <option value="1" <%= roleIdValue.equals(1) ? "selected" : ""%>>Administrator</option>
-                        <option value="2" <%= roleIdValue.equals(2) ? "selected" : ""%>>Warehouse Keeper</option>
-                        <option value="3" <%= roleIdValue.equals(3) ? "selected" : ""%>>Sale</option>
                     </select>
+
+
+                    <label>Role *:</label>
+                    <select name="roleId" id="roleIdSelect">
+                        <option value="0" ${currentRole == '0' ? 'selected' : ''}>-- Select Role --</option> 
+
+                        <c:forEach var="r" items="${allRoles}">
+                            <c:if test="${r.status eq 'active'}">
+                                <option value="${r.roleId}" ${roleIdValue == r.roleId ? 'selected' : ''}>
+                                    ${r.roleName}
+                                </option>
+                            </c:if>
+                        </c:forEach>
+                    </select>
+                    <span class="field-error" id="roleIdError"></span>
                     <% if (errors != null && errors.containsKey("roleId")) {%>
                     <span class="field-error"><%= errors.get("roleId")%></span>
                     <% }%>
 
                     <div class="form-actions">
-                        <input type="submit" value="Add User">
+                        <button type="submit" onclick="return validateAddUserForm()">Add User</button>
                         <button type="button" class="btn-close" onclick="hideAddForm()">Close Form</button>
                     </div>
                 </form>
@@ -486,14 +487,71 @@
             <table id="userTable" style="display: <%= showFormOnLoad ? "none" : "table"%>;"> 
                 <thead>
                     <tr>
-                        <th>ID</th>
-                        <th>Username</th>
-                        <th>Full Name</th>
-                        <th>Email</th>
+                        <th>
+                            <a href="#" onclick="window.location.href = createSortUrl('user_id')">
+                                ID
+                                <% if ("user_id".equals(currentSortField)) {%>
+                                <%= "ASC".equals(currentSortOrder) ? " ▲" : " ▼"%>
+                                <% }%>
+                            </a>
+                        </th>
+                        <th>
+                            <a href="#" onclick="window.location.href = createSortUrl('username')">
+                                Username
+                                <% if ("username".equals(currentSortField)) {%>
+                                <%= "ASC".equals(currentSortOrder) ? " ▲" : " ▼"%>
+                                <% }%>
+                            </a>
+                        </th>
+                        <th>
+                            <a href="#" onclick="window.location.href = createSortUrl('full_name')">
+                                Full Name
+                                <% if ("full_name".equals(currentSortField)) {%>
+                                <%= "ASC".equals(currentSortOrder) ? " ▲" : " ▼"%>
+                                <% }%>
+                            </a>
+                        </th>
+                        <th>
+                            <a href="#" onclick="window.location.href = createSortUrl('email')">
+                                Email
+                                <% if ("email".equals(currentSortField)) {%>
+                                <%= "ASC".equals(currentSortOrder) ? " ▲" : " ▼"%>
+                                <% }%>
+                            </a>
+                        </th>
                         <th>Phone Number</th>
-                        <th>Gender</th> <th>Role</th>
-                        <th>Status</th>
-                        <th>Last Login At</th>
+                        <th>
+                            <a href="#" onclick="window.location.href = createSortUrl('gender')">
+                                Gender
+                                <% if ("gender".equals(currentSortField)) {%>
+                                <%= "ASC".equals(currentSortOrder) ? " ▲" : " ▼"%>
+                                <% }%>
+                            </a>
+                        </th>
+                        <th>
+                            <a href="#" onclick="window.location.href = createSortUrl('role_name')">
+                                Role
+                                <% if ("role_name".equals(currentSortField)) {%>
+                                <%= "ASC".equals(currentSortOrder) ? " ▲" : " ▼"%>
+                                <% }%>
+                            </a>
+                        </th>
+                        <th>
+                            <a href="#" onclick="window.location.href = createSortUrl('status')">
+                                Status
+                                <% if ("status".equals(currentSortField)) {%>
+                                <%= "ASC".equals(currentSortOrder) ? " ▲" : " ▼"%>
+                                <% }%>
+                            </a>
+                        </th>
+                        <th>
+                            <a href="#" onclick="window.location.href = createSortUrl('last_login_at')">
+                                Last Login At
+                                <% if ("last_login_at".equals(currentSortField)) {%>
+                                <%= "ASC".equals(currentSortOrder) ? " ▲" : " ▼"%>
+                                <% }%>
+                            </a>
+                        </th>
                         <th>Action</th>
                     </tr>
                 </thead>
@@ -542,7 +600,7 @@
                                 if (user.getRoleId() != 1) {
                             %>
                             |
-                            <a href="user-status?id=<%= user.getUserId()%>">
+                            <a href="<%= request.getContextPath()%>/user-list?action=changeStatus&id=<%= user.getUserId()%>">
                                 <%
                                     String currentUserStatus = user.getStatus();
                                     if ("active".equalsIgnoreCase(currentUserStatus)) {
@@ -552,23 +610,7 @@
                                     }
                                 %>
                             </a>
-                            <% } %>
-                            
-<%--                        <%
-                                if (user.getRoleId() != 1) {
-                            %>
-                            |
-                            <a href="<%= request.getContextPath() %>/user-list?action=changeStatus&id=<%= user.getUserId()%>">
-                                <%
-                                    String currentUserStatus = user.getStatus();
-                                    if ("active".equalsIgnoreCase(currentUserStatus)) {
-                                        out.print("Deactivate");
-                                    } else {
-                                        out.print("Activate");
-                                    }
-                                %>
-                            </a>
-                            <% } %> --%>
+                            <% } %> 
                         </td>
                     </tr>
 
@@ -640,16 +682,116 @@
                 document.getElementById('genderFilter').value = 'all';
                 document.getElementById('roleFilter').value = '0';
                 document.getElementById('statusFilter').value = 'all';
-                document.getElementById('sortField').value = 'user_id';
-                document.getElementById('sortOrder').value = 'ASC';
 
-                document.getElementById('filterForm').submit();
+                var url = 'user-list?keyword=&gender_filter=all&role_filter=0&status_filter=all';
+                window.location.href = url;
             }
 
             if (notificationElement) {
                 setTimeout(function () {
                     notificationElement.remove();
                 }, 5000);
+            }
+
+            function createSortUrl(field) {
+                var keyword = document.getElementById('keywordFilter').value;
+                var gender = document.getElementById('genderFilter').value;
+                var role = document.getElementById('roleFilter').value;
+                var status = document.getElementById('statusFilter').value;
+
+                var currentSortField = '<%= currentSortField%>';
+                var currentSortOrder = '<%= currentSortOrder%>';
+
+                var newSortOrder = 'ASC';
+
+                if (field === currentSortField) {
+                    newSortOrder = (currentSortOrder === 'ASC') ? 'DESC' : 'ASC';
+                } else {
+                    newSortOrder = 'ASC';
+                }
+
+                var url = 'user-list?sort_field=' + field + '&sort_order=' + newSortOrder;
+
+                if (keyword && keyword.trim() !== '') {
+                    url += '&keyword=' + encodeURIComponent(keyword.trim());
+                }
+                if (gender && gender !== 'all') {
+                    url += '&gender_filter=' + gender;
+                }
+                if (role && role !== '0') {
+                    url += '&role_filter=' + role;
+                }
+                if (status && status !== 'all') {
+                    url += '&status_filter=' + status;
+                }
+
+                return url;
+            }
+
+            function displayError(id, message) {
+                document.getElementById(id + 'Error').innerText = message;
+            }
+
+            function clearErrors() {
+                const errorSpans = document.querySelectorAll('.field-error');
+                errorSpans.forEach(span => {
+                    if (span.id.endsWith('Error')) { // Chỉ xóa các span lỗi front-end
+                        span.innerText = '';
+                    }
+                });
+            }
+
+            function validateAddUserForm() {
+                clearErrors();
+                let isValid = true;
+
+                const username = document.getElementById('username').value.trim();
+                if (username === "") {
+                    displayError('username', 'Username cannot be empty.');
+                    isValid = false;
+                } else if (username.length < 5) {
+                    displayError('username', 'Username must be at least 5 characters long.');
+                    isValid = false;
+                }
+
+                const password = document.getElementById('password').value;
+                if (password === "") {
+                    displayError('password', 'Password cannot be empty.');
+                    isValid = false;
+                } else if (password.length < 6) {
+                    displayError('password', 'Password must be at least 6 characters long.');
+                    isValid = false;
+                }
+
+                const fullName = document.getElementById('fullName').value.trim();
+                if (fullName === "") {
+                    displayError('fullName', 'Full Name cannot be empty.');
+                    isValid = false;
+                }
+
+                const email = document.getElementById('email').value.trim();
+                const emailPattern = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
+                if (email === "") {
+                    displayError('email', 'Email cannot be empty.');
+                    isValid = false;
+                } else if (!emailPattern.test(email)) {
+                    displayError('email', 'Invalid email format.');
+                    isValid = false;
+                }
+
+                const phoneNumber = document.getElementById('phoneNumber').value.trim();
+                if (phoneNumber !== "" && !/^\d{10,11}$/.test(phoneNumber)) {
+                    displayError('phoneNumber', 'Phone Number must be 10-11 digits and contain only numbers.');
+                    isValid = false;
+                }
+
+                const roleId = document.getElementById('roleIdSelect').value;
+                if (roleId === '0') {
+                    displayError('roleId', 'Please select a valid Role.');
+                    isValid = false;
+                }
+
+                return isValid;
             }
         </script>
         <jsp:include page="footer.jsp"/>

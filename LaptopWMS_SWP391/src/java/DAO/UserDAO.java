@@ -23,51 +23,44 @@ public class UserDAO extends DBContext {
             String sortOrder) {
 
         List<Users> users = new ArrayList<>();
-
-        String safeSortField = (sortField == null || sortField.isEmpty()) ? "user_id" : sortField;
-        String safeSortOrder = (sortOrder == null || sortOrder.isEmpty() || !sortOrder.toUpperCase().matches("ASC|DESC")) ? "ASC" : sortOrder.toUpperCase();
-
-        String sql = "SELECT u.*, r.role_name "
-                + "FROM users u JOIN roles r ON u.role_id = r.role_id "
-                + "WHERE 1=1";
-//        AND r.role_name NOT LIKE '%Administrator%'
-
         List<Object> params = new ArrayList<>();
 
+        StringBuilder sql = new StringBuilder(
+                "SELECT u.*, r.role_name "
+                + "FROM users u JOIN roles r ON u.role_id = r.role_id "
+                + "WHERE 1=1 "
+        );
+
         if (keyword != null && !keyword.trim().isEmpty()) {
-            sql += "AND (u.full_name LIKE ? OR u.email LIKE ? OR u.phone_number LIKE ?) ";
+            sql.append("AND (u.full_name LIKE ? OR u.email LIKE ? OR u.phone_number LIKE ?) ");
             String wildcardKeyword = "%" + keyword.trim() + "%";
             params.add(wildcardKeyword);
             params.add(wildcardKeyword);
             params.add(wildcardKeyword);
         }
 
-        if (genderFilter != null && !genderFilter.isEmpty() && !genderFilter.equalsIgnoreCase("all")) {
-            sql += "AND u.gender = ? ";
+        if (genderFilter != null && !genderFilter.equalsIgnoreCase("all")) {
+            sql.append("AND u.gender = ? ");
             params.add(genderFilter);
         }
 
         if (roleIdFilter != null && roleIdFilter > 0) {
-            sql += "AND u.role_id = ? ";
+            sql.append("AND u.role_id = ? ");
             params.add(roleIdFilter);
         }
 
-        if (statusFilter != null && !statusFilter.isEmpty() && !statusFilter.equalsIgnoreCase("all")) {
-            sql += "AND u.status = ? ";
+        if (statusFilter != null && !statusFilter.equalsIgnoreCase("all")) {
+            sql.append("AND u.status = ? ");
             params.add(statusFilter);
         }
 
-        String sortFieldName = safeSortField;
-        String sortFieldPrefix = "u";
+        String safeSortField = (sortField != null && !sortField.isEmpty()) ? sortField : "user_id";
+        String safeSortOrder = (sortOrder != null && sortOrder.equalsIgnoreCase("DESC")) ? "DESC" : "ASC";
+        String finalSortField = safeSortField.equals("role_name") ? "r.role_name" : "u." + safeSortField;
 
-        if (safeSortField.equals("role_name")) {
-            sortFieldPrefix = "r";
-            sortFieldName = "role_name";
-        }
+        sql.append(String.format("ORDER BY %s %s", finalSortField, safeSortOrder));
 
-        sql += String.format(" ORDER BY %s.%s %s", sortFieldPrefix, sortFieldName, safeSortOrder);
-
-        try (Connection conn = getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+        try (Connection conn = getConnection(); PreparedStatement ps = conn.prepareStatement(sql.toString())) { // Sử dụng try-with-resources
 
             for (int i = 0; i < params.size(); i++) {
                 ps.setObject(i + 1, params.get(i));
@@ -90,13 +83,11 @@ public class UserDAO extends DBContext {
                             rs.getTimestamp("updated_at"),
                             rs.getObject("created_by", Integer.class)
                     );
-
                     user.setRoleName(rs.getString("role_name"));
 
                     users.add(user);
                 }
             }
-
         } catch (Exception e) {
             e.printStackTrace();
         }
