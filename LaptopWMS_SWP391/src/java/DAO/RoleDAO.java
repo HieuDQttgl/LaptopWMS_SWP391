@@ -97,23 +97,36 @@ public class RoleDAO extends DBContext {
     }
 
     public void updateRolePermissions(int roleId, List<Integer> permissionIds) throws Exception {
+    String deleteSql = "DELETE FROM role_permissions WHERE role_id = ?";
+    String insertSql = "INSERT INTO role_permissions (role_id, permission_id) VALUES (?, ?)";
 
-        String deleteSQL = "DELETE FROM role_permissions WHERE role_id = ?";
-        PreparedStatement psDel = getConnection().prepareStatement(deleteSQL);
-        psDel.setInt(1, roleId);
-        psDel.executeUpdate();
+    Connection conn = null;
+    try {
+        conn = getConnection();
+        conn.setAutoCommit(false); // 
 
-        String insertSQL = "INSERT INTO role_permissions (role_id, permission_id) VALUES (?, ?)";
-        PreparedStatement psIns = getConnection().prepareStatement(insertSQL);
-
-        for (Integer pid : permissionIds) {
-            psIns.setInt(1, roleId);
-            psIns.setInt(2, pid);
-            psIns.addBatch();
+        try (PreparedStatement psDel = conn.prepareStatement(deleteSql)) {
+            psDel.setInt(1, roleId);
+            psDel.executeUpdate();
         }
 
-        psIns.executeBatch();
+        try (PreparedStatement psIns = conn.prepareStatement(insertSql)) {
+            for (int pid : permissionIds) {
+                psIns.setInt(1, roleId);
+                psIns.setInt(2, pid);
+                psIns.addBatch(); 
+            }
+            psIns.executeBatch();
+        }
+
+        conn.commit(); 
+    } catch (Exception e) {
+        if (conn != null) conn.rollback(); 
+        throw e;
+    } finally {
+        if (conn != null) conn.close();
     }
+}
 
     public Role getRoleByName(String roleName) throws Exception {
         String sql = "SELECT * FROM roles WHERE role_name = ?";
@@ -142,20 +155,20 @@ public class RoleDAO extends DBContext {
         if (getRoleByName(roleName) != null) {
             return false;
         }
-        
+
         String sql = "INSERT INTO roles (role_name, role_description, status) VALUES (?, ?, 'active')";
-        
-        try (Connection conn = getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-            
+
+        try (Connection conn = getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+
             ps.setString(1, roleName);
             ps.setString(2, roleDescription);
-            
+
             return ps.executeUpdate() > 0;
-            
+
         } catch (Exception e) {
             e.printStackTrace();
             throw e;
         }
     }
+
 }

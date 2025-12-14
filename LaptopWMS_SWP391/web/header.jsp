@@ -37,19 +37,25 @@
     <div class="header-right">
         <a href="#features">Features</a>
         <a href="#hero">About</a>
-        <% if (currentUser != null) {%>
-        <a href="<%= request.getContextPath()%>/profile">Profile</a>
-        <a href="<%= request.getContextPath()%>/products">Products</a>
-        <% if (roleId == 1) {%>
-        <a href="<%= request.getContextPath()%>/user-list">User</a>
-        <a href="<%= request.getContextPath()%>/role">Role</a>
+        
+        <% if (currentUser != null) { %>
+            <a href="<%= request.getContextPath()%>/profile">Profile</a>
+            <% if (roleId == 1) { %>
+                <a href="<%= request.getContextPath()%>/user-list">User</a>
+                <a href="<%= request.getContextPath()%>/role">Role & Permission</a>
+            <% } %>
+            <% if (roleId == 2) { %>
+                <a href="<%= request.getContextPath()%>/products">Products</a>
+                <a href="<%= request.getContextPath()%>/inventory">Inventory</a>
+                <a href="<%= request.getContextPath()%>/supplier-list">Supplier</a>
+            <% } %>
+            <% if (roleId == 3) { %>
+                <a href="<%= request.getContextPath()%>/order-list">Orders</a>
+                <a href="<%= request.getContextPath()%>/customer-list">Customers</a>
+            <% } %>
+            <a href="<%= request.getContextPath()%>/logout"">Logout</a>
+        <% } else { %>
+            <a href="<%= request.getContextPath()%>/login">Login</a>
         <% } %>
-        <% if (roleId == 1 || roleId == 2) {%>
-        <a href="<%= request.getContextPath()%>/supplier-list">Supplier</a>
-        <% }%>
-        <a href="<%= request.getContextPath()%>/logout">Logout</a>
-        <% } else {%>
-        <a href="<%= request.getContextPath()%>/login">Login</a>
-        <% }%>
     </div>
 </div>

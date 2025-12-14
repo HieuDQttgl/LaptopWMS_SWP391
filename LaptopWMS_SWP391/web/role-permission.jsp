@@ -144,63 +144,73 @@
     }
 </style>
 
-<h2>Role Permission Management</h2>
+<body>
 
-<head><jsp:include page="header.jsp"/></head>
-<div style="display: flex; gap: 10px; margin-bottom: 15px;">
-    <select id="moduleSelect" onchange="filterTable()" style="padding: 8px; border-radius: 4px; border: 1px solid #ccc;">
-        <option value="all">-- All Modules --</option>
-        <% for (String m : modules) {%>
-        <option value="<%= m%>"><%= m%></option>
-        <% } %>
-    </select>
+<div class="container">
+    <h2>Role Permission Management</h2>
+    <% if (request.getParameter("success") != null) { %>
+        <div class="success-msg">Permissions updated successfully!</div>
+    <% } %>
 
-    <input type="text" 
-           id="searchInput" 
-           onkeyup="filterTable()" 
-           placeholder="Search permission name..." 
-           style="padding: 8px; border-radius: 4px; border: 1px solid #ccc; width: 250px;">
+    <div class="controls">
+        <select id="moduleSelect" onchange="filterTable()" style="padding: 8px; border-radius: 4px; border: 1px solid #ccc;">
+            <option value="all">-- All Modules --</option>
+            <% for (String m : modules) { %>
+                <option value="<%= m %>"><%= m %></option>
+            <% } %>
+        </select>
+
+        <input type="text" id="searchInput" onkeyup="filterTable()" placeholder="Search permission description..." >
+    </div>
+
+    <form action="role-permission" method="POST">
+        <table>
+            <thead>
+                <tr>
+                    <th>Permission (URL)</th>
+                    <% for (Role r : roles) { %>
+                        <th style="text-align: center;"><%= r.getRoleName() %></th>
+                    <% } %>
+                </tr>
+            </thead>
+            <tbody>
+                <% for (Permission p : permissions) { %>
+                <tr class="perm-row" data-module="<%= p.getModule() %>">
+                    <td>
+                        <span class="perm-name"><b><%= p.getPermissionDescription() %></b></span>
+                        <br>
+                        <small style="color: #888;"><%= p.getPermissionURL() %></small>
+                    </td>
+
+                    <% for (Role r : roles) { 
+                        Set<Integer> rolePerms = rolePermMap.get(r.getRoleId());
+                        boolean checked = rolePerms != null && rolePerms.contains(p.getPermissionId());
+                        boolean isAdmin = r.getRoleId() == 1;
+                    %>
+                    <td style="text-align: center;">
+                        <input type="checkbox" 
+                               name="perm_<%= r.getRoleId() %>_<%= p.getPermissionId() %>"
+                               value="true"
+                               <%= isAdmin ? "checked disabled" : (checked ? "checked" : "") %>>
+                        <% if (isAdmin) { %>
+                            <input type="hidden" name="perm_<%= r.getRoleId() %>_<%= p.getPermissionId() %>" value="true">
+                        <% } %>
+                    </td>
+                    <% } %>
+                </tr>
+                <% } %>
+            </tbody>
+        </table>
+
+        <button type="submit" class="update-btn">Save Changes</button>
+        <div style="clear: both;"></div>
+    </form>
 </div>
 
-<table>
-    <thead>
-        
-        <tr>
-            <th>Permission</th>
-                <% for (Role r : roles) {%>
-            <th><%= r.getRoleName()%></th>
-                <% } %>
-        </tr>
-    </thead>
-    <tbody>
-        <% for (Permission p : permissions) {%>
-        <tr class="perm-row" data-module="<%= p.getModule()%>">
-            <td>
-                <span class="perm-name"><b><%= p.getPermissionDescription()%></b></span>
-                <br>
-                <small style="color: #666;">Module: <%= p.getModule()%></small>
-            </td>
+<jsp:include page="footer.jsp"/>
 
-            <% for (Role r : roles) {
-                    Set<Integer> rolePerms = rolePermMap.get(r.getRoleId());
-                    boolean checked = rolePerms != null && rolePerms.contains(p.getPermissionId());
-                    boolean isAdmin = r.getRoleId() == 1;
-            %>
-            <td style="text-align: center;">
-                <input type="checkbox" 
-                       name="perm_<%= r.getRoleId()%>_<%= p.getPermissionId()%>"
-                       <%= isAdmin ? "checked disabled" : (checked ? "checked" : "")%> 
-                       />
-            </td>
-            <% } %>
-        </tr>
-        <% }%>
-    </tbody>
-</table>
-    <body><jsp:include page="footer.jsp"/></body>
 <script>
     function filterTable() {
-
         var input = document.getElementById("searchInput").value.toUpperCase();
         var selectedModule = document.getElementById("moduleSelect").value;
         var rows = document.querySelectorAll(".perm-row");
@@ -210,11 +220,9 @@
             var module = row.getAttribute("data-module");
             var matchKeyword = text.indexOf(input) > -1;
             var matchModule = (selectedModule === "all" || selectedModule === module);
-            if (matchKeyword && matchModule) {
-                row.style.display = "";
-            } else {
-                row.style.display = "none";
-            }
+            row.style.display = (matchKeyword && matchModule) ? "" : "none";
         });
     }
 </script>
+</body>
+</html>
