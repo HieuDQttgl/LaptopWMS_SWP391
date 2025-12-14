@@ -60,7 +60,7 @@ public class UserDAO extends DBContext {
 
         sql.append(String.format("ORDER BY %s %s", finalSortField, safeSortOrder));
 
-        try (Connection conn = getConnection(); PreparedStatement ps = conn.prepareStatement(sql.toString())) { // Sử dụng try-with-resources
+        try (Connection conn = getConnection(); PreparedStatement ps = conn.prepareStatement(sql.toString())) {
 
             for (int i = 0; i < params.size(); i++) {
                 ps.setObject(i + 1, params.get(i));

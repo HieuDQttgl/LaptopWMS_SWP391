@@ -40,6 +40,7 @@
         <% if (currentUser != null) {%>
         <a href="<%= request.getContextPath()%>/profile">Profile</a>
         <a href="<%= request.getContextPath()%>/products">Products</a>
+        <a href="<%= request.getContextPath()%>/order-list">Orders</a>
         <% if (roleId == 1) {%>
         <a href="<%= request.getContextPath()%>/user-list">User</a>
         <a href="<%= request.getContextPath()%>/role">Role</a>
