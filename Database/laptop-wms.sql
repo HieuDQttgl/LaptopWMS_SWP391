@@ -235,7 +235,7 @@ CREATE TABLE `product_details` (
 
 LOCK TABLES `product_details` WRITE;
 /*!40000 ALTER TABLE `product_details` DISABLE KEYS */;
-INSERT INTO `product_details` VALUES (1,1,'16GB','512GB','Intel Core i7-1360P','Intel Iris Xe',13.4,1),(2,2,'16GB','512GB','Apple M3 Pro','14-core GPU',16.2,1),(3,3,'8GB','256GB','Intel Core i3-1115G4','Intel UHD',15.6,1),(4,4,'32GB','1TB','Intel Core i7-1355U','Intel Iris Xe',14,1),(5,5,'32GB','1TB','Intel Core i9-13980HX','NVIDIA RTX 4090',18,1),(6,6,'16GB','1TB','Intel Core i7-13700HX','NVIDIA RTX 4070',16,1),(7,7,'32GB','2TB','Intel Core i9-13980HX','NVIDIA RTX 4080',17,1),(8,7,'64GB','4TB','Intel Core i9-13980HX','NVIDIA RTX 4090',17,1),(9,8,'64GB','2TB','Intel Core i9-13950HX','NVIDIA RTX 5000 Ada',16,0),(10,8,'128GB','8TB','Intel Core i9-13950HX','NVIDIA RTX 5000 Ada',16,1),(11,9,'64GB','2TB','Intel Core i7-13850HX','NVIDIA RTX 3500 Ada',17.3,1),(12,1,'32GB','1TB','Intel Core i7-1360P','Intel Iris Xe',13.4,1),(13,2,'36GB','1TB','Apple M3 Pro','18-core GPU',16.2,1),(14,2,'96GB','4TB','Apple M3 Max','40-core GPU',16.2,1),(15,4,'16GB','512GB','Intel Core i5-1335U','Intel Iris Xe',14,0);
+INSERT INTO `product_details` VALUES (1,1,'16GB','512GB','Intel Core i7-1360P','Intel Iris Xe',13.4,1),(2,2,'16GB','512GB','Apple M3 Pro','14-core GPU',16.2,1),(3,3,'8GB','256GB','Intel Core i3-1115G4','Intel UHD',15.6,1),(4,4,'32GB','1TB','Intel Core i7-1355U','Intel Iris Xe',14,1),(5,5,'32GB','1TB','Intel Core i9-13980HX','NVIDIA RTX 4090',18,1),(6,6,'16GB','1TB','Intel Core i7-13700HX','NVIDIA RTX 4070',16,0),(7,7,'32GB','2TB','Intel Core i9-13980HX','NVIDIA RTX 4080',17,1),(8,7,'64GB','4TB','Intel Core i9-13980HX','NVIDIA RTX 4090',17,1),(9,8,'64GB','2TB','Intel Core i9-13950HX','NVIDIA RTX 5000 Ada',16,0),(10,8,'128GB','8TB','Intel Core i9-13950HX','NVIDIA RTX 5000 Ada',16,1),(11,9,'64GB','2TB','Intel Core i7-13850HX','NVIDIA RTX 3500 Ada',17.3,1),(12,1,'32GB','1TB','Intel Core i7-1360P','Intel Iris Xe',13.4,1),(13,2,'36GB','1TB','Apple M3 Pro','18-core GPU',16.2,1),(14,2,'96GB','4TB','Apple M3 Max','40-core GPU',16.2,1),(15,4,'16GB','512GB','Intel Core i5-1335U','Intel Iris Xe',14,0);
 /*!40000 ALTER TABLE `product_details` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -253,7 +253,7 @@ CREATE TABLE `products` (
   `category` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
   `supplier_id` int DEFAULT NULL,
   `unit` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT 'unit',
-  `status` enum('active','inactive') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT 'active',
+  `status` tinyint(1) DEFAULT '1',
   PRIMARY KEY (`product_id`),
   KEY `fk_product_supplier` (`supplier_id`),
   CONSTRAINT `fk_product_supplier` FOREIGN KEY (`supplier_id`) REFERENCES `suppliers` (`supplier_id`)
@@ -266,7 +266,7 @@ CREATE TABLE `products` (
 
 LOCK TABLES `products` WRITE;
 /*!40000 ALTER TABLE `products` DISABLE KEYS */;
-INSERT INTO `products` VALUES (1,'Dell XPS 13 (Core i7, 16GB)','Dell','Office',1,'piece','active'),(2,'Macbook Pro M3 (16 inch)','Apple','Office',2,'piece','active'),(3,'Dell Vostro 3500 (Core i3)','Dell','Office',1,'piece','active'),(4,'Lenovo ThinkPad X1 Carbon','Lenovo','Gaming',3,'piece','active'),(5,'ASUS ROG Strix Scar 18','ASUS','Gaming',4,'piece','active'),(6,'Acer Predator Helios 16','Acer','Gaming',5,'piece','inactive'),(7,'MSI Raider GE78','MSI','Gaming',6,'piece','active'),(8,'HP ZBook Fury 16 G10','HP','Workstation',7,'piece','active'),(9,'Dell Precision 7780','Dell','Workstation',1,'piece','active');
+INSERT INTO `products` VALUES (1,'Dell XPS 13 (Core i7, 16GB)','Dell','Office',1,'piece',1),(2,'Macbook Pro M3 (16 inch)','Apple','Office',2,'piece',1),(3,'Dell Vostro 3500 (Core i3)','Dell','Office',1,'piece',1),(4,'Lenovo ThinkPad X1 Carbon','Lenovo','Gaming',3,'piece',1),(5,'ASUS ROG Strix Scar 18','ASUS','Gaming',4,'piece',1),(6,'Acer Predator Helios 16','Acer','Gaming',5,'piece',0),(7,'MSI Raider GE78','MSI','Gaming',6,'piece',1),(8,'HP ZBook Fury 16 G10','HP','Workstation',7,'piece',1),(9,'Dell Precision 7780','Dell','Workstation',1,'piece',1);
 /*!40000 ALTER TABLE `products` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -440,6 +440,10 @@ UNLOCK TABLES;
 --
 -- Dumping events for database 'laptop_wms'
 --
+
+--
+-- Dumping routines for database 'laptop_wms'
+--
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
@@ -450,4 +454,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-12-13 23:39:19
+-- Dump completed on 2025-12-14 23:25:41

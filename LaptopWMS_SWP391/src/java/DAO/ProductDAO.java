@@ -66,7 +66,7 @@ public class ProductDAO extends DBContext {
                     p.setProductName(rs.getString("product_name"));
                     p.setCategory(rs.getString("category"));
                     p.setUnit(rs.getString("unit"));
-                    p.setStatus(rs.getString("status"));
+                    p.setStatus(rs.getBoolean("status"));
 
                     p.setSupplierName(rs.getString("supplier_name"));
                     p.setBrand(rs.getString("brand"));
@@ -111,5 +111,39 @@ public class ProductDAO extends DBContext {
             e.printStackTrace();
         }
         return details;
+    }
+
+    public void toggleProductStatus(int productId) {
+        String flipParent = "UPDATE products SET status = NOT status WHERE product_id = ?";
+
+        String syncChildren = "UPDATE product_details SET status = "
+                + "(SELECT status FROM products WHERE product_id = ?) "
+                + "WHERE product_id = ?";
+
+        try {
+            try (PreparedStatement ps = getConnection().prepareStatement(flipParent)) {
+                ps.setInt(1, productId);
+                ps.executeUpdate();
+            }
+
+            try (PreparedStatement ps = getConnection().prepareStatement(syncChildren)) {
+                ps.setInt(1, productId);
+                ps.setInt(2, productId);
+                ps.executeUpdate();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void toggleDetailStatus(int detailId) {
+        String sql = "UPDATE product_details SET status = NOT status WHERE product_detail_id = ?";
+
+        try (PreparedStatement ps = getConnection().prepareStatement(sql)) {
+            ps.setInt(1, detailId);
+            ps.executeUpdate();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }
