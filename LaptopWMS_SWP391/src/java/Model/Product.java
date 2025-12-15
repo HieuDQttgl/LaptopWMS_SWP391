@@ -18,6 +18,7 @@ public class Product {
     private String brand;
     private String category;
     private String supplierName;
+    private int supplierId;
     private String unit;
     private boolean status;
 
@@ -71,6 +72,14 @@ public class Product {
 
     public void setSupplierName(String supplierName) {
         this.supplierName = supplierName;
+    }
+
+    public int getSupplierId() {
+        return supplierId;
+    }
+
+    public void setSupplierId(int supplierId) {
+        this.supplierId = supplierId;
     }
 
     public String getUnit() {
