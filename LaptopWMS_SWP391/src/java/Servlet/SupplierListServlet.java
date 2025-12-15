@@ -90,20 +90,27 @@ public class SupplierListServlet extends HttpServlet {
         }
 
         Users currentUser = (Users) session.getAttribute("currentUser");
+        int roleId = currentUser.getRoleId();
 
-        // Only Admin can add/modify suppliers
-        if (currentUser.getRoleId() != ADMIN_ROLE_ID) {
-            session.setAttribute("error", "Access denied: You do not have permission to add suppliers.");
-            response.sendRedirect(request.getContextPath() + "/supplier-list");
-            return;
-        }
-
+        // Check access for specific actions
         if ("add".equals(action)) {
+            // Only Admin can add suppliers
+            if (roleId != ADMIN_ROLE_ID) {
+                session.setAttribute("error", "Access denied: Only Admin can add suppliers.");
+                response.sendRedirect(request.getContextPath() + "/supplier-list");
+                return;
+            }
             handleAddSupplier(request, response, session, currentUser);
             return;
         }
 
         if ("changeStatus".equals(action)) {
+            // Admin and Warehouse Keeper can change status
+            if (roleId != ADMIN_ROLE_ID && roleId != WAREHOUSE_ROLE_ID) {
+                session.setAttribute("error", "Access denied: You do not have permission to change supplier status.");
+                response.sendRedirect(request.getContextPath() + "/supplier-list");
+                return;
+            }
             handleChangeStatus(request, response, session);
             return;
         }
