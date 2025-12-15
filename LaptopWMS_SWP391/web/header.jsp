@@ -39,7 +39,7 @@
         <a href="#hero">About</a>
         <% if (currentUser != null) {%>
         <a href="<%= request.getContextPath()%>/profile">Profile</a>
-        <a href="<%= request.getContextPath()%>/products">Products</a>
+        <a href="<%= request.getContextPath()%>/product-list">Products</a>
         <a href="<%= request.getContextPath()%>/order-list">Orders</a>
         <% if (roleId == 1) {%>
         <a href="<%= request.getContextPath()%>/user-list">User</a>
