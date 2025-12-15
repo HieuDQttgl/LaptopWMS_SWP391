@@ -48,6 +48,9 @@
         <% if (roleId == 1 || roleId == 2) {%>
         <a href="<%= request.getContextPath()%>/supplier-list">Supplier</a>
         <% }%>
+        <% if (roleId == 1 || roleId == 7) {%>
+        <a href="<%= request.getContextPath()%>/customer-list">Customer</a>
+        <% }%>
         <a href="<%= request.getContextPath()%>/logout">Logout</a>
         <% } else {%>
         <a href="<%= request.getContextPath()%>/login">Login</a>
