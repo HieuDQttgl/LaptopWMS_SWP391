@@ -58,12 +58,41 @@ public class SupplierListServlet extends HttpServlet {
             sortOrder = "ASC";
         }
 
-        // Get suppliers list
+        // Pagination parameters
+        int pageSize = 5; // Items per page
+        int currentPage = 1;
+
+        String pageParam = request.getParameter("page");
+        if (pageParam != null && !pageParam.isEmpty()) {
+            try {
+                currentPage = Integer.parseInt(pageParam);
+                if (currentPage < 1) {
+                    currentPage = 1;
+                }
+            } catch (NumberFormatException e) {
+                currentPage = 1;
+            }
+        }
+
+        // Get total count for pagination
+        int totalCount = supplierDAO.getTotalSuppliers(keyword, statusFilter);
+        int totalPages = (int) Math.ceil((double) totalCount / pageSize);
+
+        // Ensure current page is within valid range
+        if (currentPage > totalPages && totalPages > 0) {
+            currentPage = totalPages;
+        }
+
+        int offset = (currentPage - 1) * pageSize;
+
+        // Get suppliers list with pagination
         List<Supplier> suppliers = supplierDAO.getListSuppliers(
                 keyword,
                 statusFilter,
                 sortField,
-                sortOrder);
+                sortOrder,
+                offset,
+                pageSize);
 
         // Set attributes for JSP
         request.setAttribute("suppliers", suppliers);
@@ -72,6 +101,12 @@ public class SupplierListServlet extends HttpServlet {
         request.setAttribute("sort_field", sortField);
         request.setAttribute("sort_order", sortOrder);
         request.setAttribute("currentUser", currentUser);
+
+        // Pagination attributes
+        request.setAttribute("currentPage", currentPage);
+        request.setAttribute("totalPages", totalPages);
+        request.setAttribute("totalCount", totalCount);
+        request.setAttribute("pageSize", pageSize);
 
         request.getRequestDispatcher("/supplier-list.jsp").forward(request, response);
     }

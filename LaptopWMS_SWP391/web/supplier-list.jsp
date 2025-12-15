@@ -226,6 +226,62 @@
             .btn-secondary:hover {
                 background-color: #7f8c8d;
             }
+
+            /* Pagination Styles */
+            .pagination-container {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                gap: 8px;
+                margin: 20px 0;
+                flex-wrap: wrap;
+            }
+
+            .pagination-container a,
+            .pagination-container span {
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                min-width: 36px;
+                height: 36px;
+                padding: 0 10px;
+                border-radius: 6px;
+                text-decoration: none;
+                font-size: 14px;
+                font-weight: 500;
+                transition: all 0.2s ease;
+            }
+
+            .pagination-container a {
+                background-color: #ffffff;
+                color: #374151;
+                border: 1px solid #d1d5db;
+            }
+
+            .pagination-container a:hover {
+                background-color: #f3f4f6;
+                border-color: #9ca3af;
+            }
+
+            .pagination-container .page-current {
+                background: linear-gradient(135deg, #2563eb, #3b82f6);
+                color: #ffffff;
+                border: none;
+                box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+            }
+
+            .pagination-container .page-disabled {
+                background-color: #f3f4f6;
+                color: #9ca3af;
+                border: 1px solid #e5e7eb;
+                cursor: not-allowed;
+            }
+
+            .pagination-info {
+                color: #6b7280;
+                font-size: 14px;
+                margin-left: 16px;
+            }
         </style>
     </head>
 
@@ -413,13 +469,141 @@
                             No suppliers found.</td>
                     </tr>
                     <% }%>
-                </tbody>
             </table>
 
-            <p id="totalSuppliers" style="margin-top: 20px; color: #7f8c8d;">Total
-                Suppliers: <%= suppliers != null ? suppliers.size() : 0%>
+            <!-- Pagination -->
+            <% Integer currentPage = (Integer) request.getAttribute("currentPage");
+                Integer totalPages = (Integer) request.getAttribute("totalPages");
+                Integer totalCount = (Integer) request.getAttribute("totalCount");
+                Integer pageSize = (Integer) request.getAttribute("pageSize");
+                if (currentPage == null) {
+                    currentPage = 1;
+                }
+                if (totalPages == null) {
+                    totalPages = 1;
+                }
+                if (totalCount == null) {
+                    totalCount = 0;
+                }
+                if (pageSize == null) {
+                    pageSize = 5;
+                }
+                String baseUrl = request.getContextPath()
+                        + "/supplier-list?";
+                if (currentKeyword != null
+                        && !currentKeyword.isEmpty()) {
+                    baseUrl += "keyword="
+                            + java.net.URLEncoder.encode(currentKeyword, "UTF-8") + "&";
+                }
+                if (currentStatus != null && !currentStatus.isEmpty()) {
+                    baseUrl
+                            += "status_filter=" + currentStatus + "&";
+                }
+                if (currentSortField
+                        != null && !currentSortField.isEmpty()) {
+                    baseUrl += "sort_field="
+                            + currentSortField + "&";
+                }
+                if (currentSortOrder != null
+                        && !currentSortOrder.isEmpty()) {
+                                                        baseUrl += "sort_order="
+                                                                + currentSortOrder + "&";
+                                                    } %>
+
+            <% if (totalPages > 1) { %>
+            <div class="pagination-container">
+                <!-- Previous Button -->
+                <% if (currentPage > 1) {%>
+                <a href="<%= baseUrl%>page=<%= currentPage - 1%>">&laquo;
+                    Prev</a>
+                    <% } else { %>
+                <span class="page-disabled">&laquo; Prev</span>
+                <% } %>
+
+                <!-- Page Numbers -->
+                <% int startPage = Math.max(1, currentPage - 2);
+                    int endPage = Math.min(totalPages, currentPage
+                            + 2);
+                    if (startPage > 1) {
+                %>
+                <a href="<%= baseUrl%>page=1">1</a>
+                <% if (startPage > 2) { %>
+                <span class="page-disabled">...</span>
+                <% } %>
+                <% } %>
+
+                <% for (int i = startPage; i
+                                                                                                    <= endPage; i++) { %>
+                <% if (i == currentPage) {%>
+                <span
+                    class="page-current">
+                    <%= i%>
+                </span>
+                <% } else {%>
+                <a
+                    href="<%= baseUrl%>page=<%= i%>">
+                    <%= i%>
+                </a>
+                <% } %>
+                <% } %>
+
+                <% if (endPage
+                                                                                                                        < totalPages) { %>
+                <% if (endPage
+                                                                                                                            < totalPages
+                                                                                                                            - 1) { %>
+                <span
+                    class="page-disabled">...</span>
+                <% }
+                %>
+                <a
+                    href="<%= baseUrl%>page=<%= totalPages%>">
+                    <%= totalPages%>
+                </a>
+                <% }
+                %>
+
+                <!-- Next Button -->
+                <% if (currentPage
+                            < totalPages) {
+                %>
+                <a
+                    href="<%= baseUrl%>page=<%= currentPage + 1%>">Next
+                    &raquo;</a>
+                    <% } else {
+                    %>
+                <span
+                    class="page-disabled">Next
+                    &raquo;</span>
+                    <% }
+                    %>
+
+                <span
+                    class="pagination-info">
+                    Showing
+                    <%= Math.min((currentPage
+                                                                                                                                                    - 1)
+                                                                                                                                                    * pageSize
+                                                                                                                                                    + 1,
+                                                                                                                                                    totalCount)%>
+                    -
+                    <%= Math.min(currentPage
+                                                                                                                                                        * pageSize,
+                                                                                                                                                        totalCount)%>
+                    of
+                    <%= totalCount%>
+                    suppliers
+                </span>
+            </div>
+            <% } else {%>
+            <p
+                style="margin-top: 20px; color: #7f8c8d; text-align: center;">
+                Total Suppliers: <%= totalCount%>
             </p>
-            <a id="backLanding" href="<%= request.getContextPath()%>/landing"
+            <% }%>
+
+            <a id="backLanding"
+               href="<%= request.getContextPath()%>/landing"
                class="btn-secondary">Back to Landing Page</a>
         </div>
 
