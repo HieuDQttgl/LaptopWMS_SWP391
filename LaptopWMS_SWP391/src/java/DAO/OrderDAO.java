@@ -12,7 +12,7 @@ import java.util.List;
 public class OrderDAO extends DBContext {
 
     public List<Order> getListOrders() {
-        return getListOrders(null, null, null, null, null);
+        return getListOrders(null, null, null, null, null, null);
     }
 
     public List<Order> getListOrders(
@@ -20,7 +20,8 @@ public class OrderDAO extends DBContext {
             String statusFilter,
             Integer createdByFilter,
             String startDateFilter,
-            String endDateFilter) {
+            String endDateFilter,
+            String orderTypeFilter) {
 
         List<Order> orders = new ArrayList<>();
         List<Object> params = new ArrayList<>();
@@ -60,6 +61,14 @@ public class OrderDAO extends DBContext {
         if (endDateFilter != null && !endDateFilter.isEmpty()) {
             sql.append("AND DATE(o.created_at) <= ? ");
             params.add(endDateFilter);
+        }
+
+        if (orderTypeFilter != null && !orderTypeFilter.isEmpty() && !orderTypeFilter.equalsIgnoreCase("all")) {
+            if (orderTypeFilter.equalsIgnoreCase("EXPORT")) {
+                sql.append("AND o.customer_id IS NOT NULL ");
+            } else if (orderTypeFilter.equalsIgnoreCase("IMPORT")) {
+                sql.append("AND o.supplier_id IS NOT NULL ");
+            }
         }
 
         sql.append(" ORDER BY o.order_id ASC");
@@ -102,72 +111,8 @@ public class OrderDAO extends DBContext {
 
         return orders;
     }
-
-    public OrderSummary getOrderSummary(int customerId) {
-        String sql = """
-        SELECT COUNT(DISTINCT o.order_id) AS total_orders,
-               COALESCE(SUM(op.quantity * op.unit_price), 0) AS total_value,
-               MAX(o.created_at) AS last_order_date
-        FROM orders o
-        LEFT JOIN order_products op ON o.order_id = op.order_id
-        WHERE o.customer_id = ?
-    """;
-
-        try (PreparedStatement ps = getConnection().prepareStatement(sql)) {
-            ps.setInt(1, customerId);
-            ResultSet rs = ps.executeQuery();
-
-            if (rs.next()) {
-                OrderSummary s = new OrderSummary();
-                s.setTotalOrders(rs.getInt("total_orders"));
-                s.setTotalValue(rs.getDouble("total_value"));
-                s.setLastOrderDate(rs.getTimestamp("last_order_date"));
-                return s;
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-
-    public List<OrderDTO> getRecentOrders(int customerId, int limit) {
-        List<OrderDTO> list = new ArrayList<>();
-
-        String sql = """
-        SELECT o.order_id,
-               o.order_code,
-               o.order_status,
-               o.created_at,
-               COALESCE(SUM(op.quantity * op.unit_price), 0) AS total_amount
-        FROM orders o
-        LEFT JOIN order_products op ON o.order_id = op.order_id
-        WHERE o.customer_id = ?
-        GROUP BY o.order_id, o.order_code, o.order_status, o.created_at
-        ORDER BY o.created_at DESC
-        LIMIT ?
-    """;
-
-        try (PreparedStatement ps = getConnection().prepareStatement(sql)) {
-            ps.setInt(1, customerId);
-            ps.setInt(2, limit);
-            ResultSet rs = ps.executeQuery();
-
-            while (rs.next()) {
-                OrderDTO o = new OrderDTO();
-                o.setOrderId(rs.getInt("order_id"));
-                o.setOrderCode(rs.getString("order_code"));
-                o.setOrderStatus(rs.getString("order_status"));
-                o.setCreatedAt(rs.getTimestamp("created_at"));
-                o.setTotalAmount(rs.getDouble("total_amount"));
-                list.add(o);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return list;
-    }
-
-    public Order getOrderById(int orderId) {
+    
+        public Order getOrderById(int orderId) {
         Order order = null;
 
         String SQL = "SELECT "
@@ -216,4 +161,69 @@ public class OrderDAO extends DBContext {
         }
         return order;
     }
+
+    public OrderSummary getOrderSummary(int customerId) {
+        String sql = """
+        SELECT COUNT(DISTINCT o.order_id) AS total_orders,
+               COALESCE(SUM(op.quantity * op.unit_price), 0) AS total_value,
+               MAX(o.created_at) AS last_order_date
+        FROM orders o
+        LEFT JOIN order_products op ON o.order_id = op.order_id
+        WHERE o.customer_id = ?
+    """;
+
+        try (PreparedStatement ps = getConnection().prepareStatement(sql)) {
+            ps.setInt(1, customerId);
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {
+                OrderSummary s = new OrderSummary();
+                s.setTotalOrders(rs.getInt("total_orders"));
+                s.setTotalValue(rs.getDouble("total_value"));
+                s.setLastOrderDate(rs.getTimestamp("last_order_date"));
+                return s;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+    
+    public List<OrderDTO> getRecentOrders(int customerId, int limit) {
+        List<OrderDTO> list = new ArrayList<>();
+
+        String sql = """
+        SELECT o.order_id,
+               o.order_code,
+               o.order_status,
+               o.created_at,
+               COALESCE(SUM(op.quantity * op.unit_price), 0) AS total_amount
+        FROM orders o
+        LEFT JOIN order_products op ON o.order_id = op.order_id
+        WHERE o.customer_id = ?
+        GROUP BY o.order_id, o.order_code, o.order_status, o.created_at
+        ORDER BY o.created_at DESC
+        LIMIT ?
+    """;
+
+        try (PreparedStatement ps = getConnection().prepareStatement(sql)) {
+            ps.setInt(1, customerId);
+            ps.setInt(2, limit);
+            ResultSet rs = ps.executeQuery();
+
+            while (rs.next()) {
+                OrderDTO o = new OrderDTO();
+                o.setOrderId(rs.getInt("order_id"));
+                o.setOrderCode(rs.getString("order_code"));
+                o.setOrderStatus(rs.getString("order_status"));
+                o.setCreatedAt(rs.getTimestamp("created_at"));
+                o.setTotalAmount(rs.getDouble("total_amount"));
+                list.add(o);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
+
 }

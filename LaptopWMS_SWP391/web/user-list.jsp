@@ -118,7 +118,7 @@
                 gap: 10px;
                 margin-top: 20px;
             }
-
+            
             .btn-close {
                 background-color: #95a5a6;
                 color: white;
@@ -462,8 +462,7 @@
 
                     <label>Role *:</label>
                     <select name="roleId" id="roleIdSelect">
-                        <option value="0" ${currentRole == '0' ? 'selected' : ''}>-- Select Role --</option> 
-
+                        <option value="0" ${currentRole == '0' ? 'selected' : ''}>Select Role</option> 
                         <c:forEach var="r" items="${allRoles}">
                             <c:if test="${r.status eq 'active'}">
                                 <option value="${r.roleId}" ${roleIdValue == r.roleId ? 'selected' : ''}>
@@ -478,7 +477,7 @@
                     <% }%>
 
                     <div class="form-actions">
-                        <button type="submit" onclick="return validateAddUserForm()">Add User</button>
+                        <button type="submit" class="btn-add" onclick="return validateAddUserForm()">Add User</button>
                         <button type="button" class="btn-close" onclick="hideAddForm()">Close Form</button>
                     </div>
                 </form>

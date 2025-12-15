@@ -27,6 +27,7 @@ public class OrderListServlet extends HttpServlet {
         String createdByParam = request.getParameter("createdByFilter");
         String startDateFilter = request.getParameter("startDateFilter");
         String endDateFilter = request.getParameter("endDateFilter");
+        String orderTypeFilter = request.getParameter("orderTypeFilter");
         
         Integer createdByFilter = null;
         if (createdByParam != null && !createdByParam.isEmpty()) {
@@ -42,7 +43,8 @@ public class OrderListServlet extends HttpServlet {
                 statusFilter, 
                 createdByFilter, 
                 startDateFilter, 
-                endDateFilter
+                endDateFilter,
+                orderTypeFilter
         );
         
 
@@ -58,6 +60,7 @@ public class OrderListServlet extends HttpServlet {
         request.setAttribute("createdByFilter", createdByParam);
         request.setAttribute("startDateFilter", startDateFilter);
         request.setAttribute("endDateFilter", endDateFilter);
+        request.setAttribute("orderTypeFilter", orderTypeFilter);
         
         request.getRequestDispatcher("order-list.jsp").forward(request, response);
     }
