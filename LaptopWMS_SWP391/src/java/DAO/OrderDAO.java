@@ -64,7 +64,6 @@ public class OrderDAO extends DBContext {
 
         try (Connection conn = getConnection(); PreparedStatement ps = conn.prepareStatement(sql.toString())) {
 
-            // Thiết lập tất cả các tham số
             for (int i = 0; i < params.size(); i++) {
                 ps.setObject(i + 1, params.get(i));
             }
@@ -100,5 +99,56 @@ public class OrderDAO extends DBContext {
         }
 
         return orders;
+    }
+    
+    public Order getOrderById(int orderId) {
+        Order order = null;
+        
+        String SQL = "SELECT "
+                   + "o.*, "
+                   + "c.customer_name, "
+                   + "s.supplier_name, "
+                   + "u.full_name AS created_by_name "
+                   + "FROM orders o "
+                   + "LEFT JOIN customers c ON o.customer_id = c.customer_id "
+                   + "LEFT JOIN suppliers s ON o.supplier_id = s.supplier_id "
+                   + "LEFT JOIN users u ON o.created_by = u.user_id "
+                   + "WHERE o.order_id = ?";
+        
+        try (Connection conn = new DBContext().getConnection(); 
+             PreparedStatement ps = conn.prepareStatement(SQL)) {
+            
+            ps.setInt(1, orderId);
+            
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) { 
+                    order = new Order();  
+                    order.setOrderId(rs.getInt("order_id"));
+                    order.setOrderCode(rs.getString("order_code"));
+                    order.setDescription(rs.getString("description"));
+                    order.setOrderStatus(rs.getString("order_status"));
+                    order.setCreatedAt(rs.getTimestamp("created_at"));
+                    order.setUpdatedAt(rs.getTimestamp("updated_at"));
+                    order.setCreatedBy(rs.getInt("created_by"));
+                    
+                    int customerId = rs.getInt("customer_id");
+                    if (!rs.wasNull()) {
+                        order.setCustomerId(customerId);
+                    }
+                    
+                    int supplierId = rs.getInt("supplier_id");
+                    if (!rs.wasNull()) {
+                        order.setSupplierId(supplierId);
+                    }
+                    
+                    order.setCustomerName(rs.getString("customer_name"));
+                    order.setSupplierName(rs.getString("supplier_name"));
+                    order.setCreatedByName(rs.getString("created_by_name"));
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return order;
     }
 }

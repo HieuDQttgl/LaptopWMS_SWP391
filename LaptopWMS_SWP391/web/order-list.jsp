@@ -6,7 +6,7 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <title>Order Management</title>
-        
+
         <style>
             body {
                 font-family: "Segoe UI", Arial, sans-serif;
@@ -67,35 +67,37 @@
                 font-size: 12px;
                 text-transform: capitalize;
             }
-            .badge-status-pending { 
-                background-color: #ecf0f1; 
-                color: #7f8c8d; 
+            .badge-status-pending {
+                background-color: #ecf0f1;
+                color: #7f8c8d;
             }
-            .badge-status-approved { 
-                background-color: #fcf8e3; 
-                color: #8a6d3b; 
+            .badge-status-approved {
+                background-color: #fcf8e3;
+                color: #8a6d3b;
             }
-            .badge-status-shipping { 
-                background-color: #d9edf7; 
-                color: #31708f; 
+            .badge-status-shipping {
+                background-color: #d9edf7;
+                color: #31708f;
             }
-            .badge-status-completed { 
-                background-color: #dff0d8; 
-                color: #3c763d; 
+            .badge-status-completed {
+                background-color: #dff0d8;
+                color: #3c763d;
             }
-            .badge-status-cancelled { 
-                background-color: #f2dede; 
-                color: #a94442; 
+            .badge-status-cancelled {
+                background-color: #f2dede;
+                color: #a94442;
             }
 
-            .action-icons a {
-                margin: 0 5px;
+            .action-links a {
+                margin-right: 15px;
+                text-decoration: none;
                 color: #2980b9;
+                font-weight: 600;
                 transition: color 0.3s;
-                font-size: 16px;
             }
-            .action-icons a:hover {
+            .action-links a:hover {
                 color: #3498db;
+                text-decoration: underline;
             }
 
             .filter-container {
@@ -133,7 +135,7 @@
                 font-size: 14px;
                 box-sizing: border-box;
             }
-            
+
             .btn-action-group {
                 display: flex;
                 gap: 10px;
@@ -193,36 +195,35 @@
                 background-color: #27ae60;
             }
             .date-filter-row {
-                 display: flex;
-                 flex-wrap: wrap;
-                 gap: 15px;
-                 margin-bottom: 15px;
-                 align-items: flex-end;
+                display: flex;
+                flex-wrap: wrap;
+                gap: 15px;
+                margin-bottom: 15px;
+                align-items: flex-end;
             }
             .date-filter-row .form-group {
                 flex: 1 1 200px;
                 min-width: 150px;
             }
             .date-filter-row .form-group:nth-child(3) {
-                 flex: 2 1 auto; 
+                flex: 2 1 auto;
             }
-
         </style>
     </head>
     <body>
-        
+
         <jsp:include page="header.jsp" /> 
-        
+
         <div class="container">
-            <h2><i class="fas fa-shopping-basket"></i> Order List</h2>
+            <h2>Order List</h2>
 
             <div style="margin-bottom: 20px;">
-                <a href="order-create" class="btn-success"><i class="fas fa-plus"></i> Thêm Đơn hàng</a>
+                <a href="order-create" class="btn-success">+ Thêm Đơn hàng</a>
             </div>
-            
+
             <div class="filter-container">
                 <form action="order-list" method="get" class="filter-form">
-                    
+
                     <div class="form-row">
                         <div class="form-group">
                             <label for="keyword">Search</label>
@@ -240,13 +241,13 @@
                                 <option value="Cancelled" ${statusFilter == 'Cancelled' ? 'selected' : ''}>Cancelled</option>
                             </select>
                         </div>
-                        
+
                         <div class="form-group">
                             <label for="orderTypeFilter">Order Type</label>
                             <select id="orderTypeFilter" name="orderTypeFilter">
                                 <option value="all" ${orderTypeFilter == null || orderTypeFilter == 'all' ? 'selected' : ''}>All Types</option>
-                                <option value="Export" ${orderTypeFilter == 'Export' ? 'selected' : ''}>Export (Bán ra)</option>
-                                <option value="Import" ${orderTypeFilter == 'Import' ? 'selected' : ''}>Import (Nhập vào)</option>
+                                <option value="Export" ${orderTypeFilter == 'Export' ? 'selected' : ''}>Export</option>
+                                <option value="Import" ${orderTypeFilter == 'Import' ? 'selected' : ''}>Import</option>
                             </select>
                         </div>
 
@@ -262,7 +263,7 @@
                             </select>
                         </div>
                     </div>
-                    
+
                     <div class="date-filter-row">
                         <div class="form-group">
                             <label for="startDateFilter">From (Created Date)</label>
@@ -273,20 +274,21 @@
                             <label for="endDateFilter">To (Created Date)</label>
                             <input type="date" id="endDateFilter" name="endDateFilter" value="${endDateFilter}">
                         </div>
-                        
+
                         <div class="form-group btn-action-group" style="flex: 1 1 200px; align-self: flex-end;">
-                            <button type="submit" class="btn-primary"><i class="fas fa-filter"></i> Filter/ Search</button>
-                            <a href="order-list" class="btn-outline-secondary"><i class="fas fa-redo"></i> Reset</a>
+                            <button type="submit" class="btn-primary"> Filter/ Search</button>
+                            <a href="order-list" class="btn-outline-secondary"> Reset</a>
                         </div>
                     </div>
                 </form>
             </div>
-            
+
             <table>
                 <thead>
                     <tr>
                         <th>ID</th> 
                         <th>Order Code</th>
+                        <th>Description</th>
                         <th>Customer</th>
                         <th>Supplier</th>
                         <th>Order Type</th>
@@ -303,13 +305,14 @@
                                 <tr>
                                     <td>${order.orderId}</td>
                                     <td>${order.orderCode}</td>
+                                    <td>${order.description}</td>
                                     <td>
                                         <c:choose>
                                             <c:when test="${not empty order.customerName}">
                                                 ${order.customerName}
                                             </c:when>
                                             <c:otherwise>
-                                                 N/A
+                                                N/A
                                             </c:otherwise>
                                         </c:choose>
                                     </td>
@@ -345,9 +348,9 @@
                                         </span>
                                     </td>
                                     <td>${order.createdByName}</td>
-                                    <td class="action-icons" style="text-align: center;">
+                                    <td class="action-links" style="text-align: center;">
                                         <a href="order-detail?id=${order.orderId}" title="View">
-                                            <i class="fas fa-eye"></i> View Detail
+                                            View Detail
                                         </a>
                                     </td>
                                 </tr>
@@ -355,8 +358,8 @@
                         </c:when>
                         <c:otherwise>
                             <tr>
-                                <td colspan="9" style="text-align: center; color: #7f8c8d; padding: 20px;">
-                                    <i class="fas fa-exclamation-circle"></i> No order found.
+                                <td colspan="10" style="text-align: center; color: #7f8c8d; padding: 20px;">
+                                    No order found.
                                 </td>
                             </tr>
                         </c:otherwise>
@@ -365,8 +368,8 @@
             </table>
 
         </div>
-        
+
         <jsp:include page="footer.jsp" /> 
-        
+
     </body>
 </html>
