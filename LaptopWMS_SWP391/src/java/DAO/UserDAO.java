@@ -27,9 +27,8 @@ public class UserDAO extends DBContext {
 
         StringBuilder sql = new StringBuilder(
                 "SELECT u.*, r.role_name "
-                + "FROM users u JOIN roles r ON u.role_id = r.role_id "
-                + "WHERE 1=1 "
-        );
+                        + "FROM users u JOIN roles r ON u.role_id = r.role_id "
+                        + "WHERE 1=1 ");
 
         if (keyword != null && !keyword.trim().isEmpty()) {
             sql.append("AND (u.full_name LIKE ? OR u.email LIKE ? OR u.phone_number LIKE ?) ");
@@ -81,8 +80,7 @@ public class UserDAO extends DBContext {
                             rs.getTimestamp("last_login_at"),
                             rs.getTimestamp("created_at"),
                             rs.getTimestamp("updated_at"),
-                            rs.getObject("created_by", Integer.class)
-                    );
+                            rs.getObject("created_by", Integer.class));
                     user.setRoleName(rs.getString("role_name"));
 
                     users.add(user);
@@ -250,15 +248,16 @@ public class UserDAO extends DBContext {
         }
     }
 
-    public boolean updateProfilebyAdmin(int userId, String fullName, String email, String phoneNumber, String gender, int roleId) {
-        String sql = "UPDATE users SET full_name = ?, email = ?, phone_number = ?, gender = ?, role_id = ?, updated_at = CURRENT_TIMESTAMP WHERE user_id = ?";
+    public boolean updateProfilebyAdmin(int userId, String username, String fullName, String email, String phoneNumber,
+            String gender) {
+        String sql = "UPDATE users SET username = ?, full_name = ?, email = ?, phone_number = ?, gender = ?, updated_at = CURRENT_TIMESTAMP WHERE user_id = ?";
 
         try (Connection conn = getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setString(1, fullName);
-            ps.setString(2, email);
-            ps.setString(3, phoneNumber);
-            ps.setString(4, gender);
-            ps.setInt(5, roleId);
+            ps.setString(1, username);
+            ps.setString(2, fullName);
+            ps.setString(3, email);
+            ps.setString(4, phoneNumber);
+            ps.setString(5, gender);
             ps.setInt(6, userId);
 
             return ps.executeUpdate() > 0;
@@ -350,7 +349,9 @@ public class UserDAO extends DBContext {
         List<String> genders = new ArrayList<>();
         String sql = "SELECT DISTINCT gender FROM users WHERE gender IS NOT NULL AND gender != '' ORDER BY gender ASC";
 
-        try (Connection conn = DBContext.getConnection(); PreparedStatement ps = conn.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
+        try (Connection conn = DBContext.getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);
+                ResultSet rs = ps.executeQuery()) {
 
             while (rs.next()) {
                 genders.add(rs.getString("gender"));
@@ -365,7 +366,9 @@ public class UserDAO extends DBContext {
         List<String> statuses = new ArrayList<>();
         String sql = "SELECT DISTINCT status FROM users WHERE status IS NOT NULL AND status != '' ORDER BY status ASC";
 
-        try (Connection conn = DBContext.getConnection(); PreparedStatement ps = conn.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
+        try (Connection conn = DBContext.getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);
+                ResultSet rs = ps.executeQuery()) {
 
             while (rs.next()) {
                 statuses.add(rs.getString("status"));
@@ -376,7 +379,7 @@ public class UserDAO extends DBContext {
         return statuses;
     }
 
-    //Test method
+    // Test method
     public static void main(String[] args) {
         UserDAO userDAO = new UserDAO();
 
