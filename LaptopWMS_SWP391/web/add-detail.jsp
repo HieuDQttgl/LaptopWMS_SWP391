@@ -1,15 +1,14 @@
 <%-- 
-    Document   : add-product
-    Created on : Dec 15, 2025, 10:23:08 AM
-    Author     : super
+    Document   : add-detail.jsp
+    Created on : Dec 15, 2025, 10:04:12 PM
+    Author     : PC
 --%>
 
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <!DOCTYPE html>
 <html>
     <head>
-        <title>Add New Product</title>
+        <title>Add Configuration</title>
         <style>
             body {
                 font-family: "Segoe UI", sans-serif;
@@ -54,7 +53,7 @@
                 border-radius: 4px;
                 cursor: pointer;
                 font-size: 16px;
-                font-weight: bold;
+                font-weight: 700;
             }
             .btn-save:hover {
                 background: #27ae60;
@@ -73,55 +72,47 @@
         <jsp:include page="header.jsp" />
 
         <div class="form-container">
-            <h2>Create New Product</h2>
+            <h2>Add Configuration</h2>
+            <p style="text-align: center; color: #7f8c8d; font-size: 14px;">Adding specs for Product ID: <strong>${targetName}</strong></p>
 
-            <c:if test="${not empty error}">
-                <div style="color: #721c24; background-color: #f8d7da; border: 1px solid #f5c6cb; padding: 10px; margin-bottom: 15px; border-radius: 4px;">
-                    <strong>Error:</strong> ${error}
-                </div>
-            </c:if>
+            <form action="add-detail" method="post">
+                <input type="hidden" name="productId" value="${targetId}">
 
-            <form action="add-product" method="post">
                 <div class="form-group">
-                    <label>Model Name</label>
-                    <input type="text" name="name" required placeholder="e.g. Dell XPS 15 9530">
+                    <label>CPU</label>
+                    <input type="text" name="cpu" placeholder="e.g. Intel Core i7-13700H" required>
                 </div>
 
                 <div class="form-group">
-                    <label>Brand</label>
-                    <select name="brand">
-                        <option value="Dell">Dell</option>
-                        <option value="HP">HP</option>
-                        <option value="ASUS">ASUS</option>
-                        <option value="Apple">Apple</option>
-                        <option value="Lenovo">Lenovo</option>
-                        <option value="Acer">Acer</option>
-                        <option value="MSI">MSI</option>
-                    </select>
+                    <label>GPU</label>
+                    <input type="text" name="gpu" placeholder="e.g. NVIDIA RTX 4060 8GB" required>
                 </div>
 
                 <div class="form-group">
-                    <label>Category</label>
-                    <select name="category">
-                        <option value="Office">Office</option>
-                        <option value="Gaming">Gaming</option>
-                        <option value="Workstation">Workstation</option>
-                    </select>
+                    <label>RAM</label>
+                    <input type="text" name="ram" placeholder="e.g. 16GB" required>
                 </div>
 
                 <div class="form-group">
-                    <label>Supplier</label>
-                    <select name="supplierId" required>
-                        <option value="" disabled selected>-- Select a Supplier --</option>
-
-                        <c:forEach items="${supplierList}" var="s">
-                            <option value="${s.supplierId}">${s.supplierName}</option>
-                        </c:forEach>
-
-                    </select>
+                    <label>Storage</label>
+                    <input type="text" name="storage" placeholder="e.g. 1TB" required>
                 </div>
 
-                <button type="submit" class="btn-save">Create Product</button>
+                <div class="form-group">
+                    <label>Screen Size (inches)</label>
+
+                    <input type="number" 
+                           step="0.1" 
+                           min="10" 
+                           max="21" 
+                           name="screen" 
+                           placeholder="e.g. 15.6" 
+                           required
+                           oninvalid="this.setCustomValidity('Please enter a valid screen size (e.g. 15.6)')"
+                           oninput="this.setCustomValidity('')">
+                </div>
+
+                <button type="submit" class="btn-save">Save Configuration</button>
                 <a href="product-list" class="link-back">Cancel</a>
             </form>
         </div>

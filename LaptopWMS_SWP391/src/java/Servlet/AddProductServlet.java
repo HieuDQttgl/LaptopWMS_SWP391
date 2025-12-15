@@ -5,6 +5,8 @@
 package Servlet;
 
 import DAO.ProductDAO;
+import DAO.SupplierDAO;
+import Model.Supplier;
 import Model.Product;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -13,15 +15,14 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
  *
  * @author PC
  */
-@WebServlet(name = "ProductListServlet", urlPatterns = {"/product-list"})
-public class ProductListServlet extends HttpServlet {
+@WebServlet(name = "AddProductServlet", urlPatterns = {"/add-product"})
+public class AddProductServlet extends HttpServlet {
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -40,10 +41,10 @@ public class ProductListServlet extends HttpServlet {
             out.println("<!DOCTYPE html>");
             out.println("<html>");
             out.println("<head>");
-            out.println("<title>Servlet ProductListServlet</title>");
+            out.println("<title>Servlet AddProductServlet</title>");
             out.println("</head>");
             out.println("<body>");
-            out.println("<h1>Servlet ProductListServlet at " + request.getContextPath() + "</h1>");
+            out.println("<h1>Servlet AddProductServlet at " + request.getContextPath() + "</h1>");
             out.println("</body>");
             out.println("</html>");
         }
@@ -61,69 +62,12 @@ public class ProductListServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        SupplierDAO supplier = new SupplierDAO();
+        List<Supplier> list = supplier.getListSuppliers();
 
-        String keyword = request.getParameter("keyword");
-        String status = request.getParameter("status");
-        String category = request.getParameter("category");
-        String brand = request.getParameter("brand");
-        String sort = request.getParameter("sort_order");
+        request.setAttribute("supplierList", list);
 
-        if (status == null) {
-            status = "all";
-        }
-        if (category == null) {
-            category = "all";
-        }
-        if (brand == null) {
-            brand = "all";
-        }
-        if (sort == null) {
-            sort = "DESC"; 
-        }
-        
-        ProductDAO dao = new ProductDAO();
-        List<Product> fullList = dao.getProducts(keyword, status, category, brand, sort);
-
-        int page = 1;
-        int pageSize = 5; 
-        if (request.getParameter("page") != null) {
-            try {
-                page = Integer.parseInt(request.getParameter("page"));
-            } catch (NumberFormatException e) {
-                page = 1;
-            }
-        }
-
-        int totalItems = fullList.size();
-        int totalPages = (int) Math.ceil((double) totalItems / pageSize);
-
-        if (page < 1) {
-            page = 1;
-        }
-        if (page > totalPages && totalPages > 0) {
-            page = totalPages;
-        }
-
-        int start = (page - 1) * pageSize;
-        int end = Math.min(start + pageSize, totalItems);
-
-        List<Product> pageList = new ArrayList<>();
-        if (totalItems > 0 && start < totalItems) {
-            pageList = fullList.subList(start, end);
-        }
-
-        request.setAttribute("productList", pageList); 
-        request.setAttribute("totalPages", totalPages);
-        request.setAttribute("currentPage", page);
-        request.setAttribute("totalItems", totalItems); 
-
-        request.setAttribute("currentKeyword", keyword);
-        request.setAttribute("currentStatus", status);
-        request.setAttribute("currentCategory", category);
-        request.setAttribute("currentBrand", brand);
-        request.setAttribute("currentSortOrder", sort);
-
-        request.getRequestDispatcher("product-list.jsp").forward(request, response);
+        request.getRequestDispatcher("add-product.jsp").forward(request, response);
     }
 
     /**
@@ -137,7 +81,45 @@ public class ProductListServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        doGet(request, response);
+
+        try {
+            String name = request.getParameter("name");
+            String brand = request.getParameter("brand");
+            String category = request.getParameter("category");
+            String unit = request.getParameter("unit");
+            String supplierIdRaw = request.getParameter("supplierId");
+
+            if (name == null || name.trim().isEmpty()) {
+                request.setAttribute("error", "Product Name cannot be empty");
+                request.getRequestDispatcher("add-product.jsp").forward(request, response);
+                return;
+            }
+
+            Product p = new Product();
+            p.setProductName(name);
+            p.setBrand(brand);
+            p.setCategory(category);
+            p.setUnit(unit);
+            p.setStatus(true);
+
+            if (supplierIdRaw != null && !supplierIdRaw.isEmpty()) {
+                p.setSupplierId(Integer.parseInt(supplierIdRaw));
+            } else {
+                p.setSupplierId(1);
+            }
+
+            ProductDAO dao = new ProductDAO();
+            dao.addProduct(p);
+
+            response.sendRedirect("product-list");
+
+        } catch (NumberFormatException e) {
+            e.printStackTrace();
+            response.sendRedirect("add-product.jsp?error=InvalidNumber");
+        } catch (Exception e) {
+            e.printStackTrace();
+            response.sendRedirect("add-product.jsp?error=ServerFail");
+        }
     }
 
     /**

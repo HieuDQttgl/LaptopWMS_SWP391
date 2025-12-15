@@ -9,6 +9,7 @@ import Model.Product;
 import Model.ProductDetail;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,7 +24,7 @@ public class ProductDAO extends DBContext {
         List<Object> params = new ArrayList<>();
 
         StringBuilder sql = new StringBuilder(
-                "SELECT p.product_id, p.product_name, p.brand, p.category, p.unit, p.status, " // Added p.brand
+                "SELECT p.product_id, p.product_name, p.brand, p.category, p.unit, p.status, "
                 + "p.supplier_id, s.supplier_name "
                 + "FROM products p "
                 + "LEFT JOIN suppliers s ON p.supplier_id = s.supplier_id "
@@ -145,5 +146,54 @@ public class ProductDAO extends DBContext {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    public void addProduct(Product p) {
+        String sql = "INSERT INTO products (product_name, brand, category, supplier_id, unit, status) VALUES (?, ?, ?, ?, ?, ?)";
+
+        try (PreparedStatement ps = getConnection().prepareStatement(sql)) {
+            ps.setString(1, p.getProductName());
+            ps.setString(2, p.getBrand());
+            ps.setString(3, p.getCategory());
+            ps.setInt(4, p.getSupplierId());
+            ps.setString(5, p.getUnit());
+            ps.setBoolean(6, true);
+
+            ps.executeUpdate();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void addProductDetail(ProductDetail d) throws SQLException {
+        String sql = "INSERT INTO product_details (product_id, cpu, gpu, ram, storage, screen, status) VALUES (?, ?, ?, ?, ?, ?, ?)";
+
+        try (PreparedStatement ps = getConnection().prepareStatement(sql)) {
+            ps.setInt(1, d.getProductId());
+            ps.setString(2, d.getCpu());
+            ps.setString(3, d.getGpu());
+            ps.setString(4, d.getRam());
+            ps.setString(5, d.getStorage());
+            ps.setDouble(6, d.getScreen());
+            ps.setBoolean(7, true);
+
+            ps.executeUpdate();
+        }
+    }
+
+    public String getProductNameById(int id) {
+        String sql = "SELECT product_name FROM products WHERE product_id = ?";
+        try (PreparedStatement ps = getConnection().prepareStatement(sql)) {
+            ps.setInt(1, id);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getString("product_name");
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return "Unknown Product";
     }
 }

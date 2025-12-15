@@ -5,7 +5,7 @@
 package Servlet;
 
 import DAO.ProductDAO;
-import Model.Product;
+import Model.ProductDetail;
 import java.io.IOException;
 import java.io.PrintWriter;
 import jakarta.servlet.ServletException;
@@ -13,15 +13,13 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  *
  * @author PC
  */
-@WebServlet(name = "ProductListServlet", urlPatterns = {"/product-list"})
-public class ProductListServlet extends HttpServlet {
+@WebServlet(name = "AddDetailServlet", urlPatterns = {"/add-detail"})
+public class AddDetailServlet extends HttpServlet {
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -40,10 +38,10 @@ public class ProductListServlet extends HttpServlet {
             out.println("<!DOCTYPE html>");
             out.println("<html>");
             out.println("<head>");
-            out.println("<title>Servlet ProductListServlet</title>");
+            out.println("<title>Servlet AddDetailServlet</title>");
             out.println("</head>");
             out.println("<body>");
-            out.println("<h1>Servlet ProductListServlet at " + request.getContextPath() + "</h1>");
+            out.println("<h1>Servlet AddDetailServlet at " + request.getContextPath() + "</h1>");
             out.println("</body>");
             out.println("</html>");
         }
@@ -62,68 +60,26 @@ public class ProductListServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        String keyword = request.getParameter("keyword");
-        String status = request.getParameter("status");
-        String category = request.getParameter("category");
-        String brand = request.getParameter("brand");
-        String sort = request.getParameter("sort_order");
-
-        if (status == null) {
-            status = "all";
-        }
-        if (category == null) {
-            category = "all";
-        }
-        if (brand == null) {
-            brand = "all";
-        }
-        if (sort == null) {
-            sort = "DESC"; 
-        }
-        
-        ProductDAO dao = new ProductDAO();
-        List<Product> fullList = dao.getProducts(keyword, status, category, brand, sort);
-
-        int page = 1;
-        int pageSize = 5; 
-        if (request.getParameter("page") != null) {
-            try {
-                page = Integer.parseInt(request.getParameter("page"));
-            } catch (NumberFormatException e) {
-                page = 1;
+        try {
+            String idRaw = request.getParameter("id");
+            if (idRaw == null || idRaw.isEmpty()) {
+                response.sendRedirect("product-list");
+                return;
             }
+
+            int id = Integer.parseInt(idRaw);
+
+            ProductDAO dao = new ProductDAO();
+            String name = dao.getProductNameById(id);
+
+            request.setAttribute("targetName", name);
+            request.setAttribute("targetId", id);
+
+            request.getRequestDispatcher("add-detail.jsp").forward(request, response);
+
+        } catch (NumberFormatException e) {
+            response.sendRedirect("product-list");
         }
-
-        int totalItems = fullList.size();
-        int totalPages = (int) Math.ceil((double) totalItems / pageSize);
-
-        if (page < 1) {
-            page = 1;
-        }
-        if (page > totalPages && totalPages > 0) {
-            page = totalPages;
-        }
-
-        int start = (page - 1) * pageSize;
-        int end = Math.min(start + pageSize, totalItems);
-
-        List<Product> pageList = new ArrayList<>();
-        if (totalItems > 0 && start < totalItems) {
-            pageList = fullList.subList(start, end);
-        }
-
-        request.setAttribute("productList", pageList); 
-        request.setAttribute("totalPages", totalPages);
-        request.setAttribute("currentPage", page);
-        request.setAttribute("totalItems", totalItems); 
-
-        request.setAttribute("currentKeyword", keyword);
-        request.setAttribute("currentStatus", status);
-        request.setAttribute("currentCategory", category);
-        request.setAttribute("currentBrand", brand);
-        request.setAttribute("currentSortOrder", sort);
-
-        request.getRequestDispatcher("product-list.jsp").forward(request, response);
     }
 
     /**
@@ -137,7 +93,33 @@ public class ProductListServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        doGet(request, response);
+
+        try {
+            int productId = Integer.parseInt(request.getParameter("productId"));
+
+            String cpu = request.getParameter("cpu");
+            String gpu = request.getParameter("gpu");
+            String ram = request.getParameter("ram");
+            String storage = request.getParameter("storage");
+            double screen = Double.parseDouble(request.getParameter("screen"));
+
+            ProductDetail d = new ProductDetail();
+            d.setProductId(productId);
+            d.setCpu(cpu);
+            d.setGpu(gpu);
+            d.setRam(ram);
+            d.setStorage(storage);
+            d.setScreen(screen);
+
+            ProductDAO dao = new ProductDAO();
+            dao.addProductDetail(d);
+
+            response.sendRedirect("product-list");
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            response.sendRedirect("product-list?error=AddDetailFailed");
+        }
     }
 
     /**
