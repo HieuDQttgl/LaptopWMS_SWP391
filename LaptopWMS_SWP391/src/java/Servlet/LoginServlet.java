@@ -1,5 +1,6 @@
 package Servlet;
 
+import DAO.PermissionDAO;
 import DAO.RoleDAO;
 import DAO.UserDAO;
 import Model.Role;
@@ -49,10 +50,14 @@ public class LoginServlet extends HttpServlet {
                     return;
                 }
                 userDao.updateLastLogin(user.getUserId());
+                PermissionDAO permissionDAO = new PermissionDAO();
+                List<String> userPermissions = permissionDAO.getPermissionUrlsByRoleId(user.getRoleId());
+                
                 HttpSession session = request.getSession();
                 session.setAttribute("username", user.getUsername());
                 session.setAttribute("fullName", user.getFullName());
-                session.setAttribute("currentUser", user);
+                session.setAttribute("currentUser", user);                
+                session.setAttribute("userPermissions", userPermissions);
                 response.sendRedirect(request.getContextPath() + "/landing");
             } catch (Exception ex) {
                 Logger.getLogger(LoginServlet.class.getName()).log(Level.SEVERE, null, ex);

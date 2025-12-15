@@ -19,7 +19,7 @@ import java.util.List;
  *
  * @author PC
  */
-@WebServlet(name = "ProductListServlet", urlPatterns = {"/products"})
+@WebServlet(name = "ProductListServlet", urlPatterns = {"/product-list"})
 public class ProductListServlet extends HttpServlet {
 
     /**

@@ -11,6 +11,7 @@ import java.sql.Timestamp;
  * @author Admin
  */
 public class Permission {
+
     private int permissionId;
     private String permissionURL;
     private String permissionDescription;
@@ -77,7 +78,5 @@ public class Permission {
     public void setUpdatedAt(Timestamp updatedAt) {
         this.updatedAt = updatedAt;
     }
-    
-    
 
 }

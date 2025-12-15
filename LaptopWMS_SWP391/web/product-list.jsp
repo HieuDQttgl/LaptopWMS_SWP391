@@ -11,7 +11,6 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <jsp:include page="header.jsp"/>
         <title>Laptop Inventory</title>
 
         <style>
@@ -158,12 +157,15 @@
         </style>
     </head>
     <body>
-
+        <jsp:include page="header.jsp"/>
+        
         <div class="container">
             <h1>Laptop Product Management</h1>
 
             <div style="display: flex; justify-content: space-between; align-items: center;">
-                <button class="btn-add">+ Add New Product</button>
+                <c:if test="${sessionScope.currentUser.getRoleId() == 1 or sessionScope.currentUser.getRoleId() == 2}">
+                    <button class="btn-add">+ Add New Product</button>
+                </c:if>
                 <div style="color: #7f8c8d; font-size: 14px;">
                     Total Models: <strong>${not empty productList ? productList.size() : 0}</strong>
                 </div>
@@ -180,7 +182,7 @@
                     <button type="submit" class="btn-filter" style="padding: 6px 12px; background: #3498db; color: white; border: none; border-radius: 4px; cursor: pointer;">Search</button>
 
                     <div class="filter-group">
-                        <select name="status" onchange="this.form.submit()" ...>
+                        <select name="status" onchange="this.form.submit()" style="padding: 6px; border: 1px solid #ccc; border-radius: 4px;">
                             <option value="all" ${currentStatus == 'all' ? 'selected' : ''}>All Status</option>
                             <option value="1" ${currentStatus == '1' ? 'selected' : ''}>Active</option>
                             <option value="0" ${currentStatus == '0' ? 'selected' : ''}>Inactive</option>
