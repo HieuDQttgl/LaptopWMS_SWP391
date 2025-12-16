@@ -208,6 +208,20 @@
             .date-filter-row .form-group:nth-child(3) {
                 flex: 2 1 auto;
             }
+            .success-box {
+                color: #155724;
+                background-color: #d4edda;
+                border: 1px solid #c3e6cb;
+                padding: 10px;
+                margin-bottom: 15px;
+                border-radius: 4px;
+                opacity: 1;
+                transition: opacity 1s ease-out;
+            }
+
+            .action-links {
+                text-align: center !important;
+            }
         </style>
     </head>
     <body>
@@ -217,19 +231,37 @@
         <div class="container">
             <h2>Order List</h2>
 
+            <c:if test="${param.success == 'true'}">
+                <div class="success-box auto-hide">
+                    <strong>Success:</strong> Add new order successfully!
+                </div>
+            </c:if>
+            <c:if test="${param.success == 'status_updated'}">
+                <div class="success-box">
+                    ✅ Order <strong>${param.code}</strong> successfully changed status to <strong>${param.newStatus}</strong>!
+                </div>
+            </c:if>
+            <c:if test="${param.error == 'transition_denied'}">
+                <div style="padding: 10px; background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; border-radius: 4px; margin-bottom: 15px;">
+                    ❌ **Permission/Business Logic Error:** You are not allowed to perform this status transition (or the transition status is invalid).
+                </div>
+            </c:if>
+            <c:if test="${param.error == 'order_not_found'}">
+                <div style="padding: 10px; background-color: #fff3cd; color: #856404; border: 1px solid #ffeeba; border-radius: 4px; margin-bottom: 15px;">
+                    ⚠️ Error: Order to be updated not found.
+                </div>
+            </c:if>
             <div style="margin-bottom: 20px;">
-                <a href="order-create" class="btn-success">+ Thêm Đơn hàng</a>
+                <a href="add-order" class="btn-success">+ Add new Order</a>
             </div>
 
             <div class="filter-container">
                 <form action="order-list" method="get" class="filter-form">
-
                     <div class="form-row">
                         <div class="form-group">
                             <label for="keyword">Search</label>
                             <input type="text" id="keyword" name="keyword" placeholder="Search by OrderCode,Customer,Supplier,.." value="${keyword}">
                         </div>
-
                         <div class="form-group">
                             <label for="statusFilter">Status</label>
                             <select id="statusFilter" name="statusFilter">
@@ -241,7 +273,6 @@
                                 <option value="Cancelled" ${statusFilter == 'Cancelled' ? 'selected' : ''}>Cancelled</option>
                             </select>
                         </div>
-
                         <div class="form-group">
                             <label for="orderTypeFilter">Order Type</label>
                             <select id="orderTypeFilter" name="orderTypeFilter">
@@ -250,7 +281,6 @@
                                 <option value="Import" ${orderTypeFilter == 'Import' ? 'selected' : ''}>Import</option>
                             </select>
                         </div>
-
                         <div class="form-group">
                             <label for="createdByFilter">Creator</label>
                             <select id="createdByFilter" name="createdByFilter">
@@ -263,18 +293,15 @@
                             </select>
                         </div>
                     </div>
-
                     <div class="date-filter-row">
                         <div class="form-group">
                             <label for="startDateFilter">From (Created Date)</label>
                             <input type="date" id="startDateFilter" name="startDateFilter" value="${startDateFilter}">
                         </div>
-
                         <div class="form-group">
                             <label for="endDateFilter">To (Created Date)</label>
                             <input type="date" id="endDateFilter" name="endDateFilter" value="${endDateFilter}">
                         </div>
-
                         <div class="form-group btn-action-group" style="flex: 1 1 200px; align-self: flex-end;">
                             <button type="submit" class="btn-primary"> Filter/ Search</button>
                             <a href="order-list" class="btn-outline-secondary"> Reset</a>
@@ -282,7 +309,6 @@
                     </div>
                 </form>
             </div>
-
             <table>
                 <thead>
                     <tr>
@@ -295,7 +321,7 @@
                         <th>Created At</th>
                         <th>Status</th>
                         <th>Created By</th>
-                        <th style="text-align: center;">Action</th>
+                        <th>Action</th> 
                     </tr>
                 </thead>
                 <tbody>
@@ -327,11 +353,12 @@
                                         </c:choose>
                                     </td>
                                     <td>
+                                        <c:set var="isImport" value="${empty order.customerName and not empty order.supplierName}" />
                                         <c:choose>
-                                            <c:when test="${not empty order.customerName and empty order.supplierName}">
+                                            <c:when test="${!isImport and not empty order.customerName}">
                                                 <span class="badge-status" style="background-color: #ffe7e6; color: #f5222d;">Export</span>
                                             </c:when>
-                                            <c:when test="${empty order.customerName and not empty order.supplierName}">
+                                            <c:when test="${isImport}">
                                                 <span class="badge-status" style="background-color: #e6f7ff; color: #1890ff;">Import</span>
                                             </c:when>
                                             <c:otherwise>
@@ -348,10 +375,21 @@
                                         </span>
                                     </td>
                                     <td>${order.createdByName}</td>
-                                    <td class="action-links" style="text-align: center;">
-                                        <a href="order-detail?id=${order.orderId}" title="View">
-                                            View Detail
-                                        </a>
+
+                                    <td class="action-links">
+                                        <a href="order-detail?id=${order.orderId}" title="View">View Detail</a>
+                                        
+                                        <c:choose>
+                                            <c:when test="${order.orderStatus == 'completed' || order.orderStatus == 'cancelled'}">
+                                                | <span style="color: #a94442; font-weight: 600;">Finalized</span>
+                                            </c:when>
+                                            
+                                            <c:otherwise>
+                                                | <a href="order-status?orderId=${order.orderId}" title="Change Status">
+                                                    Change Status
+                                                </a>
+                                            </c:otherwise>
+                                        </c:choose>
                                     </td>
                                 </tr>
                             </c:forEach>
@@ -366,10 +404,21 @@
                     </c:choose>
                 </tbody>
             </table>
-
         </div>
 
         <jsp:include page="footer.jsp" /> 
 
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                document.querySelectorAll('.success-box.auto-hide').forEach(successBox => {
+                    setTimeout(() => {
+                        successBox.style.opacity = '0';
+                        setTimeout(() => {
+                            successBox.style.display = 'none';
+                        }, 1000);
+                    }, 5000);
+                });
+            });
+        </script>
     </body>
 </html>

@@ -32,6 +32,7 @@ public class PermissionFilter implements Filter {
 
         String requestURI = req.getRequestURI();
         String contextPath = req.getContextPath();
+        
         String path = requestURI.substring(contextPath.length());
 
         if (path.startsWith("/css/") || path.startsWith("/js/")

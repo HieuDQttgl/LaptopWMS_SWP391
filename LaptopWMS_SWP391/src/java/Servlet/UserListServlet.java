@@ -119,12 +119,8 @@ public class UserListServlet extends HttpServlet {
 
     try {
         List<Role> allRoles = roleDAO.getAllRoles();
-        List<String> genders = userDAO.getDistinctGenders();
-        List<String> statuses = userDAO.getDistinctStatuses();
 
         request.setAttribute("allRoles", allRoles);
-        request.setAttribute("genders", genders);
-        request.setAttribute("statuses", statuses);
         
     } catch (Exception e) {
         e.printStackTrace();

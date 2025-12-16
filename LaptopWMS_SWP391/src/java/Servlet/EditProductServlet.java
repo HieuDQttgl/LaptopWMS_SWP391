@@ -4,7 +4,9 @@
  */
 package Servlet;
 
+import Model.*;
 import DAO.ProductDAO;
+import DAO.SupplierDAO;
 import java.io.IOException;
 import java.io.PrintWriter;
 import jakarta.servlet.ServletException;
@@ -12,13 +14,14 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import java.util.List;
 
 /**
  *
  * @author PC
  */
-@WebServlet(name = "ToggleProductServlet", urlPatterns = {"/toggleProduct"})
-public class ToggleProductServlet extends HttpServlet {
+@WebServlet(name = "EditProductServlet", urlPatterns = {"/edit-product"})
+public class EditProductServlet extends HttpServlet {
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -37,10 +40,10 @@ public class ToggleProductServlet extends HttpServlet {
             out.println("<!DOCTYPE html>");
             out.println("<html>");
             out.println("<head>");
-            out.println("<title>Servlet ToggleProductServlet</title>");
+            out.println("<title>Servlet EditProductServlet</title>");
             out.println("</head>");
             out.println("<body>");
-            out.println("<h1>Servlet ToggleProductServlet at " + request.getContextPath() + "</h1>");
+            out.println("<h1>Servlet EditProductServlet at " + request.getContextPath() + "</h1>");
             out.println("</body>");
             out.println("</html>");
         }
@@ -59,13 +62,34 @@ public class ToggleProductServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        String idStr = request.getParameter("id");
-        if (idStr != null) {
-            int id = Integer.parseInt(idStr);
+        try {
+            String idRaw = request.getParameter("id");
+            if (idRaw == null) {
+                response.sendRedirect("product-list");
+                return;
+            }
+
+            int id = Integer.parseInt(idRaw);
             ProductDAO dao = new ProductDAO();
-            dao.toggleProductStatus(id);
+            Product p = dao.getProductById(id);
+
+            if (p == null) {
+                response.sendRedirect("product-list?error=NotFound");
+                return;
+            }
+
+            // Get Suppliers for the dropdown
+            SupplierDAO supDao = new SupplierDAO();
+            List<Supplier> suppliers = supDao.getListSuppliers();
+
+            request.setAttribute("product", p);
+            request.setAttribute("supplierList", suppliers);
+
+            request.getRequestDispatcher("edit-product.jsp").forward(request, response);
+
+        } catch (NumberFormatException e) {
+            response.sendRedirect("product-list");
         }
-        response.sendRedirect("product-list");
     }
 
     /**
@@ -79,7 +103,35 @@ public class ToggleProductServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        doGet(request, response);
+
+        try {
+            int id = Integer.parseInt(request.getParameter("productId"));
+
+            String name = request.getParameter("name");
+            String brand = request.getParameter("brand");
+            String category = request.getParameter("category");
+
+            String unit = request.getParameter("unit");
+
+            int supplierId = Integer.parseInt(request.getParameter("supplierId"));
+
+            Product p = new Product();
+            p.setProductId(id);
+            p.setProductName(name);
+            p.setBrand(brand);
+            p.setCategory(category);
+            p.setUnit(unit);
+            p.setSupplierId(supplierId);
+
+            ProductDAO dao = new ProductDAO();
+            dao.updateProduct(p);
+
+            response.sendRedirect("product-list");
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            response.sendRedirect("product-list?error=EditFailed");
+        }
     }
 
     /**

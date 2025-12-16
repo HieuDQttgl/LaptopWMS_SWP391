@@ -345,40 +345,6 @@ public class UserDAO extends DBContext {
         return false;
     }
 
-    public List<String> getDistinctGenders() {
-        List<String> genders = new ArrayList<>();
-        String sql = "SELECT DISTINCT gender FROM users WHERE gender IS NOT NULL AND gender != '' ORDER BY gender ASC";
-
-        try (Connection conn = DBContext.getConnection();
-                PreparedStatement ps = conn.prepareStatement(sql);
-                ResultSet rs = ps.executeQuery()) {
-
-            while (rs.next()) {
-                genders.add(rs.getString("gender"));
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return genders;
-    }
-
-    public List<String> getDistinctStatuses() {
-        List<String> statuses = new ArrayList<>();
-        String sql = "SELECT DISTINCT status FROM users WHERE status IS NOT NULL AND status != '' ORDER BY status ASC";
-
-        try (Connection conn = DBContext.getConnection();
-                PreparedStatement ps = conn.prepareStatement(sql);
-                ResultSet rs = ps.executeQuery()) {
-
-            while (rs.next()) {
-                statuses.add(rs.getString("status"));
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return statuses;
-    }
-
     // Test method
     public static void main(String[] args) {
         UserDAO userDAO = new UserDAO();

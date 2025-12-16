@@ -157,4 +157,33 @@ public class CustomerDAO extends DBContext {
         return 0;
     }
 
+    public List<Customer> getListCustomers() {
+        List<Customer> list = new ArrayList<>();
+        String sql = "SELECT customer_id, customer_name FROM customers";
+
+        try (PreparedStatement ps = getConnection().prepareStatement(sql)) {
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                Customer ctm = new Customer();
+                ctm.setCustomerId(rs.getInt("customer_id"));
+                ctm.setCustomerName(rs.getString("customer_name"));
+                list.add(ctm);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
+    
+    public static void main(String[] args) {
+        CustomerDAO customerDAO = new CustomerDAO();
+
+        System.out.println("=== Testing ===");
+        List<Customer> allUsers = customerDAO.getListCustomers();
+        System.out.println("Found " + allUsers.size() + " Customers:");
+        for (Customer user : allUsers) {
+            System.out.println(user);
+        }
+    }
+
 }

@@ -194,7 +194,7 @@ CREATE TABLE `permissions` (
   UNIQUE KEY `permission_name` (`permission_url`),
   KEY `idx_permission_name` (`permission_url`),
   KEY `idx_module` (`module`)
-) ENGINE=InnoDB AUTO_INCREMENT=30 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=32 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -203,7 +203,7 @@ CREATE TABLE `permissions` (
 
 LOCK TABLES `permissions` WRITE;
 /*!40000 ALTER TABLE `permissions` DISABLE KEYS */;
-INSERT INTO `permissions` VALUES (1,'/landing','User homepage','common','2025-12-03 12:19:13','2025-12-08 14:10:12'),(2,'/user-list','View user list','admin','2025-12-03 12:19:13','2025-12-08 14:10:12'),(4,'/user-detail','View user details','admin','2025-12-03 12:19:13','2025-12-08 14:10:12'),(5,'/user-status','Update user status','admin','2025-12-03 12:19:13','2025-12-08 14:10:12'),(6,'/edit-role','Edit user role','role','2025-12-03 12:19:13','2025-12-08 14:10:12'),(7,'/add-role','Create new roles','role','2025-12-03 12:19:13','2025-12-08 14:10:12'),(8,'/role','View role status','role','2025-12-03 12:19:13','2025-12-08 14:10:12'),(9,'/role-list','Change role status','role','2025-12-03 12:19:13','2025-12-08 14:10:12'),(10,'/role-permission','Manage role permissions','role','2025-12-03 12:19:13','2025-12-08 14:10:12'),(11,'/profile','View own profile','profile','2025-12-03 12:19:13','2025-12-08 14:10:12'),(12,'/change-password','Change own password','profile','2025-12-03 12:19:13','2025-12-08 14:10:12'),(13,'/edit-profile','Edit own profile','profile','2025-12-03 12:19:13','2025-12-08 14:10:12'),(14,'/login','Login to system','common','2025-12-03 12:19:13','2025-12-08 14:10:12'),(15,'/logout','Logout from system','common','2025-12-03 12:19:13','2025-12-08 14:10:12'),(16,'/forgot','Allow user to recover password','common','2025-12-08 14:10:12','2025-12-08 14:10:12'),(17,'/product-list','View products list','product','2025-12-15 04:25:56','2025-12-15 04:53:13'),(18,'/add-product','Add new product','product','2025-12-15 04:25:56','2025-12-15 04:25:56'),(19,'/edit-product','Edit product details','product','2025-12-15 04:25:56','2025-12-15 04:25:56'),(20,'/product-detail','View product details','product','2025-12-15 04:25:56','2025-12-15 04:25:56'),(21,'/toggleProduct','Activate/Deactivate product','product','2025-12-15 04:25:56','2025-12-15 04:25:56'),(22,'/supplier-list','View suppliers list','supplier','2025-12-15 04:25:56','2025-12-15 04:25:56'),(23,'/supplier-detail','View supplier details','supplier','2025-12-15 04:25:56','2025-12-15 04:25:56'),(24,'/add-supplier','Add new supplier','supplier','2025-12-15 04:25:56','2025-12-15 04:25:56'),(25,'/edit-supplier','Edit supplier details','supplier','2025-12-15 04:25:56','2025-12-15 04:25:56'),(26,'/list-all-urls','View all URL mappings (Debug tool)','admin','2025-12-15 04:48:28','2025-12-15 04:48:28'),(27,'/order-list','View order list','order','2025-12-15 14:38:44','2025-12-15 14:39:33'),(28,'/order-detail','View order detail','order','2025-12-15 14:38:44','2025-12-15 14:38:44'),(29,'/add-detail','Add product configuration details',NULL,'2025-12-15 15:35:33','2025-12-15 15:35:33');
+INSERT INTO `permissions` VALUES (1,'/landing','User homepage','common','2025-12-03 12:19:13','2025-12-08 14:10:12'),(2,'/user-list','View user list','admin','2025-12-03 12:19:13','2025-12-08 14:10:12'),(4,'/user-detail','View user details','admin','2025-12-03 12:19:13','2025-12-08 14:10:12'),(5,'/user-status','Update user status','admin','2025-12-03 12:19:13','2025-12-08 14:10:12'),(6,'/edit-role','Edit user role','role','2025-12-03 12:19:13','2025-12-08 14:10:12'),(7,'/add-role','Create new roles','role','2025-12-03 12:19:13','2025-12-08 14:10:12'),(8,'/role','View role status','role','2025-12-03 12:19:13','2025-12-08 14:10:12'),(9,'/role-list','Change role status','role','2025-12-03 12:19:13','2025-12-08 14:10:12'),(10,'/role-permission','Manage role permissions','role','2025-12-03 12:19:13','2025-12-08 14:10:12'),(11,'/profile','View own profile','profile','2025-12-03 12:19:13','2025-12-08 14:10:12'),(12,'/change-password','Change own password','profile','2025-12-03 12:19:13','2025-12-08 14:10:12'),(13,'/edit-profile','Edit own profile','profile','2025-12-03 12:19:13','2025-12-08 14:10:12'),(14,'/login','Login to system','common','2025-12-03 12:19:13','2025-12-08 14:10:12'),(15,'/logout','Logout from system','common','2025-12-03 12:19:13','2025-12-08 14:10:12'),(16,'/forgot','Allow user to recover password','common','2025-12-08 14:10:12','2025-12-08 14:10:12'),(17,'/product-list','View products list','product','2025-12-15 04:25:56','2025-12-15 04:53:13'),(18,'/add-product','Add new product','product','2025-12-15 04:25:56','2025-12-15 04:25:56'),(19,'/edit-product','Edit product details','product','2025-12-15 04:25:56','2025-12-15 04:25:56'),(21,'/toggleProduct','Activate/Deactivate product','product','2025-12-15 04:25:56','2025-12-15 04:25:56'),(22,'/supplier-list','View suppliers list','supplier','2025-12-15 04:25:56','2025-12-15 04:25:56'),(23,'/supplier-detail','View supplier details','supplier','2025-12-15 04:25:56','2025-12-15 04:25:56'),(24,'/add-supplier','Add new supplier','supplier','2025-12-15 04:25:56','2025-12-15 04:25:56'),(25,'/edit-supplier','Edit supplier details','supplier','2025-12-15 04:25:56','2025-12-15 04:25:56'),(26,'/list-all-urls','View all URL mappings (Debug tool)','admin','2025-12-15 04:48:28','2025-12-15 04:48:28'),(27,'/order-list','View order list','order','2025-12-15 14:38:44','2025-12-15 14:39:33'),(28,'/order-detail','View order detail','order','2025-12-15 14:38:44','2025-12-15 14:38:44'),(29,'/add-product-detail','Add product configuration details',NULL,'2025-12-15 15:35:33','2025-12-16 11:16:39'),(30,'/edit-product-detail','Edit product details',NULL,'2025-12-16 11:11:53','2025-12-16 11:11:53'),(31,'/toggleSpec','Activate/Deactivate  product details',NULL,'2025-12-16 11:21:46','2025-12-16 11:24:25');
 /*!40000 ALTER TABLE `permissions` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -226,7 +226,7 @@ CREATE TABLE `product_details` (
   PRIMARY KEY (`product_detail_id`),
   KEY `fk_details_product` (`product_id`),
   CONSTRAINT `fk_details_product` FOREIGN KEY (`product_id`) REFERENCES `products` (`product_id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=43 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=44 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -235,7 +235,7 @@ CREATE TABLE `product_details` (
 
 LOCK TABLES `product_details` WRITE;
 /*!40000 ALTER TABLE `product_details` DISABLE KEYS */;
-INSERT INTO `product_details` VALUES (1,1,'16GB','512GB','Intel Core i7-1360P','Intel Iris Xe',13.4,1),(2,2,'16GB','512GB','Apple M3 Pro','14-core GPU',16.2,1),(3,3,'8GB','256GB','Intel Core i3-1115G4','Intel UHD',15.6,1),(4,4,'32GB','1TB','Intel Core i7-1355U','Intel Iris Xe',14,1),(5,5,'32GB','1TB','Intel Core i9-13980HX','NVIDIA RTX 4090',18,1),(6,6,'16GB','1TB','Intel Core i7-13700HX','NVIDIA RTX 4070',16,0),(7,7,'32GB','2TB','Intel Core i9-13980HX','NVIDIA RTX 4080',17,1),(8,7,'64GB','4TB','Intel Core i9-13980HX','NVIDIA RTX 4090',17,1),(9,8,'64GB','2TB','Intel Core i9-13950HX','NVIDIA RTX 5000 Ada',16,0),(10,8,'128GB','8TB','Intel Core i9-13950HX','NVIDIA RTX 5000 Ada',16,1),(11,9,'64GB','2TB','Intel Core i7-13850HX','NVIDIA RTX 3500 Ada',17.3,1),(12,1,'32GB','1TB','Intel Core i7-1360P','Intel Iris Xe',13.4,1),(13,2,'36GB','1TB','Apple M3 Pro','18-core GPU',16.2,1),(14,2,'96GB','4TB','Apple M3 Max','40-core GPU',16.2,1),(15,4,'16GB','512GB','Intel Core i5-1335U','Intel Iris Xe',14,0),(42,10,'8GB','512GB','AMD Ryzen 5-5600H','NVIDIA RTX 3050 Ti 4GB',16,1);
+INSERT INTO `product_details` VALUES (1,1,'16GB','512GB','Intel Core i7-1360P','Intel Iris Xe',13.4,1),(2,2,'16GB','512GB','Apple M3 Pro','14-core GPU',16.2,1),(3,3,'8GB','256GB','Intel Core i3-1115G4','Intel UHD',15.6,1),(4,4,'32GB','1TB','Intel Core i7-1355U','Intel Iris Xe',14,1),(5,5,'32GB','1TB','Intel Core i9-13980HX','NVIDIA RTX 4090',18,1),(6,6,'16GB','1TB','Intel Core i7-13700HX','NVIDIA RTX 4070',16,0),(7,7,'32GB','2TB','Intel Core i9-13980HX','NVIDIA RTX 4080',17,1),(8,7,'64GB','4TB','Intel Core i9-13980HX','NVIDIA RTX 4090',17,1),(9,8,'64GB','2TB','Intel Core i9-13950HX','NVIDIA RTX 5000 Ada',16,0),(10,8,'128GB','8TB','Intel Core i9-13950HX','NVIDIA RTX 5000 Ada',16,1),(11,9,'64GB','2TB','Intel Core i7-13850HX','NVIDIA RTX 3500 Ada',17.3,1),(12,1,'32GB','1TB','Intel Core i7-1360P','Intel Iris Xe',13.4,1),(13,2,'36GB','1TB','Apple M3 Pro','18-core GPU',16.2,1),(14,2,'96GB','4TB','Apple M3 Max','40-core GPU',16.2,1),(15,4,'16GB','512GB','Intel Core i5-1335U','Intel Iris Xe',14,0),(42,10,'8GB','512GB','AMD Ryzen 5-5600H','NVIDIA RTX 3050 6GB',16,1),(43,10,'32gb','512gb','ccccc','dddddd',21,1);
 /*!40000 ALTER TABLE `product_details` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -266,7 +266,7 @@ CREATE TABLE `products` (
 
 LOCK TABLES `products` WRITE;
 /*!40000 ALTER TABLE `products` DISABLE KEYS */;
-INSERT INTO `products` VALUES (1,'Dell XPS 13 (Core i7, 16GB)','Dell','Office',1,'piece',1),(2,'Macbook Pro M3 (16 inch)','Apple','Office',2,'piece',1),(3,'Dell Vostro 3500 (Core i3)','Dell','Office',1,'piece',1),(4,'Lenovo ThinkPad X1 Carbon','Lenovo','Gaming',3,'piece',1),(5,'ASUS ROG Strix Scar 18','ASUS','Gaming',4,'piece',1),(6,'Acer Predator Helios 16','Acer','Gaming',5,'piece',0),(7,'MSI Raider GE78','MSI','Gaming',6,'piece',1),(8,'HP ZBook Fury 16 G10','HP','Workstation',7,'piece',1),(9,'Dell Precision 7780','Dell','Workstation',1,'piece',1),(10,'Test Product (Empty Specs)','Dell','Office',1,'piece',1);
+INSERT INTO `products` VALUES (1,'Dell XPS 13 (Core i7, 16GB)','Dell','Office',1,'piece',1),(2,'Macbook Pro M3 (16 inch)','Apple','Office',2,'piece',1),(3,'Dell Vostro 3500 (Core i3)','Dell','Office',1,'piece',1),(4,'Lenovo ThinkPad X1 Carbon','Lenovo','Gaming',3,'piece',1),(5,'ASUS ROG Strix Scar 18','ASUS','Gaming',4,'piece',1),(6,'Acer Predator Helios 16','Acer','Gaming',5,'piece',0),(7,'MSI Raider GE78','MSI','Gaming',6,'piece',1),(8,'HP ZBook Fury 16 G10','HP','Workstation',7,'piece',1),(9,'Dell Precision 7780','Dell','Workstation',1,'piece',1),(10,'Test Product (Test Editing)','Acer','Workstation',5,NULL,1);
 /*!40000 ALTER TABLE `products` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -290,7 +290,7 @@ CREATE TABLE `role_permissions` (
   CONSTRAINT `fk_role_permissions_granted_by` FOREIGN KEY (`granted_by`) REFERENCES `users` (`user_id`) ON DELETE SET NULL,
   CONSTRAINT `role_permissions_ibfk_1` FOREIGN KEY (`role_id`) REFERENCES `roles` (`role_id`) ON DELETE CASCADE,
   CONSTRAINT `role_permissions_ibfk_2` FOREIGN KEY (`permission_id`) REFERENCES `permissions` (`permission_id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=324 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=328 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -299,7 +299,7 @@ CREATE TABLE `role_permissions` (
 
 LOCK TABLES `role_permissions` WRITE;
 /*!40000 ALTER TABLE `role_permissions` DISABLE KEYS */;
-INSERT INTO `role_permissions` VALUES (199,1,1,'2025-12-08 14:50:25',NULL),(200,1,2,'2025-12-08 14:50:25',NULL),(201,1,4,'2025-12-08 14:50:25',NULL),(202,1,5,'2025-12-08 14:50:25',NULL),(203,1,6,'2025-12-08 14:50:25',NULL),(204,1,7,'2025-12-08 14:50:25',NULL),(205,1,8,'2025-12-08 14:50:25',NULL),(206,1,9,'2025-12-08 14:50:25',NULL),(207,1,10,'2025-12-08 14:50:25',NULL),(208,1,11,'2025-12-08 14:50:25',NULL),(209,1,12,'2025-12-08 14:50:25',NULL),(210,1,13,'2025-12-08 14:50:25',NULL),(211,1,14,'2025-12-08 14:50:25',NULL),(212,1,15,'2025-12-08 14:50:25',NULL),(213,1,16,'2025-12-08 14:50:25',NULL),(226,1,18,'2025-12-15 04:25:56',NULL),(227,1,24,'2025-12-15 04:25:56',NULL),(228,1,19,'2025-12-15 04:25:56',NULL),(229,1,25,'2025-12-15 04:25:56',NULL),(230,1,20,'2025-12-15 04:25:56',NULL),(231,1,17,'2025-12-15 04:25:56',NULL),(232,1,23,'2025-12-15 04:25:56',NULL),(233,1,22,'2025-12-15 04:25:56',NULL),(234,1,21,'2025-12-15 04:25:56',NULL),(263,1,26,'2025-12-15 04:48:28',NULL),(293,2,11,'2025-12-15 14:40:16',NULL),(294,2,12,'2025-12-15 14:40:16',NULL),(295,2,13,'2025-12-15 14:40:16',NULL),(296,2,14,'2025-12-15 14:40:16',NULL),(297,2,15,'2025-12-15 14:40:16',NULL),(298,2,16,'2025-12-15 14:40:16',NULL),(299,2,17,'2025-12-15 14:40:16',NULL),(300,2,18,'2025-12-15 14:40:16',NULL),(301,2,19,'2025-12-15 14:40:16',NULL),(302,2,20,'2025-12-15 14:40:16',NULL),(303,2,21,'2025-12-15 14:40:16',NULL),(304,2,22,'2025-12-15 14:40:16',NULL),(305,2,23,'2025-12-15 14:40:16',NULL),(306,2,24,'2025-12-15 14:40:16',NULL),(307,2,25,'2025-12-15 14:40:16',NULL),(308,2,27,'2025-12-15 14:40:16',NULL),(309,2,28,'2025-12-15 14:40:16',NULL),(310,3,11,'2025-12-15 14:40:16',NULL),(311,3,12,'2025-12-15 14:40:16',NULL),(312,3,13,'2025-12-15 14:40:16',NULL),(313,3,14,'2025-12-15 14:40:16',NULL),(314,3,15,'2025-12-15 14:40:16',NULL),(315,3,16,'2025-12-15 14:40:16',NULL),(316,3,17,'2025-12-15 14:40:16',NULL),(317,3,20,'2025-12-15 14:40:16',NULL),(318,3,22,'2025-12-15 14:40:16',NULL),(319,3,23,'2025-12-15 14:40:16',NULL),(320,3,27,'2025-12-15 14:40:16',NULL),(321,3,28,'2025-12-15 14:40:16',NULL),(322,1,29,'2025-12-15 15:35:33',NULL),(323,2,29,'2025-12-15 15:35:33',NULL);
+INSERT INTO `role_permissions` VALUES (199,1,1,'2025-12-08 14:50:25',NULL),(200,1,2,'2025-12-08 14:50:25',NULL),(201,1,4,'2025-12-08 14:50:25',NULL),(202,1,5,'2025-12-08 14:50:25',NULL),(203,1,6,'2025-12-08 14:50:25',NULL),(204,1,7,'2025-12-08 14:50:25',NULL),(205,1,8,'2025-12-08 14:50:25',NULL),(206,1,9,'2025-12-08 14:50:25',NULL),(207,1,10,'2025-12-08 14:50:25',NULL),(208,1,11,'2025-12-08 14:50:25',NULL),(209,1,12,'2025-12-08 14:50:25',NULL),(210,1,13,'2025-12-08 14:50:25',NULL),(211,1,14,'2025-12-08 14:50:25',NULL),(212,1,15,'2025-12-08 14:50:25',NULL),(213,1,16,'2025-12-08 14:50:25',NULL),(226,1,18,'2025-12-15 04:25:56',NULL),(227,1,24,'2025-12-15 04:25:56',NULL),(228,1,19,'2025-12-15 04:25:56',NULL),(229,1,25,'2025-12-15 04:25:56',NULL),(231,1,17,'2025-12-15 04:25:56',NULL),(232,1,23,'2025-12-15 04:25:56',NULL),(233,1,22,'2025-12-15 04:25:56',NULL),(234,1,21,'2025-12-15 04:25:56',NULL),(263,1,26,'2025-12-15 04:48:28',NULL),(293,2,11,'2025-12-15 14:40:16',NULL),(294,2,12,'2025-12-15 14:40:16',NULL),(295,2,13,'2025-12-15 14:40:16',NULL),(296,2,14,'2025-12-15 14:40:16',NULL),(297,2,15,'2025-12-15 14:40:16',NULL),(298,2,16,'2025-12-15 14:40:16',NULL),(299,2,17,'2025-12-15 14:40:16',NULL),(300,2,18,'2025-12-15 14:40:16',NULL),(301,2,19,'2025-12-15 14:40:16',NULL),(303,2,21,'2025-12-15 14:40:16',NULL),(304,2,22,'2025-12-15 14:40:16',NULL),(305,2,23,'2025-12-15 14:40:16',NULL),(306,2,24,'2025-12-15 14:40:16',NULL),(307,2,25,'2025-12-15 14:40:16',NULL),(308,2,27,'2025-12-15 14:40:16',NULL),(309,2,28,'2025-12-15 14:40:16',NULL),(310,3,11,'2025-12-15 14:40:16',NULL),(311,3,12,'2025-12-15 14:40:16',NULL),(312,3,13,'2025-12-15 14:40:16',NULL),(313,3,14,'2025-12-15 14:40:16',NULL),(314,3,15,'2025-12-15 14:40:16',NULL),(315,3,16,'2025-12-15 14:40:16',NULL),(316,3,17,'2025-12-15 14:40:16',NULL),(318,3,22,'2025-12-15 14:40:16',NULL),(319,3,23,'2025-12-15 14:40:16',NULL),(320,3,27,'2025-12-15 14:40:16',NULL),(321,3,28,'2025-12-15 14:40:16',NULL),(322,1,29,'2025-12-15 15:35:33',NULL),(323,2,29,'2025-12-15 15:35:33',NULL),(324,1,30,'2025-12-16 11:11:53',NULL),(325,2,30,'2025-12-16 11:11:53',NULL),(326,1,31,'2025-12-16 11:21:46',NULL),(327,2,31,'2025-12-16 11:21:46',NULL);
 /*!40000 ALTER TABLE `role_permissions` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -433,17 +433,9 @@ CREATE TABLE `users` (
 
 LOCK TABLES `users` WRITE;
 /*!40000 ALTER TABLE `users` DISABLE KEYS */;
-INSERT INTO `users` VALUES (1,'admin','123','System Administrator','admin@laptopwms.com','0985290363','Male',1,'active','2025-12-15 15:35:18','2025-12-03 12:19:13','2025-12-15 15:35:18',NULL),(2,'keeper1','123','Nguyen Van A','aaa1@gmail.com','0123231233','Male',2,'active','2025-12-15 15:35:43','2025-12-07 14:12:07','2025-12-15 15:35:43',NULL),(3,'sale1','123456','Nguyễn Thị B','b@gmail.com','0214563841','Female',3,'active','2025-12-15 11:27:37','2025-12-15 11:27:22','2025-12-15 11:27:37',1);
+INSERT INTO `users` VALUES (1,'admin','123','System Administrator','admin@laptopwms.com','0985290363','Male',1,'active','2025-12-16 11:37:43','2025-12-03 12:19:13','2025-12-16 11:37:43',NULL),(2,'keeper1','123','Nguyen Van A','aaa1@gmail.com','0123231233','Male',2,'active','2025-12-15 15:35:43','2025-12-07 14:12:07','2025-12-15 15:35:43',NULL),(3,'sale1','123456','Nguyễn Thị B','b@gmail.com','0214563841','Female',3,'active','2025-12-15 11:27:37','2025-12-15 11:27:22','2025-12-15 11:27:37',1);
 /*!40000 ALTER TABLE `users` ENABLE KEYS */;
 UNLOCK TABLES;
-
---
--- Dumping events for database 'laptop_wms'
---
-
---
--- Dumping routines for database 'laptop_wms'
---
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
@@ -454,4 +446,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-12-15 22:47:24
+-- Dump completed on 2025-12-16 18:43:05
