@@ -378,21 +378,53 @@ public class OrderDAO extends DBContext {
 
         return searchPrefix + formattedNumber;
     }
-    
+
+    public String updateOrderStatus(int orderId, String newStatus) throws java.sql.SQLException {
+        String orderCode = null;
+
+        String selectSql = "SELECT order_code FROM orders WHERE order_id = ?";
+        try (Connection con = DBContext.getConnection(); PreparedStatement psSelect = con.prepareStatement(selectSql)) {
+
+            psSelect.setInt(1, orderId);
+            try (java.sql.ResultSet rs = psSelect.executeQuery()) {
+                if (rs.next()) {
+                    orderCode = rs.getString("order_code");
+                } else {
+                    return null;
+                }
+            }
+        }
+
+        String updateSql = "UPDATE orders SET order_status = ? WHERE order_id = ?";
+        try (Connection con = DBContext.getConnection(); PreparedStatement psUpdate = con.prepareStatement(updateSql)) {
+
+            psUpdate.setString(1, newStatus);
+            psUpdate.setInt(2, orderId);
+
+            int rowsAffected = psUpdate.executeUpdate();
+
+            if (rowsAffected > 0) {
+                return orderCode;
+            } else {
+                return null;
+            }
+        }
+    }
+
     public static void main(String[] args) {
         OrderDAO orderDAO = new OrderDAO();
         System.out.println("--- Bắt đầu Test OrderDAO.addOrder ---");
-        
+
         try {
             // 1. Tạo đối tượng Order (Đơn hàng Export/Xuất Hàng)
             Order newOrder = createTestOrder();
-            
+
             // 2. Tạo danh sách Chi tiết Đơn hàng
             List<OrderProduct> details = createTestOrderDetails();
-            
+
             // 3. Thực hiện thêm đơn hàng
             boolean success = orderDAO.addOrder(newOrder, details);
-            
+
             if (success) {
                 System.out.println("\n✅ TEST THÀNH CÔNG!");
                 System.out.println("Đơn hàng đã được thêm thành công vào DB.");
@@ -401,29 +433,29 @@ public class OrderDAO extends DBContext {
                 System.out.println("\n❌ TEST THẤT BẠI.");
                 System.out.println("Kiểm tra lại Console/Log để xem chi tiết SQLException.");
             }
-            
+
         } catch (Exception e) {
             System.out.println("\n🚨 ĐÃ XẢY RA NGOẠI LỆ KHI THỰC HIỆN TEST:");
             e.printStackTrace();
         }
     }
-    
+
     private static Order createTestOrder() {
         Order order = new Order();
-        
+
         order.setCustomerId(1);
         order.setSupplierId(0);
-        
+
         order.setDescription("Đơn hàng test tự động từ Main.");
-        order.setOrderStatus("Pending"); 
-        order.setCreatedBy(1);   
-        
+        order.setOrderStatus("Pending");
+        order.setCreatedBy(1);
+
         return order;
     }
 
     private static List<OrderProduct> createTestOrderDetails() {
         List<OrderProduct> details = new ArrayList<>();
-        
+
         OrderProduct detail1 = new OrderProduct();
         detail1.setProductId(1);
         detail1.setQuantity(2);
@@ -433,9 +465,9 @@ public class OrderDAO extends DBContext {
         OrderProduct detail2 = new OrderProduct();
         detail2.setProductId(5);
         detail2.setQuantity(1);
-        detail2.setUnitPrice(new BigDecimal("1250.00")); 
+        detail2.setUnitPrice(new BigDecimal("1250.00"));
         details.add(detail2);
-        
+
         return details;
     }
 }
