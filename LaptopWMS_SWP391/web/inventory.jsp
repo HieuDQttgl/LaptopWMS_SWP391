@@ -102,10 +102,6 @@
             <h1>Inventory Management</h1>
 
             <div class="controls">
-                <div>
-                    <a href="audit-inventory" class="btn btn-audit">Audit Inventory</a>
-                </div>
-                
                 <form action="inventory" method="get" class="filter-group">
                     <select name="location" onchange="this.form.submit()">
                         <option value="0">All Locations</option>
@@ -154,6 +150,7 @@
                         <td><%= item.getLastUpdated() %></td>
                         <td>
                             <a href="inventory-detail?id=<%= item.getInventoryId() %>" class="btn btn-view">View Details</a>
+                            <a href="audit-inventory?productId=<%= item.getProductId() %>" class="btn btn-audit" style="background-color: #e67e22; margin-left: 5px;">Audit</a>
                         </td>
                     </tr>
                     <%

@@ -203,6 +203,7 @@
         </table>
 
         <button type="submit" class="update-btn">Save Changes</button>
+        <a href="javascript:history.back()" class="btn-back"> Back</a>
         <div style="clear: both;"></div>
     </form>
 </div>
