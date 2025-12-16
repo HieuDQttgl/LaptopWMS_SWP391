@@ -197,7 +197,101 @@ public class ProductDAO extends DBContext {
         return "Unknown Product";
     }
 
+    public Product getProductById(int id) {
+        Product p = null;
+
+        String sql = "SELECT * FROM products WHERE product_id = ?";
+
+        try (PreparedStatement ps = getConnection().prepareStatement(sql)) {
+            ps.setInt(1, id);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    p = new Product();
+
+                    p.setProductId(rs.getInt("product_id"));
+                    p.setProductName(rs.getString("product_name"));
+                    p.setBrand(rs.getString("brand"));
+                    p.setCategory(rs.getString("category"));
+                    p.setUnit(rs.getString("unit"));
+                    p.setStatus(rs.getBoolean("status"));
+                    p.setSupplierId(rs.getInt("supplier_id"));
+
+                    return p;
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
     public Object getListProducts() {
         return getProducts(null, null, null, null, null);
+    }
+
+    public void updateProduct(Product p) {
+        String sql = "UPDATE products SET product_name=?, brand=?, category=?, supplier_id=?, unit=? WHERE product_id=?";
+
+        try (PreparedStatement ps = getConnection().prepareStatement(sql)) {
+            ps.setString(1, p.getProductName());
+            ps.setString(2, p.getBrand());
+            ps.setString(3, p.getCategory());
+            ps.setInt(4, p.getSupplierId());
+            ps.setString(5, p.getUnit());
+
+            ps.setInt(6, p.getProductId());
+
+            ps.executeUpdate();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public ProductDetail getProductDetailById(int productDetailId) {
+        ProductDetail d = null;
+
+        String sql = "SELECT product_detail_id, product_id, ram, storage, cpu, gpu, screen, status "
+                + "FROM product_details WHERE product_detail_id = ?";
+
+        try (PreparedStatement ps = getConnection().prepareStatement(sql)) {
+            ps.setInt(1, productDetailId);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    d = new ProductDetail();
+
+                    d.setProductDetailId(rs.getInt("product_detail_id"));
+                    d.setProductId(rs.getInt("product_id"));
+                    d.setRam(rs.getString("ram"));
+                    d.setStorage(rs.getString("storage"));
+                    d.setCpu(rs.getString("cpu"));
+                    d.setGpu(rs.getString("gpu"));
+                    d.setScreen(rs.getDouble("screen"));
+                    d.setStatus(rs.getBoolean("status"));
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return d;
+    }
+
+    public void updateProductDetail(ProductDetail d) {
+        String sql = "UPDATE product_details SET ram=?, storage=?, cpu=?, gpu=?, screen=?, status=? WHERE product_detail_id=?";
+
+        try (PreparedStatement ps = getConnection().prepareStatement(sql)) {
+            ps.setString(1, d.getRam());
+            ps.setString(2, d.getStorage());
+            ps.setString(3, d.getCpu());
+            ps.setString(4, d.getGpu());
+            ps.setDouble(5, d.getScreen());
+            ps.setBoolean(6, d.isStatus());
+            
+            ps.setInt(7, d.getProductDetailId());
+
+            ps.executeUpdate();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }

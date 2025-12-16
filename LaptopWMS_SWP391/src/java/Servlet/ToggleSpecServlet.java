@@ -65,7 +65,7 @@ public class ToggleSpecServlet extends HttpServlet {
             ProductDAO dao = new ProductDAO();
             dao.toggleDetailStatus(id);
         }
-        response.sendRedirect("products");
+        response.sendRedirect("product-list");
     }
 
     /**

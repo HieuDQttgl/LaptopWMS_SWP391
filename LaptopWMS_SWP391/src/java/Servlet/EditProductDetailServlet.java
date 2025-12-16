@@ -5,6 +5,7 @@
 package Servlet;
 
 import DAO.ProductDAO;
+import Model.ProductDetail;
 import java.io.IOException;
 import java.io.PrintWriter;
 import jakarta.servlet.ServletException;
@@ -17,8 +18,8 @@ import jakarta.servlet.http.HttpServletResponse;
  *
  * @author PC
  */
-@WebServlet(name = "ToggleProductServlet", urlPatterns = {"/toggleProduct"})
-public class ToggleProductServlet extends HttpServlet {
+@WebServlet(name = "EditProductDetailServlet", urlPatterns = {"/edit-product-detail"})
+public class EditProductDetailServlet extends HttpServlet {
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -37,10 +38,10 @@ public class ToggleProductServlet extends HttpServlet {
             out.println("<!DOCTYPE html>");
             out.println("<html>");
             out.println("<head>");
-            out.println("<title>Servlet ToggleProductServlet</title>");
+            out.println("<title>Servlet EditProductDetailServlet</title>");
             out.println("</head>");
             out.println("<body>");
-            out.println("<h1>Servlet ToggleProductServlet at " + request.getContextPath() + "</h1>");
+            out.println("<h1>Servlet EditProductDetailServlet at " + request.getContextPath() + "</h1>");
             out.println("</body>");
             out.println("</html>");
         }
@@ -59,13 +60,29 @@ public class ToggleProductServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        String idStr = request.getParameter("id");
-        if (idStr != null) {
-            int id = Integer.parseInt(idStr);
-            ProductDAO dao = new ProductDAO();
-            dao.toggleProductStatus(id);
+        String idParam = request.getParameter("id");
+
+        if (idParam != null && !idParam.isEmpty()) {
+            try {
+                int id = Integer.parseInt(idParam);
+
+                ProductDAO dao = new ProductDAO();
+                ProductDetail detail = dao.getProductDetailById(id);
+
+                if (detail != null) {
+                    request.setAttribute("detail", detail);
+
+                    request.getRequestDispatcher("edit-product-detail.jsp").forward(request, response);
+                } else {
+                    response.sendRedirect("product-list");
+                }
+
+            } catch (NumberFormatException e) {
+                response.sendRedirect("product-list");
+            }
+        } else {
+            response.sendRedirect("product-list");
         }
-        response.sendRedirect("product-list");
     }
 
     /**
@@ -79,7 +96,36 @@ public class ToggleProductServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        doGet(request, response);
+
+        try {
+            int id = Integer.parseInt(request.getParameter("id"));
+            int productId = Integer.parseInt(request.getParameter("productId"));
+
+            String cpu = request.getParameter("cpu");
+            String gpu = request.getParameter("gpu");
+            String ram = request.getParameter("ram");
+            String storage = request.getParameter("storage");
+            double screen = Double.parseDouble(request.getParameter("screen"));
+            boolean status = Boolean.parseBoolean(request.getParameter("status"));
+
+            ProductDetail d = new ProductDetail();
+            d.setProductDetailId(id);
+            d.setCpu(cpu);
+            d.setGpu(gpu);
+            d.setRam(ram);
+            d.setStorage(storage);
+            d.setScreen(screen);
+            d.setStatus(status);
+
+            ProductDAO dao = new ProductDAO();
+            dao.updateProductDetail(d);
+
+            response.sendRedirect("product-list?id=" + productId);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            response.sendRedirect("product-list");
+        }
     }
 
     /**
@@ -90,6 +136,6 @@ public class ToggleProductServlet extends HttpServlet {
     @Override
     public String getServletInfo() {
         return "Mama mia";
-    }// </editor-fold>
+    }
 
 }
