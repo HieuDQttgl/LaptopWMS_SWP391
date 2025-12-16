@@ -33,10 +33,12 @@ public class AddOrderServlet extends HttpServlet {
             throws ServletException, IOException {
         
         try {
-            // Tải dữ liệu cần thiết cho dropdown list (JSP)
             request.setAttribute("allCustomers", customerDAO.getListCustomers());
             request.setAttribute("allSuppliers", supplierDAO.getListSuppliers());
             request.setAttribute("allProducts", productDAO.getListProducts());
+            
+            request.removeAttribute("tempOrder");
+            request.removeAttribute("tempDetails");
             
             request.getRequestDispatcher("add-order.jsp").forward(request, response);
             
@@ -60,7 +62,6 @@ public class AddOrderServlet extends HttpServlet {
         Integer customerId = 0;
         Integer supplierId = 0;
         
-        // --- 1. KIỂM TRA ĐĂNG NHẬP ---
         Users currentUser = (Users) request.getSession().getAttribute("currentUser");
         if (currentUser == null) {
             response.sendRedirect(request.getContextPath() + "/login");
@@ -68,7 +69,6 @@ public class AddOrderServlet extends HttpServlet {
         }
         Integer createdBy = currentUser.getUserId();
 
-        // >>> BẮT ĐẦU SỬA: THÊM LOGIC PARSE ID ĐỐI TÁC <<<
         try {
             if (customerIdStr != null && !customerIdStr.trim().isEmpty() && !customerIdStr.trim().equals("0")) {
                 customerId = Integer.valueOf(customerIdStr.trim());
@@ -79,143 +79,155 @@ public class AddOrderServlet extends HttpServlet {
         } catch (NumberFormatException e) {
             errors.put("party", "ID đối tác không hợp lệ.");
         }
-        // >>> KẾT THÚC SỬA: ID đối tác đã được set đúng <<<
 
-        // Khởi tạo đối tượng Order
         Order newOrder = new Order();
-        newOrder.setCustomerId(customerId);
-        newOrder.setSupplierId(supplierId);
+        if (customerId > 0) {
+            newOrder.setCustomerId(customerId);
+            newOrder.setSupplierId(null); 
+        } else if (supplierId > 0) {
+            newOrder.setSupplierId(supplierId);
+            newOrder.setCustomerId(null);
+        } else {
+            errors.put("party", "Vui lòng chọn Khách hàng hoặc Nhà cung cấp.");
+            newOrder.setCustomerId(null);
+            newOrder.setSupplierId(null);
+        }
+        
         newOrder.setDescription(description);
         newOrder.setOrderStatus("Pending");
         newOrder.setCreatedBy(createdBy);
 
-        // --- 3. VALIDATION VÀ PARSE CHI TIẾT ĐƠN HÀNG (LOGIC SỬA LỖI MAPPING TÊN SẢN PHẨM) ---
         List<OrderProduct> details = new ArrayList<>();
-        // Map mới để lưu trữ tên sản phẩm đã gõ khi form bị lỗi (Key: Index, Value: Tên SP)
-        Map<Integer, String> errorProductNames = new HashMap<>(); 
+        Map<Integer, String> errorProductNames = new HashMap<>();
+        boolean hasDetailError = false;
         
-        int index = 0;
-        boolean hasDetails = false;
-        boolean hasDetailError = false; // Cờ báo lỗi chi tiết
+        String[] productIds = request.getParameterValues("productId");
+        String[] quantities = request.getParameterValues("quantity");
+        String[] unitPrices = request.getParameterValues("unitPrice");
+        String[] productNames = request.getParameterValues("productName");
+        
+        
+        if (productIds != null && productIds.length > 0) {
+            for (int i = 0; i < productIds.length; i++) {
+                
+                String productIdStr = (i < productIds.length) ? productIds[i] : null;
+                String quantityStr = (i < quantities.length) ? quantities[i] : null;
+                String unitPriceStr = (i < unitPrices.length) ? unitPrices[i] : null;
+                String productName = (i < productNames.length) ? productNames[i] : null;
 
-        while (true) {
-            String productIdKey = "details[" + index + "].productId";
-            String quantityKey = "details[" + index + "].quantity";
-            String unitPriceKey = "details[" + index + "].unitPrice";
-            String productNameKey = "productName_TEMP_" + index; // Lấy tên tạm thời từ JSP
-            
-            String detailProductIdStr = request.getParameter(productIdKey);
-            String detailQuantityStr = request.getParameter(quantityKey);
-            String detailUnitPriceStr = request.getParameter(unitPriceKey);
-            String detailProductName = request.getParameter(productNameKey);
-
-            if (detailProductIdStr == null && detailQuantityStr == null && detailUnitPriceStr == null) {
-                break; 
-            }
-            
-            // Nếu chỉ tìm thấy một vài tham số, có thể là lỗi cấu trúc form, nhưng ta vẫn xử lý
-            if (detailProductIdStr == null || detailQuantityStr == null || detailUnitPriceStr == null) {
-                 errors.put("details", "Missing fields for product line " + (index + 1) + ". Check the form structure.");
-                 index++;
-                 hasDetailError = true;
-                 continue;
-            }
-
-            hasDetails = true;
-            
-            Integer productId = null;
-            Integer quantity = null;
-            BigDecimal unitPrice = null;
-
-            try {
-                // PARSE DỮ LIỆU
-                if (!detailProductIdStr.trim().isEmpty()) {
-                    productId = Integer.valueOf(detailProductIdStr.trim());
-                }
-                if (!detailQuantityStr.trim().isEmpty()) {
-                    quantity = Integer.valueOf(detailQuantityStr.trim());
-                }
-                if (!detailUnitPriceStr.trim().isEmpty()) {
-                    unitPrice = new BigDecimal(detailUnitPriceStr.trim());
+                if (productIdStr == null || productIdStr.trim().isEmpty() || productIdStr.trim().equals("0")) {
+                     if (productName != null && !productName.trim().isEmpty()) {
+                         errors.put("details_line_" + i, "Dòng " + (i + 1) + ": Sản phẩm chưa được chọn hợp lệ từ danh sách.");
+                         errorProductNames.put(i, productName.trim());
+                         hasDetailError = true;
+                         
+                         OrderProduct tempDetail = new OrderProduct();
+                         try {
+                             if (quantityStr != null && !quantityStr.trim().isEmpty()) tempDetail.setQuantity(Integer.parseInt(quantityStr.trim()));
+                             if (unitPriceStr != null && !unitPriceStr.trim().isEmpty()) tempDetail.setUnitPrice(new BigDecimal(unitPriceStr.trim()));
+                         } catch (Exception ex) { }
+                         details.add(tempDetail);
+                     }
+                     continue;
                 }
                 
-                // --- Validation chi tiết ---
-                if (productId == null || productId <= 0) {
-                    errors.put("details", "Product ID at line " + (index + 1) + " is invalid or missing. Ensure product is selected.");
-                    hasDetailError = true;
-                } else if (quantity == null || quantity <= 0) {
-                    errors.put("details", "Quantity at line " + (index + 1) + " must be a positive number.");
-                    hasDetailError = true;
-                } else if (unitPrice == null || unitPrice.compareTo(BigDecimal.ZERO) < 0) {
-                    errors.put("details", "Unit Price at line " + (index + 1) + " must be a non-negative number.");
-                    hasDetailError = true;
-                } else {
-                    // Thêm vào danh sách nếu hợp lệ
+                try {
+                    int productId = Integer.parseInt(productIdStr.trim());
+                    int quantity = Integer.parseInt(quantityStr.trim());
+                    BigDecimal unitPrice = new BigDecimal(unitPriceStr.trim());
+
+                    if (productId <= 0) {
+                        continue; 
+                    }
+                    
+                    if (quantity <= 0) {
+                        errors.put("details_line_" + i, "Dòng " + (i + 1) + ": Số lượng phải > 0.");
+                        hasDetailError = true;
+                    }
+                    if (unitPrice.compareTo(BigDecimal.ZERO) < 0) {
+                        errors.put("details_line_" + i, "Dòng " + (i + 1) + ": Đơn giá không hợp lệ.");
+                        hasDetailError = true;
+                    }
+                    
                     OrderProduct detail = new OrderProduct();
                     detail.setProductId(productId);
                     detail.setQuantity(quantity);
                     detail.setUnitPrice(unitPrice);
+                    
                     details.add(detail);
+                    
+                } catch (NumberFormatException e) {
+                    errors.put("details_line_" + i, "Dòng " + (i + 1) + ": Số lượng hoặc Đơn giá không phải là số hợp lệ.");
+                    hasDetailError = true;
+                    
+                    OrderProduct tempDetail = new OrderProduct();
+                    try {
+                        if (productIdStr != null && !productIdStr.trim().isEmpty() && !productIdStr.trim().equals("0")) tempDetail.setProductId(Integer.parseInt(productIdStr.trim()));
+                        errorProductNames.put(i, productName != null ? productName.trim() : "");
+                    } catch (Exception ex) { }
+                    details.add(tempDetail);
+                    
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    errors.put("details_line_" + i, "Dòng " + (i + 1) + ": Lỗi không xác định.");
+                    hasDetailError = true;
+                    
+                    OrderProduct tempDetail = new OrderProduct();
+                    try {
+                         if (productIdStr != null && !productIdStr.trim().isEmpty() && !productIdStr.trim().equals("0")) tempDetail.setProductId(Integer.parseInt(productIdStr.trim()));
+                    } catch (Exception ex) {}
+                    details.add(tempDetail);
                 }
-
-            } catch (NumberFormatException e) {
-                errors.put("details", "Product data at line " + (index + 1) + " contains incorrect number syntax.");
-                hasDetailError = true;
             }
-            
-            // >>> LƯU TÊN SẢN PHẨM GÕ TAY VÀO MAP DỰ TẠM <<<
-            // Nếu có lỗi chi tiết (hoặc ID sản phẩm bằng 0/null), chúng ta cần lưu lại tên SP gõ tay
-            // để giữ UX khi quay lại JSP.
-            if (detailProductName != null && !detailProductName.trim().isEmpty()) {
-                errorProductNames.put(index, detailProductName);
-            }
-            
-            index++; 
         }
         
-        // Kiểm tra điều kiện đơn hàng phải có ít nhất 1 chi tiết
-        if (!hasDetails) {
-            errors.put("details", "Order must have at least 1 product.");
+        if (details.isEmpty() && !hasDetailError) {
+             errors.put("details", "Đơn hàng phải có ít nhất 1 sản phẩm.");
         }
         
-        // --- 4. XỬ LÝ KẾT QUẢ ---
-        if (!errors.isEmpty() || hasDetailError) {
+        List<OrderProduct> validDetails = new ArrayList<>();
+        if (errors.isEmpty() && !hasDetailError) {
+             for (OrderProduct detail : details) {
+                 if (detail.getProductId() != null && detail.getProductId() > 0 && 
+                     detail.getQuantity() != null && detail.getQuantity() > 0 && 
+                     detail.getUnitPrice() != null && detail.getUnitPrice().compareTo(BigDecimal.ZERO) >= 0) {
+                     validDetails.add(detail);
+                 }
+             }
+        }
+        
+        if (!errors.isEmpty() || hasDetailError || validDetails.isEmpty()) {
             request.setAttribute("errors", errors);
             request.setAttribute("tempOrder", newOrder);
             
-            // >>> TRUYỀN MAP TÊN SẢN PHẨM GÕ TAY BỊ LỖI VỀ JSP <<<
-            request.setAttribute("errorProductNames", errorProductNames); 
-            
-            // Truyền tất cả các chi tiết đã parse thành công (details)
-            // Lưu ý: Nếu có lỗi, 'details' chỉ chứa các dòng hợp lệ.
-            // Để JSP hiển thị lại đúng số dòng, ta cần dựa vào logic JSP.
             request.setAttribute("tempDetails", details); 
+            request.setAttribute("errorProductNames", errorProductNames);
             
-            // Tải lại dữ liệu cho form
             try {
                 request.setAttribute("allCustomers", customerDAO.getListCustomers());
                 request.setAttribute("allSuppliers", supplierDAO.getListSuppliers());
                 request.setAttribute("allProducts", productDAO.getListProducts());
-            } catch (Exception e) {
-                 e.printStackTrace();
-                 errors.put("general", "Lỗi tải lại dữ liệu danh mục.");
+            } catch (Exception e) { 
+                errors.put("general", "Lỗi tải lại dữ liệu danh mục.");
             }
             
             request.getRequestDispatcher("add-order.jsp").forward(request, response);
             
         } else {
-            // ... (Logic lưu DB thành công hoặc thất bại) ...
+            System.out.println("------------------------------------------");
+            System.out.println("DEBUG: Valid Details Count before DAO: " + validDetails.size()); 
+            System.out.println("------------------------------------------");
             try {
-                boolean success = orderDAO.addOrder(newOrder, details);
+                boolean success = orderDAO.addOrder(newOrder, validDetails); 
 
                 if (success) {
-                    request.getSession().setAttribute("message", "Add new order success!");
-                    response.sendRedirect(request.getContextPath() + "/order-list");
+                    response.sendRedirect(request.getContextPath() + "/order-list?success=true");
                 } else {
                     errors.put("general", "System error: Cannot save order, please try again.");
                     request.setAttribute("errors", errors);
                     request.setAttribute("tempOrder", newOrder);
-                    request.setAttribute("tempDetails", details);
+                    request.setAttribute("tempDetails", validDetails);
+                    
                     request.setAttribute("allCustomers", customerDAO.getListCustomers());
                     request.setAttribute("allSuppliers", supplierDAO.getListSuppliers());
                     request.setAttribute("allProducts", productDAO.getListProducts());
@@ -225,16 +237,16 @@ public class AddOrderServlet extends HttpServlet {
             } catch (Exception e) {
                  e.printStackTrace();
                  errors.put("general", "Lỗi DB/Server nghiêm trọng: " + e.getMessage());
+                 
                  request.setAttribute("errors", errors);
                  request.setAttribute("tempOrder", newOrder);
-                 request.setAttribute("tempDetails", details);
-                 
+                 request.setAttribute("tempDetails", validDetails);
+
                  try {
                      request.setAttribute("allCustomers", customerDAO.getListCustomers());
                      request.setAttribute("allSuppliers", supplierDAO.getListSuppliers());
                      request.setAttribute("allProducts", productDAO.getListProducts());
-                 } catch (Exception ex) { /* Bỏ qua lỗi này */ }
-                 
+                 } catch (Exception ex) { }
                  request.getRequestDispatcher("add-order.jsp").forward(request, response);
             }
         }

@@ -5,9 +5,9 @@ import java.math.RoundingMode;
 
 public class OrderProductDetailDTO {
     
-    private int orderProductId;
-    private int productId;
-    private int quantity;
+    private Integer orderProductId;
+    private Integer productId;
+    private Integer quantity;
     private BigDecimal unitPrice;
     private String productName;
     
@@ -16,7 +16,7 @@ public class OrderProductDetailDTO {
     public OrderProductDetailDTO() {
     }
 
-    public OrderProductDetailDTO(int orderProductId, int productId, String productName, int quantity, BigDecimal unitPrice) {
+    public OrderProductDetailDTO(Integer orderProductId, Integer productId, String productName, Integer quantity, BigDecimal unitPrice) {
         this.orderProductId = orderProductId;
         this.productId = productId;
         this.productName = productName;
@@ -33,19 +33,19 @@ public class OrderProductDetailDTO {
     }
 
 
-    public int getOrderProductId() {
+    public Integer getOrderProductId() {
         return orderProductId;
     }
 
-    public void setOrderProductId(int orderProductId) {
+    public void setOrderProductId(Integer orderProductId) {
         this.orderProductId = orderProductId;
     }
 
-    public int getProductId() {
+    public Integer getProductId() {
         return productId;
     }
 
-    public void setProductId(int productId) {
+    public void setProductId(Integer productId) {
         this.productId = productId;
     }
 
@@ -57,11 +57,11 @@ public class OrderProductDetailDTO {
         this.productName = productName;
     }
 
-    public int getQuantity() {
+    public Integer getQuantity() {
         return quantity;
     }
 
-    public void setQuantity(int quantity) {
+    public void setQuantity(Integer quantity) {
         this.quantity = quantity;
     }
 

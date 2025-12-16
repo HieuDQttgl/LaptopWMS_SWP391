@@ -208,6 +208,16 @@
             .date-filter-row .form-group:nth-child(3) {
                 flex: 2 1 auto;
             }
+            .success-box {
+                color: #155724;
+                background-color: #d4edda;
+                border: 1px solid #c3e6cb;
+                padding: 10px;
+                margin-bottom: 15px;
+                border-radius: 4px;
+                opacity: 1;
+                transition: opacity 1s ease-out;
+            }
         </style>
     </head>
     <body>
@@ -217,8 +227,13 @@
         <div class="container">
             <h2>Order List</h2>
 
+            <c:if test="${param.success == 'true'}">
+                <div class="success-box auto-hide">
+                    <strong>Success:</strong> Add new order successfully!
+                </div>
+            </c:if>
             <div style="margin-bottom: 20px;">
-                <a href="add-order" class="btn-success">+ Thêm Đơn hàng</a>
+                <a href="add-order" class="btn-success">+ Add new Order</a>
             </div>
 
             <div class="filter-container">
@@ -371,5 +386,16 @@
 
         <jsp:include page="footer.jsp" /> 
 
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+            document.querySelectorAll('.success-box.auto-hide').forEach(successBox => {
+                setTimeout(() => {
+                    successBox.style.opacity = '0';
+                    setTimeout(() => {
+                        successBox.style.display = 'none';
+                    }, 1000);
+                }, 5000);
+            });
+        </script>
     </body>
 </html>

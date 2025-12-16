@@ -5,13 +5,13 @@ import java.util.List;
 
 public class Order {
     
-    private int orderId;
+    private Integer orderId;
     private String orderCode;
     private String description;
     private Integer createdBy;
     private String orderStatus;
-    private int customerId;
-    private int supplierId;
+    private Integer customerId;
+    private Integer supplierId;
     private Timestamp createdAt;
     private Timestamp updatedAt;
 
@@ -40,11 +40,11 @@ public class Order {
     }
 
 
-    public int getOrderId() {
+    public Integer getOrderId() {
         return orderId;
     }
 
-    public void setOrderId(int orderId) {
+    public void setOrderId(Integer orderId) {
         this.orderId = orderId;
     }
 
@@ -84,7 +84,7 @@ public class Order {
         return customerId;
     }
 
-    public void setCustomerId(int customerId) {
+    public void setCustomerId(Integer customerId) {
         this.customerId = customerId;
     }
 
@@ -92,7 +92,7 @@ public class Order {
         return supplierId;
     }
 
-    public void setSupplierId(int supplierId) {
+    public void setSupplierId(Integer supplierId) {
         this.supplierId = supplierId;
     }
 

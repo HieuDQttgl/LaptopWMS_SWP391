@@ -160,7 +160,7 @@
                 <div class="form-group">
                     <label>Loại Đơn hàng</label>
                     <div class="type-switcher">
-                        <div id="export-btn" class="type-btn active" data-type="export">
+                        <div id="export-btn" class="type-btn" data-type="export">
                             Xuất Hàng (Sale)
                         </div>
                         <div id="import-btn" class="type-btn" data-type="import">
@@ -175,7 +175,7 @@
                 <h3>Thông tin chung</h3>
                 <div style="display: flex; gap: 20px;">
 
-                    <div class="form-group partner-field" id="customer-group" style="flex: 1; display: block;">
+                    <div class="form-group partner-field" id="customer-group" style="flex: 1;">
                         <label>Khách hàng (Export)</label>
                         <select name="customerId" id="customerIdSelect">
                             <option value="0">-- Chọn Khách hàng --</option>
@@ -226,67 +226,69 @@
                             </tr>
                         </thead>
                         <tbody id="detail-table-body">
-                            <%-- Thiết lập biến cho logic hiển thị chi tiết --%>
+                            
                             <c:set var="detailsToRender" value="${not empty tempDetails ? tempDetails : null}" />
                             <c:if test="${empty detailsToRender}"><c:set var="detailsToRender" value="${[]}" /></c:if>
 
-                            <%-- Chuẩn bị Map cho việc tra cứu tên sản phẩm (Product ID -> Name) --%>
+                            
                             <jsp:useBean id="productMap" class="java.util.HashMap" scope="page" />
                             <c:forEach items="${allProducts}" var="p">
                                 <c:set target="${productMap}" property="${p.productId}" value="${p.productName}" />
                             </c:forEach>
 
-                            <%-- Lấy tên sản phẩm bị lỗi để hiển thị lại --%>
                             <c:set var="errorNames" value="${not empty errorProductNames ? errorProductNames : null}" />
 
                             <c:choose>
                                 <c:when test="${fn:length(detailsToRender) > 0}">
                                     <c:forEach items="${detailsToRender}" var="detail" varStatus="loop">
-                                    
-                                    <%-- Xác định tên sản phẩm (Tên lỗi > Tên hợp lệ) --%>
-                                    <c:choose><c:when test="${not empty errorNames[loop.index]}">
-                                        <c:set var="currentProductName" value="${errorNames[loop.index]}" />
-                                        <c:set var="currentProductId" value="" />
-                                    </c:when><c:otherwise>
-                                        <c:set var="currentProductName" value="${productMap[detail.productId]}" />
-                                        <c:set var="currentProductId" value="${detail.productId}" />
-                                    </c:otherwise></c:choose>
-                                    
-                                    <tr class="order-detail-row" data-index="${loop.index}">
-                                        <td>
-                                            <input type="text" list="products" name="productName_TEMP_${loop.index}"
-                                                    value="${currentProductName}"
-                                                    placeholder="Gõ tên sản phẩm..." class="product-name-input" required>
-                                            
-                                            <input type="hidden" name="productId_TEMP_${loop.index}"
-                                                    value="${currentProductId}"
-                                                    class="product-id-input">
+                                        
+                                        <c:choose><c:when test="${not empty errorNames[loop.index]}">
+                                                <c:set var="currentProductName" value="${errorNames[loop.index]}" />
+                                                <c:set var="currentProductId" value="" />
+                                            </c:when><c:otherwise>
+                                                <c:set var="currentProductName" value="${productMap[detail.productId]}" />
+                                                <c:set var="currentProductId" value="${detail.productId}" />
+                                            </c:otherwise></c:choose>
+
+                                            <tr class="order-detail-row" data-index="${loop.index}">
+                                            <td>
+                                                <input type="text" list="products" name="productName"
+                                                        value="${currentProductName}"
+                                                        placeholder="Gõ tên sản phẩm..." class="product-name-input" required>
+                                                
+                                                <input type="hidden" name="productId"
+                                                        value="${currentProductId}"
+                                                        class="product-id-input">
+                                                <c:if test="${not empty errors['details_line_' + loop.index]}">
+                                                    <div class="error-message" style="margin-top: 5px; color: #dc3545;">${errors['details_line_' + loop.index]}</div>
+                                                </c:if>
                                             </td>
                                             <td>
-                                                <input type="number" name="quantity_TEMP" min="1" required value=${not empty detail.quantity ? detail.quantity : 1}"">
+                                                <input type="number" name="quantity" min="1" required value="${empty detail.quantity || detail.quantity < 1 ? 1 : detail.quantity}">
                                             </td>
+
                                             <td>
-                                                <input type="text" name="unitPrice_TEMP" required value="${detail.unitPrice}"
+                                                <input type="text" name="unitPrice" required value="${detail.unitPrice}"
                                                         placeholder="Ví dụ: 15000000.00">
                                             </td>
                                             <td>
                                                 <button type="button" class="btn-remove" onclick="removeDetailRow(this)">X</button>
                                             </td>
                                         </tr>
-                                </c:forEach>
+                                    </c:forEach>
                                 </c:when>
                                 <c:otherwise>
+                                    
                                     <tr class="order-detail-row" data-index="0">
                                         <td>
-                                            <input type="text" list="products" name="productName_TEMP_0" placeholder="Gõ tên sản phẩm..." class="product-name-input" required>
-
-                                            <input type="hidden" name="productId_TEMP_0" value="" class="product-id-input">
+                                            <input type="text" list="products" name="productName" placeholder="Gõ tên sản phẩm..." class="product-name-input" required>
+                                            <input type="hidden" name="productId" value="" class="product-id-input">
                                         </td>
                                         <td>
-                                            <input type="number" name="quantity_TEMP" min="1" required value="1">
+                                            <input type="number" name="quantity" min="1" required value="1">
                                         </td>
                                         <td>
-                                            <input type="text" name="unitPrice_TEMP" required placeholder="Ví dụ: 15000000.00">
+                                            <input type="text" name="unitPrice" required placeholder="Ví dụ: 15000000.00">
                                         </td>
                                         <td>
                                             <button type="button" class="btn-remove" onclick="removeDetailRow(this)">X</button>
@@ -314,7 +316,24 @@
         <jsp:include page="footer.jsp" />
 
         <script>
-            let detailIndex = ${fn:length(detailsToRender) > 0 ? fn:length(detailsToRender) : 1};
+            let detailIndex = 0;
+
+            function initializeDetailIndex() {
+                const detailRows = document.querySelectorAll('#detail-table-body .order-detail-row');
+                let maxIndex = -1;
+
+                detailRows.forEach(row => {
+                    const index = parseInt(row.getAttribute('data-index'));
+                    if (!isNaN(index) && index > maxIndex) {
+                        maxIndex = index;
+                    }
+                });
+                
+                detailIndex = maxIndex + 1;
+            }
+            
+            document.addEventListener('DOMContentLoaded', initializeDetailIndex);
+
 
             document.addEventListener('input', function (e) {
                 if (e.target.classList.contains('product-name-input')) {
@@ -327,27 +346,27 @@
                     );
 
                     if (selectedOption) {
-                        // Cập nhật ID khi người dùng chọn từ datalist
                         hiddenIdInput.value = selectedOption.getAttribute('data-product-id');
                     } else {
-                        // Xóa ID nếu văn bản nhập vào không khớp với bất kỳ tùy chọn nào
-                        hiddenIdInput.value = '';
+                        hiddenIdInput.value = '';  
                     }
                 }
             });
 
             function getDetailRowTemplate() {
+                const currentId = detailIndex;
+
                 const template = `
-                    <tr class="order-detail-row" data-index="${detailIndex}">
+                    <tr class="order-detail-row" data-index="${currentId}">
                         <td>
-                            <input type="text" list="products" name="productName_TEMP_${detailIndex}" placeholder="Gõ tên sản phẩm..." class="product-name-input" required>
-                            <input type="hidden" name="productId_TEMP_${detailIndex}" value="" class="product-id-input">
+                            <input type="text" list="products" name="productName" placeholder="Gõ tên sản phẩm..." class="product-name-input" required>
+                            <input type="hidden" name="productId" value="" class="product-id-input">
                         </td>
                         <td>
-                            <input type="number" name="quantity_TEMP" min="1" required value="1">
+                            <input type="number" name="quantity" min="1" required value="1">
                         </td>
                         <td>
-                            <input type="text" name="unitPrice_TEMP" required placeholder="Ví dụ: 15000000.00">
+                            <input type="text" name="unitPrice" required placeholder="Ví dụ: 15000000.00">
                         </td>
                         <td>
                             <button type="button" class="btn-remove" onclick="removeDetailRow(this)">X</button>
@@ -407,21 +426,22 @@
                     }, 10000);
                 });
 
-
                 const initialCustomerId = document.getElementById('customerIdSelect').value;
                 const initialSupplierId = document.getElementById('supplierIdSelect').value;
 
                 let initialType = 'export';
-
-                if (initialSupplierId !== '0' && initialSupplierId !== '') {
+                if ((initialSupplierId !== '0' && initialSupplierId !== '') || 
+                    (initialCustomerId === '0' && initialSupplierId === '0' && document.getElementById('supplier-group').style.display === 'block')) {
                     initialType = 'import';
+                } else {
+                    initialType = 'export';
                 }
 
                 switchOrderType(initialType);
 
                 document.querySelectorAll('.type-btn').forEach(button => {
                     button.addEventListener('click', function () {
-                        switchOrderType(this.dataset.type); // Sử dụng .dataset.type
+                        switchOrderType(this.dataset.type);
                     });
                 });
             });
@@ -436,54 +456,35 @@
                 }
 
                 const detailRows = document.querySelectorAll('#detail-table-body .order-detail-row');
-                let validProductFound = false;
                 let validDetailCount = 0;
+                let productsAreValid = true;
 
-                detailRows.forEach((row, index) => {
-
+                detailRows.forEach((row) => {
                     const productIdInput = row.querySelector('.product-id-input');
-                    const quantityInput = row.querySelector('input[name^="quantity_TEMP"]'); // Bắt đầu bằng quantity_TEMP
-                    const unitPriceInput = row.querySelector('input[name^="unitPrice_TEMP"]'); // Bắt đầu bằng unitPrice_TEMP
                     const productNameInput = row.querySelector('.product-name-input');
-
-                    // Chỉ đổi tên những trường hợp hợp lệ để Server side Binding
-                    if (productIdInput.value !== '' && productIdInput.value !== '0') {
-                        // Đổi tên để binding thành công
-                        productIdInput.name = `details[${validDetailCount}].productId`;
-                        quantityInput.name = `details[${validDetailCount}].quantity`;
-                        unitPriceInput.name = `details[${validDetailCount}].unitPrice`;
-
-                        validProductFound = true;
+                    
+                    if (productIdInput.value !== '' && productIdInput.value !== '0' && 
+                        productIdInput.value !== null && parseInt(productIdInput.value) > 0) {
+                        
                         validDetailCount++;
                     } else {
-                        // Nếu không hợp lệ, giữ nguyên tên TEMP cho mục đích hiển thị lỗi,
-                        // nhưng đổi index về index gốc (vì chúng ta đã xóa index trong vòng lặp)
-                        productNameInput.name = `productName_TEMP_${row.dataset.index}`;
-
-                        // Loại bỏ các trường còn lại để chúng không được gửi lên Server
-                        // hoặc giữ nguyên tên TEMP cũ để Server biết đây là dòng lỗi.
-                        // (Ở đây tôi giữ lại productName cho việc hiển thị lại lỗi)
-                        productIdInput.name = `productId_TEMP_${row.dataset.index}`;
-                        quantityInput.name = `quantity_TEMP_FOR_ERROR_${row.dataset.index}`;
-                        unitPriceInput.name = `unitPrice_TEMP_FOR_ERROR_${row.dataset.index}`;
-
-                        // Cảnh báo nếu có một dòng chi tiết không hợp lệ
-                        alert('Vui lòng chọn sản phẩm hợp lệ cho tất cả các chi tiết.');
-                        validProductFound = false;
-                        return false; // Thoát vòng lặp
+                        if (productNameInput.value.trim() !== '') {
+                            productsAreValid = false;
+                        }
                     }
-
-                    // Xóa các trường tên sản phẩm TEMP đã được xử lý thành công (tùy chọn)
-                    // Hoặc giữ lại như bạn đang làm để phục vụ việc hiển thị lại khi có lỗi khác.
-                    // productNameInput.name = ''; // Không làm gì, Server có thể bỏ qua nếu không có binding
                 });
 
-                // Kiểm tra lần cuối
-                if (!validProductFound && detailRows.length > 0) {
+                if (!productsAreValid) {
+                    alert('Vui lòng chọn sản phẩm hợp lệ từ danh sách gợi ý cho tất cả các chi tiết đã điền tên.');
                     return false;
                 }
 
-                return validProductCount > 0; // Đảm bảo có ít nhất 1 chi tiết hợp lệ
+                if (validDetailCount === 0) {
+                    alert('Đơn hàng phải có ít nhất một chi tiết sản phẩm hợp lệ.');
+                    return false;
+                }
+
+                return true;  
             }
         </script>
     </body>

@@ -4,10 +4,10 @@ import java.math.BigDecimal;
 
 public class OrderProduct {
 
-    private int orderProductId;
-    private int orderId;
-    private int productId;
-    private int quantity;
+    private Integer orderProductId;
+    private Integer orderId;
+    private Integer productId;
+    private Integer quantity;
     private BigDecimal unitPrice;
 
     public OrderProduct() {
@@ -24,27 +24,27 @@ public class OrderProduct {
 
     // --- Getters và Setters ---
     
-    public int getOrderProductId() {
+    public Integer getOrderProductId() {
         return orderProductId;
     }
 
-    public void setOrderProductId(int orderProductId) {
+    public void setOrderProductId(Integer orderProductId) {
         this.orderProductId = orderProductId;
     }
 
-    public int getOrderId() {
+    public Integer getOrderId() {
         return orderId;
     }
 
-    public void setOrderId(int orderId) {
+    public void setOrderId(Integer orderId) {
         this.orderId = orderId;
     }
 
-    public int getProductId() {
+    public Integer getProductId() {
         return productId;
     }
 
-    public void setProductId(int productId) {
+    public void setProductId(Integer productId) {
         this.productId = productId;
     }
 
@@ -52,7 +52,7 @@ public class OrderProduct {
         return quantity;
     }
 
-    public void setQuantity(int quantity) {
+    public void setQuantity(Integer quantity) {
         this.quantity = quantity;
     }
 

@@ -4,6 +4,7 @@ import DTO.OrderDTO;
 import DTO.OrderSummary;
 import Model.Order;
 import Model.OrderProduct;
+import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -237,7 +238,7 @@ public class OrderDAO extends DBContext {
         String sqlOrder = "INSERT INTO orders (order_code, customer_id, supplier_id, description, order_status, created_by, created_at) "
                 + "VALUES (?, ?, ?, ?, ?, ?, ?)";
 
-        String sqlDetail = "INSERT INTO order_details (order_id, product_id, quantity, unit_price) "
+        String sqlDetail = "INSERT INTO order_products (order_id, product_id, quantity, unit_price) "
                 + "VALUES (?, ?, ?, ?)";
 
         try {
@@ -376,5 +377,65 @@ public class OrderDAO extends DBContext {
         String formattedNumber = String.format("%03d", newNumber);
 
         return searchPrefix + formattedNumber;
+    }
+    
+    public static void main(String[] args) {
+        OrderDAO orderDAO = new OrderDAO();
+        System.out.println("--- Bắt đầu Test OrderDAO.addOrder ---");
+        
+        try {
+            // 1. Tạo đối tượng Order (Đơn hàng Export/Xuất Hàng)
+            Order newOrder = createTestOrder();
+            
+            // 2. Tạo danh sách Chi tiết Đơn hàng
+            List<OrderProduct> details = createTestOrderDetails();
+            
+            // 3. Thực hiện thêm đơn hàng
+            boolean success = orderDAO.addOrder(newOrder, details);
+            
+            if (success) {
+                System.out.println("\n✅ TEST THÀNH CÔNG!");
+                System.out.println("Đơn hàng đã được thêm thành công vào DB.");
+                System.out.println("Mã Đơn hàng: " + newOrder.getOrderCode());
+            } else {
+                System.out.println("\n❌ TEST THẤT BẠI.");
+                System.out.println("Kiểm tra lại Console/Log để xem chi tiết SQLException.");
+            }
+            
+        } catch (Exception e) {
+            System.out.println("\n🚨 ĐÃ XẢY RA NGOẠI LỆ KHI THỰC HIỆN TEST:");
+            e.printStackTrace();
+        }
+    }
+    
+    private static Order createTestOrder() {
+        Order order = new Order();
+        
+        order.setCustomerId(1);
+        order.setSupplierId(0);
+        
+        order.setDescription("Đơn hàng test tự động từ Main.");
+        order.setOrderStatus("Pending"); 
+        order.setCreatedBy(1);   
+        
+        return order;
+    }
+
+    private static List<OrderProduct> createTestOrderDetails() {
+        List<OrderProduct> details = new ArrayList<>();
+        
+        OrderProduct detail1 = new OrderProduct();
+        detail1.setProductId(1);
+        detail1.setQuantity(2);
+        detail1.setUnitPrice(new BigDecimal("5000.50"));
+        details.add(detail1);
+
+        OrderProduct detail2 = new OrderProduct();
+        detail2.setProductId(5);
+        detail2.setQuantity(1);
+        detail2.setUnitPrice(new BigDecimal("1250.00")); 
+        details.add(detail2);
+        
+        return details;
     }
 }
