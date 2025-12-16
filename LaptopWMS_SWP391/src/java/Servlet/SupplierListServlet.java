@@ -58,12 +58,41 @@ public class SupplierListServlet extends HttpServlet {
             sortOrder = "ASC";
         }
 
-        // Get suppliers list
+        // Pagination parameters
+        int pageSize = 5; // Items per page
+        int currentPage = 1;
+
+        String pageParam = request.getParameter("page");
+        if (pageParam != null && !pageParam.isEmpty()) {
+            try {
+                currentPage = Integer.parseInt(pageParam);
+                if (currentPage < 1) {
+                    currentPage = 1;
+                }
+            } catch (NumberFormatException e) {
+                currentPage = 1;
+            }
+        }
+
+        // Get total count for pagination
+        int totalCount = supplierDAO.getTotalSuppliers(keyword, statusFilter);
+        int totalPages = (int) Math.ceil((double) totalCount / pageSize);
+
+        // Ensure current page is within valid range
+        if (currentPage > totalPages && totalPages > 0) {
+            currentPage = totalPages;
+        }
+
+        int offset = (currentPage - 1) * pageSize;
+
+        // Get suppliers list with pagination
         List<Supplier> suppliers = supplierDAO.getListSuppliers(
                 keyword,
                 statusFilter,
                 sortField,
-                sortOrder);
+                sortOrder,
+                offset,
+                pageSize);
 
         // Set attributes for JSP
         request.setAttribute("suppliers", suppliers);
@@ -72,6 +101,12 @@ public class SupplierListServlet extends HttpServlet {
         request.setAttribute("sort_field", sortField);
         request.setAttribute("sort_order", sortOrder);
         request.setAttribute("currentUser", currentUser);
+
+        // Pagination attributes
+        request.setAttribute("currentPage", currentPage);
+        request.setAttribute("totalPages", totalPages);
+        request.setAttribute("totalCount", totalCount);
+        request.setAttribute("pageSize", pageSize);
 
         request.getRequestDispatcher("/supplier-list.jsp").forward(request, response);
     }
@@ -90,20 +125,27 @@ public class SupplierListServlet extends HttpServlet {
         }
 
         Users currentUser = (Users) session.getAttribute("currentUser");
+        int roleId = currentUser.getRoleId();
 
-        // Only Admin can add/modify suppliers
-        if (currentUser.getRoleId() != ADMIN_ROLE_ID) {
-            session.setAttribute("error", "Access denied: You do not have permission to add suppliers.");
-            response.sendRedirect(request.getContextPath() + "/supplier-list");
-            return;
-        }
-
+        // Check access for specific actions
         if ("add".equals(action)) {
+            // Only Admin can add suppliers
+            if (roleId != ADMIN_ROLE_ID) {
+                session.setAttribute("error", "Access denied: Only Admin can add suppliers.");
+                response.sendRedirect(request.getContextPath() + "/supplier-list");
+                return;
+            }
             handleAddSupplier(request, response, session, currentUser);
             return;
         }
 
         if ("changeStatus".equals(action)) {
+            // Admin and Warehouse Keeper can change status
+            if (roleId != ADMIN_ROLE_ID && roleId != WAREHOUSE_ROLE_ID) {
+                session.setAttribute("error", "Access denied: You do not have permission to change supplier status.");
+                response.sendRedirect(request.getContextPath() + "/supplier-list");
+                return;
+            }
             handleChangeStatus(request, response, session);
             return;
         }

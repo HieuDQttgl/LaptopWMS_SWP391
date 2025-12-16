@@ -17,18 +17,18 @@
         <style>
             body {
                 font-family: "Segoe UI", Arial, sans-serif;
-                background-color: #f5f6fa; /* Màu nền nhẹ nhàng */
+                background-color: #f5f6fa;
                 margin: 0;
                 padding: 0;
-                color: #2c3e50; /* Màu chữ chính */
+                color: #2c3e50;
             }
             .container {
                 max-width: 1200px;
                 margin: 40px auto;
                 background-color: white;
                 padding: 30px;
-                border-radius: 12px; /* Góc bo tròn lớn hơn */
-                box-shadow: 0 4px 20px rgba(0,0,0,0.07); /* Shadow nhẹ, chuyên nghiệp */
+                border-radius: 12px;
+                box-shadow: 0 4px 20px rgba(0,0,0,0.07);
             }
             h1 {
                 text-align: center;
@@ -118,7 +118,7 @@
                 gap: 10px;
                 margin-top: 20px;
             }
-
+            
             .btn-close {
                 background-color: #95a5a6;
                 color: white;
@@ -462,8 +462,7 @@
 
                     <label>Role *:</label>
                     <select name="roleId" id="roleIdSelect">
-                        <option value="0" ${currentRole == '0' ? 'selected' : ''}>-- Select Role --</option> 
-
+                        <option value="0" ${currentRole == '0' ? 'selected' : ''}>Select Role</option> 
                         <c:forEach var="r" items="${allRoles}">
                             <c:if test="${r.status eq 'active'}">
                                 <option value="${r.roleId}" ${roleIdValue == r.roleId ? 'selected' : ''}>
@@ -478,7 +477,7 @@
                     <% }%>
 
                     <div class="form-actions">
-                        <button type="submit" onclick="return validateAddUserForm()">Add User</button>
+                        <button type="submit" class="btn-add" onclick="return validateAddUserForm()">Add User</button>
                         <button type="button" class="btn-close" onclick="hideAddForm()">Close Form</button>
                     </div>
                 </form>
@@ -626,7 +625,7 @@
             </table>
 
             <p id="totalUsers" style="margin-top: 20px; color: #7f8c8d; display: <%= showFormOnLoad ? "none" : "block"%>;">Total Users: <%= users != null ? users.size() : 0%></p>
-            <a id="backLanding" href="<%= request.getContextPath()%>/landing" class="btn-secondary" style="display: <%= showFormOnLoad ? "none" : "block"%>;">Back to Landing Page</a>
+            <a id="backLanding" href="<%= request.getContextPath()%>/landing" class="btn-secondary" style="color: #34495e; text-decoration: none; font-weight: 600; display: <%= showFormOnLoad ? "none" : "block"%>;">Back to Landing Page</a>
         </div>
 
         <script>

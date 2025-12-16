@@ -16,6 +16,10 @@ public class Order {
     private Timestamp updatedAt;
 
     private List<OrderProduct> orderProducts;
+    
+    private String customerName;
+    private String supplierName;
+    private String createdByName;
 
     public Order() {
     }
@@ -116,6 +120,31 @@ public class Order {
         this.orderProducts = orderProducts;
     }
 
+    
+    public String getCustomerName() {
+        return customerName;
+    }
+
+    public void setCustomerName(String customerName) {
+        this.customerName = customerName;
+    }
+
+    public String getSupplierName() {
+        return supplierName;
+    }
+
+    public void setSupplierName(String supplierName) {
+        this.supplierName = supplierName;
+    }
+
+    public String getCreatedByName() {
+        return createdByName;
+    }
+
+    public void setCreatedByName(String createdByName) {
+        this.createdByName = createdByName;
+    }
+    
     @Override
     public String toString() {
         return "Order{" + "orderId=" + orderId + ", orderCode=" + orderCode + ", orderStatus=" + orderStatus + ", customerId=" + customerId + ", supplierId=" + supplierId + '}';

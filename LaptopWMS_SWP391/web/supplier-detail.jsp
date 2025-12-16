@@ -3,9 +3,9 @@
 <%@ page import="Model.Users" %>
 <!DOCTYPE html>
 <html>
+    <jsp:include page="header.jsp" />
 
     <head>
-        <jsp:include page="header.jsp" />
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Supplier Details</title>
@@ -31,20 +31,20 @@
                 margin: 0;
                 font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
                 background: radial-gradient(circle at top left, #dbeafe 0, #eff6ff 25%, #f9fafb 60%);
-                display: flex;
-                align-items: center;
-                justify-content: center;
                 min-height: 100vh;
                 color: var(--text-main);
             }
 
             .detail-wrapper {
-                width: 100%;
-                max-width: 600px;
-                padding: 16px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                padding: 40px 16px;
             }
 
             .card {
+                width: 100%;
+                max-width: 600px;
                 background: var(--card-bg);
                 border-radius: var(--radius-lg);
                 box-shadow: var(--shadow-soft);

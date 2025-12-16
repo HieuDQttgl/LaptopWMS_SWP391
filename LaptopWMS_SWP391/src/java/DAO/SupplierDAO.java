@@ -8,28 +8,12 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Data Access Object for Supplier entity.
- * Provides CRUD operations and filtering/sorting capabilities.
- */
 public class SupplierDAO extends DBContext {
 
-    /**
-     * Get all suppliers with default sorting by supplier_id ASC
-     */
     public List<Supplier> getListSuppliers() {
         return getListSuppliers(null, null, "supplier_id", "ASC");
     }
 
-    /**
-     * Get suppliers with filtering and sorting options
-     * 
-     * @param keyword      Search keyword for supplier name, email, phone
-     * @param statusFilter Filter by status (active/inactive)
-     * @param sortField    Field to sort by
-     * @param sortOrder    ASC or DESC
-     * @return List of suppliers matching the criteria
-     */
     public List<Supplier> getListSuppliers(
             String keyword,
             String statusFilter,
@@ -100,9 +84,120 @@ public class SupplierDAO extends DBContext {
         return suppliers;
     }
 
-    /**
-     * Get a supplier by ID
-     */
+
+    public List<Supplier> getListSuppliers(
+            String keyword,
+            String statusFilter,
+            String sortField,
+            String sortOrder,
+            int offset,
+            int limit) {
+
+        List<Supplier> suppliers = new ArrayList<>();
+
+        // Validate sort parameters
+        String safeSortField = (sortField == null || sortField.isEmpty()) ? "supplier_id" : sortField;
+        String safeSortOrder = (sortOrder == null || sortOrder.isEmpty()
+                || !sortOrder.toUpperCase().matches("ASC|DESC"))
+                        ? "ASC"
+                        : sortOrder.toUpperCase();
+
+        // Whitelist allowed sort fields to prevent SQL injection
+        String[] allowedFields = { "supplier_id", "supplier_name", "supplier_email", "supplier_phone", "status" };
+        boolean isValidField = false;
+        for (String field : allowedFields) {
+            if (field.equals(safeSortField)) {
+                isValidField = true;
+                break;
+            }
+        }
+        if (!isValidField) {
+            safeSortField = "supplier_id";
+        }
+
+        String sql = "SELECT * FROM suppliers WHERE 1=1 ";
+
+        List<Object> params = new ArrayList<>();
+
+        // Add keyword search
+        if (keyword != null && !keyword.trim().isEmpty()) {
+            sql += "AND (supplier_name LIKE ? OR supplier_email LIKE ? OR supplier_phone LIKE ?) ";
+            String wildcardKeyword = "%" + keyword.trim() + "%";
+            params.add(wildcardKeyword);
+            params.add(wildcardKeyword);
+            params.add(wildcardKeyword);
+        }
+
+        // Add status filter
+        if (statusFilter != null && !statusFilter.isEmpty() && !statusFilter.equalsIgnoreCase("all")) {
+            sql += "AND status = ? ";
+            params.add(statusFilter);
+        }
+
+        sql += String.format(" ORDER BY %s %s LIMIT ? OFFSET ?", safeSortField, safeSortOrder);
+        params.add(limit);
+        params.add(offset);
+
+        try (Connection conn = getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            for (int i = 0; i < params.size(); i++) {
+                ps.setObject(i + 1, params.get(i));
+            }
+
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    Supplier supplier = mapResultSetToSupplier(rs);
+                    suppliers.add(supplier);
+                }
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return suppliers;
+    }
+
+
+    public int getTotalSuppliers(String keyword, String statusFilter) {
+        String sql = "SELECT COUNT(*) FROM suppliers WHERE 1=1 ";
+        List<Object> params = new ArrayList<>();
+
+        // Add keyword search
+        if (keyword != null && !keyword.trim().isEmpty()) {
+            sql += "AND (supplier_name LIKE ? OR supplier_email LIKE ? OR supplier_phone LIKE ?) ";
+            String wildcardKeyword = "%" + keyword.trim() + "%";
+            params.add(wildcardKeyword);
+            params.add(wildcardKeyword);
+            params.add(wildcardKeyword);
+        }
+
+        // Add status filter
+        if (statusFilter != null && !statusFilter.isEmpty() && !statusFilter.equalsIgnoreCase("all")) {
+            sql += "AND status = ? ";
+            params.add(statusFilter);
+        }
+
+        try (Connection conn = getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            for (int i = 0; i < params.size(); i++) {
+                ps.setObject(i + 1, params.get(i));
+            }
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1);
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
+
+
     public Supplier getSupplierById(int supplierId) {
         String sql = "SELECT * FROM suppliers WHERE supplier_id = ?";
 
@@ -122,12 +217,7 @@ public class SupplierDAO extends DBContext {
         return null;
     }
 
-    /**
-     * Add a new supplier
-     * 
-     * @param supplier The supplier to add
-     * @return true if added successfully, false otherwise
-     */
+
     public boolean addSupplier(Supplier supplier) {
         String sql = "INSERT INTO suppliers (supplier_name, supplier_email, supplier_phone, status) "
                 + "VALUES (?, ?, ?, ?)";
@@ -157,12 +247,7 @@ public class SupplierDAO extends DBContext {
         return false;
     }
 
-    /**
-     * Update an existing supplier
-     * 
-     * @param supplier The supplier with updated information
-     * @return true if updated successfully, false otherwise
-     */
+
     public boolean updateSupplier(Supplier supplier) {
         String sql = "UPDATE suppliers SET supplier_name = ?, supplier_email = ?, supplier_phone = ? "
                 + "WHERE supplier_id = ?";
@@ -183,13 +268,7 @@ public class SupplierDAO extends DBContext {
         return false;
     }
 
-    /**
-     * Update supplier status (activate/deactivate)
-     * 
-     * @param supplierId The supplier ID
-     * @param newStatus  The new status (active/inactive)
-     * @return The supplier name if successful, null otherwise
-     */
+
     public String updateStatus(int supplierId, String newStatus) {
         String supplierName = null;
 
@@ -228,12 +307,7 @@ public class SupplierDAO extends DBContext {
         return null;
     }
 
-    /**
-     * Check if a supplier name already exists
-     * 
-     * @param supplierName The name to check
-     * @return true if exists, false otherwise
-     */
+
     public boolean isSupplierNameExists(String supplierName) {
         String sql = "SELECT COUNT(*) FROM suppliers WHERE supplier_name = ?";
 
@@ -253,13 +327,7 @@ public class SupplierDAO extends DBContext {
         return false;
     }
 
-    /**
-     * Check if a supplier name exists excluding a specific supplier (for updates)
-     * 
-     * @param supplierName      The name to check
-     * @param excludeSupplierId The supplier ID to exclude from the check
-     * @return true if exists, false otherwise
-     */
+
     public boolean isSupplierNameExists(String supplierName, int excludeSupplierId) {
         String sql = "SELECT COUNT(*) FROM suppliers WHERE supplier_name = ? AND supplier_id != ?";
 
@@ -280,12 +348,7 @@ public class SupplierDAO extends DBContext {
         return false;
     }
 
-    /**
-     * Get count of suppliers by status
-     * 
-     * @param status The status to count (active/inactive), or null for all
-     * @return The count of suppliers
-     */
+
     public int getSupplierCount(String status) {
         String sql = "SELECT COUNT(*) FROM suppliers";
         if (status != null && !status.isEmpty()) {
@@ -310,9 +373,7 @@ public class SupplierDAO extends DBContext {
         return 0;
     }
 
-    /**
-     * Helper method to map ResultSet to Supplier object
-     */
+
     private Supplier mapResultSetToSupplier(ResultSet rs) throws Exception {
         Supplier supplier = new Supplier();
         supplier.setSupplierId(rs.getInt("supplier_id"));
@@ -323,9 +384,7 @@ public class SupplierDAO extends DBContext {
         return supplier;
     }
 
-    /**
-     * Test method - run to verify DAO operations
-     */
+
     public static void main(String[] args) {
         SupplierDAO supplierDAO = new SupplierDAO();
 

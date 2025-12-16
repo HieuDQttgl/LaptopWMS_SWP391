@@ -11,7 +11,6 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <jsp:include page="header.jsp"/>
         <title>Laptop Inventory</title>
 
         <style>
@@ -40,12 +39,12 @@
             .btn-add {
                 background-color: #2ecc71;
                 color: white;
-                padding: 12px 20px;
+                padding: 6px 14px;
                 border: none;
-                border-radius: 6px;
+                border-radius: 4px;
                 cursor: pointer;
-                font-weight: 600;
-                margin-bottom: 20px;
+                font-weight: 700;
+                margin-bottom: 10px;
                 text-decoration: none;
                 display: inline-block;
             }
@@ -92,7 +91,6 @@
                 color: #2980b9;
             }
 
-            /* Toggle Icon */
             .toggle-icon {
                 display: inline-block;
                 font-size: 12px;
@@ -104,7 +102,6 @@
                 color: #2c3e50;
             }
 
-            /* Hidden Child Row */
             .details-row {
                 display: none;
             }
@@ -118,7 +115,6 @@
                 box-shadow: inset 0 3px 6px rgba(0,0,0,0.05);
             }
 
-            /* Inner Specs Table */
             .inner-table {
                 width: 100%;
                 border: 1px solid #dcdcdc;
@@ -137,7 +133,6 @@
                 border-bottom: 1px solid #eee;
             }
 
-            /* Status Badges */
             .status-badge {
                 padding: 4px 10px;
                 border-radius: 20px;
@@ -155,22 +150,48 @@
                 color: #e74c3c;
                 border: 1px solid #e74c3c;
             }
+
+            .pagination {
+                list-style: none;
+                padding: 0;
+                display: flex;
+                gap: 5px;
+                justify-content: center;
+                margin-top: 30px;
+            }
+            .pagination a {
+                text-decoration: none;
+                padding: 8px 14px;
+                border: 1px solid #ddd;
+                color: #3498db;
+                border-radius: 4px;
+                font-weight: 600;
+                transition: 0.2s;
+            }
+            .pagination .active {
+                background-color: #3498db;
+                color: white;
+                border-color: #3498db;
+            }
+            .pagination a:hover:not(.active) {
+                background-color: #f1f1f1;
+            }
         </style>
     </head>
     <body>
+        <jsp:include page="header.jsp"/>
 
         <div class="container">
             <h1>Laptop Product Management</h1>
 
             <div style="display: flex; justify-content: space-between; align-items: center;">
-                <button class="btn-add">+ Add New Product</button>
-                <div style="color: #7f8c8d; font-size: 14px;">
-                    Total Models: <strong>${not empty productList ? productList.size() : 0}</strong>
-                </div>
+                <c:if test="${sessionScope.currentUser.getRoleId() == 1 or sessionScope.currentUser.getRoleId() == 2}">
+                    <a href="add-product" class="btn-add">+ Add New Product</a>
+                </c:if>
             </div>
 
             <div class="filter-container" style="margin-bottom: 20px; padding: 15px; background: #fff; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.05);">
-                <form action="products" method="get" style="display: flex; gap: 15px; align-items: center; flex-wrap: wrap;">
+                <form action="product-list" method="get" style="display: flex; gap: 15px; align-items: center; flex-wrap: wrap;">
 
                     <div class="filter-group">
                         <input type="text" name="keyword" placeholder="Search model name..." 
@@ -182,8 +203,8 @@
                     <div class="filter-group">
                         <select name="status" onchange="this.form.submit()" style="padding: 6px; border: 1px solid #ccc; border-radius: 4px;">
                             <option value="all" ${currentStatus == 'all' ? 'selected' : ''}>All Status</option>
-                            <option value="active" ${currentStatus == 'active' ? 'selected' : ''}>Active</option>
-                            <option value="inactive" ${currentStatus == 'inactive' ? 'selected' : ''}>Inactive</option>
+                            <option value="1" ${currentStatus == '1' ? 'selected' : ''}>Active</option>
+                            <option value="0" ${currentStatus == '0' ? 'selected' : ''}>Inactive</option>
                         </select>
                     </div>
 
@@ -214,7 +235,7 @@
                         </select>
                     </div>
 
-                    <a href="products" class="btn-clear" style="padding: 6px 12px; background: #e74c3c; color: white; text-decoration: none; border-radius: 4px; font-size: 13px; font-weight: 600;">Clear</a>
+                    <a href="product-list" class="btn-clear" style="padding: 6px 12px; background: #e74c3c; color: white; text-decoration: none; border-radius: 4px; font-size: 13px; font-weight: 600;">Clear</a>
                 </form>
             </div>
 
@@ -227,6 +248,7 @@
                         <th>Category</th>
                         <th>Supplier</th>
                         <th>Status</th>
+                        <th>Actions</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -244,15 +266,32 @@
                                     <td>${p.category}</td>
                                     <td>${p.supplierName}</td>
                                     <td>
-                                        <c:if test="${p.status eq 'active'}"><span class="status-badge status-active">Active</span></c:if>
-                                        <c:if test="${p.status ne 'active'}"><span class="status-badge status-inactive">Inactive</span></c:if>
-                                        </td>
-                                    </tr>
+                                        <c:choose>
+                                            <c:when test="${p.status}">
+                                                <span class="status-badge status-active">Active</span>
+                                            </c:when>
+                                            <c:otherwise>
+                                                <span class="status-badge status-inactive">Inactive</span>
+                                            </c:otherwise>
+                                        </c:choose>
+                                    </td>
+                                    <td onclick="event.stopPropagation();">
+                                        <a href="toggleProduct?id=${p.productId}" 
+                                           style="color: ${p.status ? '#e74c3c' : '#2ecc71'}; text-decoration: none; font-weight: 600; font-size: 13px;">
+                                            ${p.status ? 'Deactivate' : 'Activate'}
+                                        </a>
+                                    </td>
+                                </tr>
 
-                                    <tr id="row-${p.productId}" class="details-row">
+                                <tr id="row-${p.productId}" class="details-row">
                                     <td colspan="8" style="padding: 0;">
                                         <div class="details-container">
                                             <h4 style="margin: 0 0 10px 0; color: #555;">Available Configurations for ${p.productName}</h4>
+
+                                            <a href="add-detail?id=${p.productId}" 
+                                               class="btn-add">
+                                                + Add Detail
+                                            </a>
 
                                             <table class="inner-table">
                                                 <thead>
@@ -271,19 +310,26 @@
                                                         <c:when test="${not empty p.detailsList}">
                                                             <c:forEach var="d" items="${p.detailsList}">
                                                                 <tr>
-                                                                    <td>${d.cpu}</td>
-                                                                    <td>${d.gpu}</td>
+                                                                    <td><b>${d.cpu}</b></td>
+                                                                    <td><b>${d.gpu}</b></td>
                                                                     <td><b>${d.storage}</b></td>
                                                                     <td><b>${d.ram}</b></td>
-                                                                    <td>${d.screen}"</td>
+                                                                    <td><b>${d.screen}"</b></td>
                                                                     <td>
                                                                         <c:choose>
                                                                             <c:when test="${d.status}"><span style="color: green;">Active</span></c:when>
                                                                             <c:otherwise><span style="color: red;">Hidden</span></c:otherwise>
                                                                         </c:choose>
                                                                     </td>
+
                                                                     <td>
-                                                                        <a href="#" style="color: #3498db; text-decoration: none;">Edit Spec</a>
+                                                                        <a href="editSpec?id=${d.productDetailId}" style="color: #3498db; text-decoration: none; font-weight: 600;">Edit</a>
+                                                                        <span style="color: #ccc; margin: 0 5px;">|</span>
+
+                                                                        <a href="toggleSpec?id=${d.productDetailId}" 
+                                                                           style="color: ${d.status ? '#e74c3c' : '#2ecc71'}; text-decoration: none; font-size: 12px;">
+                                                                            ${d.status ? 'Deactivate' : 'Activate'}
+                                                                        </a>
                                                                     </td>
                                                                 </tr>
                                                             </c:forEach>
@@ -291,7 +337,7 @@
                                                         <c:otherwise>
                                                             <tr>
                                                                 <td colspan="7" style="text-align:center; color: #999;">
-                                                                    No configurations found. <a href="#">Add one?</a>
+                                                                    No configurations found.
                                                                 </td>
                                                             </tr>
                                                         </c:otherwise>
@@ -311,6 +357,16 @@
                 </tbody>
             </table>
 
+            <c:if test="${totalPages > 1}">
+                <div class="pagination">
+                    <c:forEach begin="1" end="${totalPages}" var="i">
+                        <a href="product-list?page=${i}&keyword=${currentKeyword}&brand=${currentBrand}&category=${currentCategory}&status=${currentStatus}&sort_order=${currentSortOrder}"
+                           class="${currentPage == i ? 'active' : ''}">
+                            ${i}
+                        </a>
+                    </c:forEach>
+                </div>
+            </c:if>
         </div>
 
         <script>
