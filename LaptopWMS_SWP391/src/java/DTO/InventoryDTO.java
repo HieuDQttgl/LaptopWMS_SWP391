@@ -1,4 +1,4 @@
-package Model;
+package DTO;
 
 import java.sql.Timestamp;
 
@@ -26,7 +26,6 @@ public class InventoryDTO {
     public void setProductId(int productId) {
         this.productId = productId;
     }
-
     
 
     public int getInventoryId() {

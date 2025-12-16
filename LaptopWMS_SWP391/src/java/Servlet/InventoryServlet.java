@@ -1,7 +1,7 @@
 package Servlet;
 
 import DAO.InventoryDAO;
-import Model.InventoryDTO;
+import DTO.InventoryDTO;
 import Model.Location;
 import java.io.IOException;
 import java.util.List;

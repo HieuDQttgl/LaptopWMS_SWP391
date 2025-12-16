@@ -1,5 +1,5 @@
 <%@page import="Model.Location"%>
-<%@page import="Model.InventoryDTO"%>
+<%@page import="DTO.InventoryDTO"%>
 <%@page import="java.util.List"%>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
@@ -98,21 +98,23 @@
     <body>
         <jsp:include page="header.jsp"></jsp:include>
 
-        <div class="inventory-container">
-            <h1>Inventory Management</h1>
-
-            <div class="controls">
-                <form action="inventory" method="get" class="filter-group">
-                    <select name="location" onchange="this.form.submit()">
-                        <option value="0">All Locations</option>
+            <div class="inventory-container">
+                <h1>Inventory Management</h1>
+                <a href="add-inventory" class="btn" style="background-color: #2ecc71; color: white; margin-bottom: 15px; display: inline-block;">
+                    <i class="fas fa-plus"></i>Add New Product to Inventory
+                </a>
+                <div class="controls">
+                    <form action="inventory" method="get" class="filter-group">
+                        <select name="location" onchange="this.form.submit()">
+                            <option value="0">All Locations</option>
                         <%
                             List<Location> locations = (List<Location>) request.getAttribute("locations");
                             int selectedLoc = (int) request.getAttribute("selectedLocation");
                             if (locations != null) {
                                 for (Location loc : locations) {
                         %>
-                        <option value="<%= loc.getLocationId() %>" <%= selectedLoc == loc.getLocationId() ? "selected" : "" %>>
-                            <%= loc.getLocationName() %>
+                        <option value="<%= loc.getLocationId()%>" <%= selectedLoc == loc.getLocationId() ? "selected" : ""%>>
+                            <%= loc.getLocationName()%>
                         </option>
                         <%
                                 }
@@ -120,7 +122,7 @@
                         %>
                     </select>
 
-                    <input type="text" name="search" placeholder="Search product..." value="<%= request.getAttribute("search") %>">
+                    <input type="text" name="search" placeholder="Search product..." value="<%= request.getAttribute("search")%>">
                     <button type="submit" class="btn btn-search">Search</button>
                 </form>
             </div>
@@ -143,19 +145,19 @@
                             for (InventoryDTO item : list) {
                     %>
                     <tr>
-                        <td><%= item.getInventoryId() %></td>
-                        <td><%= item.getProductName() %></td>
-                        <td><%= item.getLocationName() %></td>
-                        <td><%= item.getStockQuantity() %></td>
-                        <td><%= item.getLastUpdated() %></td>
+                        <td><%= item.getInventoryId()%></td>
+                        <td><%= item.getProductName()%></td>
+                        <td><%= item.getLocationName()%></td>
+                        <td><%= item.getStockQuantity()%></td>
+                        <td><%= item.getLastUpdated()%></td>
                         <td>
-                            <a href="inventory-detail?id=<%= item.getInventoryId() %>" class="btn btn-view">View Details</a>
-                            <a href="audit-inventory?productId=<%= item.getProductId() %>" class="btn btn-audit" style="background-color: #e67e22; margin-left: 5px;">Audit</a>
+                            <a href="inventory-detail?id=<%= item.getInventoryId()%>" class="btn btn-view">View Details</a>
+                            <a href="audit-inventory?productId=<%= item.getProductId()%>" class="btn btn-audit" style="background-color: #e67e22; margin-left: 5px;">Audit</a>
                         </td>
                     </tr>
                     <%
-                            }
-                        } else {
+                        }
+                    } else {
                     %>
                     <tr>
                         <td colspan="6" style="text-align: center;">No inventory records found.</td>
@@ -176,16 +178,16 @@
 
                     if (currentPage > 1) {
                 %>
-                <a href="<%= baseLink + (currentPage - 1) %>">&laquo; Prev</a>
+                <a href="<%= baseLink + (currentPage - 1)%>">&laquo; Prev</a>
                 <% } %>
 
-                <% for (int i = 1; i <= totalPages; i++) { %>
-                <a href="<%= baseLink + i %>" class="<%= i == currentPage ? "active" : "" %>"><%= i %></a>
+                <% for (int i = 1; i <= totalPages; i++) {%>
+                <a href="<%= baseLink + i%>" class="<%= i == currentPage ? "active" : ""%>"><%= i%></a>
                 <% } %>
 
-                <% if (currentPage < totalPages) { %>
-                <a href="<%= baseLink + (currentPage + 1) %>">Next &raquo;</a>
-                <% } %>
+                <% if (currentPage < totalPages) {%>
+                <a href="<%= baseLink + (currentPage + 1)%>">Next &raquo;</a>
+                <% }%>
             </div>
         </div>
 

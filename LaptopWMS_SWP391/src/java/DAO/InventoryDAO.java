@@ -1,6 +1,9 @@
 package DAO;
 
-import Model.InventoryDTO;
+import DTO.ProductDTO;
+import DTO.InventoryDTO;
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import Model.Location;
 import Model.ProductItem;
 import java.sql.Connection;
@@ -12,7 +15,7 @@ import java.util.Map;
 
 public class InventoryDAO {
 
-     public List<Location> getAllLocations() {
+    public List<Location> getAllLocations() {
         List<Location> list = new ArrayList<>();
         String sql = "SELECT * FROM locations";
         try (Connection conn = DBContext.getConnection(); PreparedStatement st = conn.prepareStatement(sql)) {
@@ -105,20 +108,18 @@ public class InventoryDAO {
 
     public List<ProductItem> getItemsForAudit(int productId) {
         List<ProductItem> list = new ArrayList<>();
-        // Fixed SQL query - added product_detail_id to the SELECT
-        String sql = "SELECT pi.items_id, pi.product_detail_id, pi.serial_number, pi.status, pi.items_note, " +
-                     "pd.ram, pd.storage, pd.cpu, pd.gpu, pd.screen " +
-                     "FROM product_items pi " +
-                     "JOIN product_details pd ON pi.product_detail_id = pd.product_detail_id " +
-                     "WHERE pd.product_id = ? " +
-                     "ORDER BY pi.items_id ASC";
-        
-        try (Connection conn = DBContext.getConnection(); 
-             PreparedStatement st = conn.prepareStatement(sql)) {
-            
+        String sql = "SELECT pi.items_id, pi.product_detail_id, pi.serial_number, pi.status, pi.items_note, "
+                + "pd.ram, pd.storage, pd.cpu, pd.gpu, pd.screen "
+                + "FROM product_items pi "
+                + "JOIN product_details pd ON pi.product_detail_id = pd.product_detail_id "
+                + "WHERE pd.product_id = ? "
+                + "ORDER BY pi.items_id ASC";
+
+        try (Connection conn = DBContext.getConnection(); PreparedStatement st = conn.prepareStatement(sql)) {
+
             st.setInt(1, productId);
             ResultSet rs = st.executeQuery();
-            
+
             while (rs.next()) {
                 ProductItem item = new ProductItem();
                 item.setItemId(rs.getInt("items_id"));
@@ -126,36 +127,42 @@ public class InventoryDAO {
                 item.setSerialNumber(rs.getString("serial_number"));
                 item.setStatus(rs.getString("status"));
                 item.setItemNote(rs.getString("items_note"));
-                
-                // Build spec summary with all available details
                 StringBuilder specSummary = new StringBuilder();
-                
+
                 String ram = rs.getString("ram");
                 String storage = rs.getString("storage");
                 String cpu = rs.getString("cpu");
                 String gpu = rs.getString("gpu");
                 double screen = rs.getDouble("screen");
-                
+
                 if (ram != null && !ram.isEmpty()) {
                     specSummary.append("RAM: ").append(ram);
                 }
                 if (storage != null && !storage.isEmpty()) {
-                    if (specSummary.length() > 0) specSummary.append(" | ");
+                    if (specSummary.length() > 0) {
+                        specSummary.append(" | ");
+                    }
                     specSummary.append("Storage: ").append(storage);
                 }
                 if (cpu != null && !cpu.isEmpty()) {
-                    if (specSummary.length() > 0) specSummary.append(" | ");
+                    if (specSummary.length() > 0) {
+                        specSummary.append(" | ");
+                    }
                     specSummary.append("CPU: ").append(cpu);
                 }
                 if (gpu != null && !gpu.isEmpty()) {
-                    if (specSummary.length() > 0) specSummary.append(" | ");
+                    if (specSummary.length() > 0) {
+                        specSummary.append(" | ");
+                    }
                     specSummary.append("GPU: ").append(gpu);
                 }
                 if (screen > 0) {
-                    if (specSummary.length() > 0) specSummary.append(" | ");
+                    if (specSummary.length() > 0) {
+                        specSummary.append(" | ");
+                    }
                     specSummary.append("Screen: ").append(screen).append('"');
                 }
-                
+
                 item.setSpecSummary(specSummary.toString());
                 list.add(item);
             }
@@ -173,13 +180,12 @@ public class InventoryDAO {
                 + "JOIN product_details pd ON pi.product_detail_id = pd.product_detail_id "
                 + "WHERE pd.product_id = ? AND pi.status = 'Available') "
                 + "WHERE i.product_id = ?";
-
         try (Connection conn = DBContext.getConnection()) {
             conn.setAutoCommit(false);
             try {
                 PreparedStatement psItem = conn.prepareStatement(updateItemSql);
                 for (Integer id : auditData.keySet()) {
-                    psItem.setString(1, auditData.get(id)[0]); 
+                    psItem.setString(1, auditData.get(id)[0]);
                     psItem.setString(2, auditData.get(id)[1]);
                     psItem.setInt(3, id);
                     psItem.addBatch();
@@ -199,6 +205,92 @@ public class InventoryDAO {
         } catch (Exception e) {
             System.err.println("Error in updateAuditAndSync: " + e.getMessage());
             e.printStackTrace();
+        }
+    }
+    public String getLocationNameById(int locationId) {
+    String sql = "SELECT location_name FROM locations WHERE location_id = ?";
+    try (Connection conn = DBContext.getConnection(); 
+         PreparedStatement st = conn.prepareStatement(sql)) {
+        st.setInt(1, locationId);
+        ResultSet rs = st.executeQuery();
+        if (rs.next()) {
+            return rs.getString("location_name");
+        }
+    } catch (Exception e) {
+        e.printStackTrace();
+    }
+    return "Unknown Location";
+}
+    public List<ProductDTO> getProductsAvailableToAdd() {
+    List<ProductDTO> list = new ArrayList<>();
+    String sql = "SELECT p.product_id, p.product_name, p.status " +
+                 "FROM products p " +
+                 "LEFT JOIN inventory i ON p.product_id = i.product_id " +
+                 "WHERE i.product_id IS NULL AND p.status = 1"; 
+
+    try (Connection conn = DBContext.getConnection(); 
+         PreparedStatement st = conn.prepareStatement(sql)) {
+        ResultSet rs = st.executeQuery();
+        while (rs.next()) {
+            list.add(new ProductDTO(
+                rs.getInt("product_id"),
+                rs.getString("product_name"),
+                rs.getInt("status")
+            ));
+        }
+    } catch (Exception e) {
+        e.printStackTrace();
+    }
+    return list;
+}
+
+    public List<ProductDTO> getProductsNotInInventory() {
+        List<ProductDTO> list = new ArrayList<>();
+  
+        String sql = "SELECT p.product_id, p.product_name, p.status "
+                + "FROM products p "
+                + "WHERE p.status = 1 "
+                + "ORDER BY p.product_name";
+        try (Connection conn = DBContext.getConnection(); PreparedStatement st = conn.prepareStatement(sql)) {
+            ResultSet rs = st.executeQuery();
+            while (rs.next()) {
+                list.add(new ProductDTO(
+                        rs.getInt("product_id"),
+                        rs.getString("product_name"),
+                        rs.getInt("status")
+                ));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
+
+    public boolean addProductToInventory(int productID, int locationId) throws Exception {
+        
+        String checkSQL = "SELECT COUNT(*) FROM inventory WHERE product_id = ? AND location_id = ?";
+        String insertSQL = "INSERT INTO inventory (product_id, location_id, stock_quantity, last_updated) VALUES (?, ?, 0, ?)";
+
+        try (Connection conn = DBContext.getConnection()) {
+            
+            try (PreparedStatement check = conn.prepareStatement(checkSQL)) {
+                check.setInt(1, productID);
+                check.setInt(2, locationId);
+                ResultSet rs = check.executeQuery();
+                if (rs.next() && rs.getInt(1) > 0) {
+                    return false; 
+                }
+            }
+
+            try (PreparedStatement insert = conn.prepareStatement(insertSQL)) {
+                insert.setInt(1, productID);
+                insert.setInt(2, locationId);
+                insert.setTimestamp(3, Timestamp.valueOf(LocalDateTime.now()));
+                return insert.executeUpdate() > 0;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw e;
         }
     }
 }
