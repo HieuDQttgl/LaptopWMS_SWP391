@@ -3,11 +3,13 @@ package DAO;
 import DTO.OrderDTO;
 import DTO.OrderSummary;
 import Model.Order;
+import Model.OrderProduct;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
+import java.sql.SQLException;
 
 public class OrderDAO extends DBContext {
 
@@ -111,8 +113,8 @@ public class OrderDAO extends DBContext {
 
         return orders;
     }
-    
-        public Order getOrderById(int orderId) {
+
+    public Order getOrderById(int orderId) {
         Order order = null;
 
         String SQL = "SELECT "
@@ -188,7 +190,7 @@ public class OrderDAO extends DBContext {
         }
         return null;
     }
-    
+
     public List<OrderDTO> getRecentOrders(int customerId, int limit) {
         List<OrderDTO> list = new ArrayList<>();
 
@@ -226,4 +228,153 @@ public class OrderDAO extends DBContext {
         return list;
     }
 
+    public boolean addOrder(Order order, List<OrderProduct> details) {
+        Connection conn = null;
+        PreparedStatement psOrder = null;
+        PreparedStatement psDetail = null;
+        boolean success = false;
+
+        String sqlOrder = "INSERT INTO orders (order_code, customer_id, supplier_id, description, order_status, created_by, created_at) "
+                + "VALUES (?, ?, ?, ?, ?, ?, ?)";
+
+        String sqlDetail = "INSERT INTO order_details (order_id, product_id, quantity, unit_price) "
+                + "VALUES (?, ?, ?, ?)";
+
+        try {
+            conn = getConnection();
+
+            String newOrderCode = generateNewOrderCode(conn, order);
+            order.setOrderCode(newOrderCode);
+
+            conn.setAutoCommit(false);
+
+            psOrder = conn.prepareStatement(sqlOrder, PreparedStatement.RETURN_GENERATED_KEYS);
+
+            psOrder.setString(1, order.getOrderCode());
+
+            if (order.getCustomerId() != null && order.getCustomerId() > 0) {
+                psOrder.setInt(2, order.getCustomerId());
+                psOrder.setNull(3, java.sql.Types.INTEGER);
+            } else if (order.getSupplierId() != null && order.getSupplierId() > 0) {
+                psOrder.setNull(2, java.sql.Types.INTEGER);
+                psOrder.setInt(3, order.getSupplierId());
+            } else {
+                psOrder.setNull(2, java.sql.Types.INTEGER);
+                psOrder.setNull(3, java.sql.Types.INTEGER);
+            }
+
+            psOrder.setString(4, order.getDescription());
+            psOrder.setString(5, order.getOrderStatus());
+            psOrder.setInt(6, order.getCreatedBy());
+            psOrder.setTimestamp(7, new java.sql.Timestamp(System.currentTimeMillis())); // created_at
+
+            int affectedRows = psOrder.executeUpdate();
+            if (affectedRows == 0) {
+                throw new SQLException("Creating order failed, no rows affected.");
+            }
+
+            int newOrderId = -1;
+            try (ResultSet generatedKeys = psOrder.getGeneratedKeys()) {
+                if (generatedKeys.next()) {
+                    newOrderId = generatedKeys.getInt(1);
+                } else {
+                    throw new SQLException("Creating order failed, no ID obtained.");
+                }
+            }
+
+            if (newOrderId != -1 && details != null && !details.isEmpty()) {
+                psDetail = conn.prepareStatement(sqlDetail);
+
+                for (OrderProduct detail : details) {
+                    psDetail.setInt(1, newOrderId);
+                    psDetail.setInt(2, detail.getProductId());
+                    psDetail.setInt(3, detail.getQuantity());
+                    psDetail.setBigDecimal(4, detail.getUnitPrice());
+
+                    psDetail.addBatch();
+                }
+
+                int[] results = psDetail.executeBatch();
+
+                for (int result : results) {
+                    if (result <= 0) {
+                        throw new SQLException("Creating order details failed.");
+                    }
+                }
+            }
+            conn.commit();
+            success = true;
+
+        } catch (SQLException e) {
+            if (conn != null) {
+                try {
+                    System.err.print("Transaction is being rolled back");
+                    conn.rollback();
+                } catch (SQLException ex) {
+                    ex.printStackTrace();
+                }
+            }
+            e.printStackTrace();
+
+        } finally {
+            try {
+                if (psDetail != null) {
+                    psDetail.close();
+                }
+                if (psOrder != null) {
+                    psOrder.close();
+                }
+                if (conn != null) {
+                    conn.close();
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+
+        return success;
+    }
+
+    private String generateNewOrderCode(Connection conn, Order order) throws SQLException {
+
+        String prefix;
+        String year = String.valueOf(java.time.Year.now());
+
+        if (order.getCustomerId() != null && order.getCustomerId() > 0) {
+            prefix = "EXP";
+        } else {
+            prefix = "IMP";
+        }
+
+        String searchPrefix = prefix + "-" + year;
+
+        String sqlMax = "SELECT MAX(SUBSTR(o.order_code, LENGTH(?) + 1)) "
+                + "FROM orders o WHERE o.order_code LIKE ? AND YEAR(o.created_at) = ?";
+
+        int lastNumber = 0;
+
+        try (PreparedStatement psMax = conn.prepareStatement(sqlMax)) {
+            psMax.setString(1, searchPrefix);
+            psMax.setString(2, searchPrefix + "%");
+            psMax.setString(3, year);
+
+            try (ResultSet rs = psMax.executeQuery()) {
+                if (rs.next()) {
+                    String maxCodeSuffix = rs.getString(1);
+                    if (maxCodeSuffix != null && !maxCodeSuffix.trim().isEmpty()) {
+                        try {
+                            lastNumber = Integer.parseInt(maxCodeSuffix.trim());
+                        } catch (NumberFormatException e) {
+                            System.err.println("Error parsing order code suffix: " + maxCodeSuffix);
+                        }
+                    }
+                }
+            }
+        }
+
+        int newNumber = lastNumber + 1;
+        String formattedNumber = String.format("%03d", newNumber);
+
+        return searchPrefix + formattedNumber;
+    }
 }

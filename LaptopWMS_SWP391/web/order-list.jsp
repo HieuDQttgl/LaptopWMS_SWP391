@@ -218,7 +218,7 @@
             <h2>Order List</h2>
 
             <div style="margin-bottom: 20px;">
-                <a href="order-create" class="btn-success">+ Thêm Đơn hàng</a>
+                <a href="add-order" class="btn-success">+ Thêm Đơn hàng</a>
             </div>
 
             <div class="filter-container">

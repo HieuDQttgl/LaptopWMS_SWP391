@@ -196,4 +196,8 @@ public class ProductDAO extends DBContext {
         }
         return "Unknown Product";
     }
+
+    public Object getListProducts() {
+        return getProducts(null, null, null, null, null);
+    }
 }

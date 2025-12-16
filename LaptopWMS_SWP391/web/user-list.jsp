@@ -303,8 +303,6 @@
                 Users tempUser = (Users) request.getAttribute("tempUser");
 
                 List<Role> allRoles = (List<Role>) request.getAttribute("allRoles");
-                List<String> genders = (List<String>) request.getAttribute("genders");
-                List<String> statuses = (List<String>) request.getAttribute("statuses");
 
                 boolean showFormOnLoad = errors != null || tempUser != null;
 
@@ -334,7 +332,6 @@
                     currentSortOrder = "ASC";
                 }
 
-                // Hiển thị thông báo
                 if (errorMessage != null) {
                     out.println("<p id='notification' class='message-error notification'>" + errorMessage + "</p>");
                     request.getSession().removeAttribute("error");

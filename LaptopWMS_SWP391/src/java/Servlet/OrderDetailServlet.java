@@ -11,7 +11,6 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import java.sql.SQLException; // Import thêm cho debug
 
 @WebServlet(name = "OrderDetailServlet", urlPatterns = {"/order-detail"})
 public class OrderDetailServlet extends HttpServlet {
@@ -33,13 +32,11 @@ public class OrderDetailServlet extends HttpServlet {
         String idParam = request.getParameter("id");
         int orderId = -1;
         
-        // 1. Kiểm tra tham số ID
         if (idParam == null || idParam.isEmpty()) {
              response.sendRedirect("order-list");
              return;
         }
         
-        // 2. Chuyển đổi ID và xử lý NumberFormatException
         try {
             orderId = Integer.parseInt(idParam);
         } catch (NumberFormatException e) {
@@ -48,10 +45,8 @@ public class OrderDetailServlet extends HttpServlet {
         }
 
         try {
-            // Lấy dữ liệu từ DAO
             Order order = orderDAO.getOrderById(orderId); 
             
-            // 3. Xử lý Order không tồn tại
             if (order == null) {
                 response.sendError(HttpServletResponse.SC_NOT_FOUND, "Không tìm thấy Đơn hàng ID: " + orderId);
                 return;
