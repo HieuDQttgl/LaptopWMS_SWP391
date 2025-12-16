@@ -18,8 +18,8 @@ import jakarta.servlet.http.HttpServletResponse;
  *
  * @author PC
  */
-@WebServlet(name = "AddDetailServlet", urlPatterns = {"/add-detail"})
-public class AddDetailServlet extends HttpServlet {
+@WebServlet(name = "AddProductDetailServlet", urlPatterns = {"/add-product-detail"})
+public class AddProductDetailServlet extends HttpServlet {
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -75,7 +75,7 @@ public class AddDetailServlet extends HttpServlet {
             request.setAttribute("targetName", name);
             request.setAttribute("targetId", id);
 
-            request.getRequestDispatcher("add-detail.jsp").forward(request, response);
+            request.getRequestDispatcher("add-product-detail.jsp").forward(request, response);
 
         } catch (NumberFormatException e) {
             response.sendRedirect("product-list");

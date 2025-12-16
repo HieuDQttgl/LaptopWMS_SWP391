@@ -75,7 +75,7 @@
             <h2>Add Configuration</h2>
             <p style="text-align: center; color: #7f8c8d; font-size: 14px;">Adding specs for Product ID: <strong>${targetName}</strong></p>
 
-            <form action="add-detail" method="post">
+            <form action="add-product-detail" method="post">
                 <input type="hidden" name="productId" value="${targetId}">
 
                 <div class="form-group">

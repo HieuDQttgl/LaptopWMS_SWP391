@@ -276,6 +276,7 @@
                                         </c:choose>
                                     </td>
                                     <td onclick="event.stopPropagation();">
+                                        <a href="edit-product?id=${p.productId}" style="text-decoration: none; color: #3498db; margin-right: 10px;">Edit</a>
                                         <a href="toggleProduct?id=${p.productId}" 
                                            style="color: ${p.status ? '#e74c3c' : '#2ecc71'}; text-decoration: none; font-weight: 600; font-size: 13px;">
                                             ${p.status ? 'Deactivate' : 'Activate'}
@@ -288,7 +289,7 @@
                                         <div class="details-container">
                                             <h4 style="margin: 0 0 10px 0; color: #555;">Available Configurations for ${p.productName}</h4>
 
-                                            <a href="add-detail?id=${p.productId}" 
+                                            <a href="add-product-detail?id=${p.productId}" 
                                                class="btn-add">
                                                 + Add Detail
                                             </a>
@@ -323,7 +324,7 @@
                                                                     </td>
 
                                                                     <td>
-                                                                        <a href="editSpec?id=${d.productDetailId}" style="color: #3498db; text-decoration: none; font-weight: 600;">Edit</a>
+                                                                        <a href="edit-product-detail?id=${d.productDetailId}" style="color: #3498db; text-decoration: none; font-weight: 600;">Edit</a>
                                                                         <span style="color: #ccc; margin: 0 5px;">|</span>
 
                                                                         <a href="toggleSpec?id=${d.productDetailId}" 
