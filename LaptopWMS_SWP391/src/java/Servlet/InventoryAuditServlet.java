@@ -26,12 +26,26 @@ public class InventoryAuditServlet extends HttpServlet {
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         int productId = Integer.parseInt(request.getParameter("productId"));
-        InventoryDAO dao = new InventoryDAO();
-        List<ProductItem> items = dao.getItemsForAudit(productId);
+        try {
 
-        request.setAttribute("items", items);
-        request.setAttribute("productId", productId);
-        request.getRequestDispatcher("inventory-audit.jsp").forward(request, response);
+            String locParam = request.getParameter("locationId");
+            int locationId = (locParam != null && !locParam.isEmpty()) ? Integer.parseInt(locParam) : 0;
+
+            InventoryDAO dao = new InventoryDAO();
+
+            List<ProductItem> items = dao.getItemsForAudit(productId);
+            List<Model.ProductDetail> details = dao.getDetailsByProductId(productId);
+
+            request.setAttribute("items", items);
+            request.setAttribute("productDetails", details);
+            request.setAttribute("productId", productId);
+            request.setAttribute("locationId", locationId);
+
+            request.getRequestDispatcher("inventory-audit.jsp").forward(request, response);
+        } catch (Exception e) {
+            e.printStackTrace();
+            response.sendRedirect("inventory?error=system");
+        }
     }
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {

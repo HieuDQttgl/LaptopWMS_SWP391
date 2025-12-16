@@ -207,46 +207,46 @@ public class InventoryDAO {
             e.printStackTrace();
         }
     }
-    public String getLocationNameById(int locationId) {
-    String sql = "SELECT location_name FROM locations WHERE location_id = ?";
-    try (Connection conn = DBContext.getConnection(); 
-         PreparedStatement st = conn.prepareStatement(sql)) {
-        st.setInt(1, locationId);
-        ResultSet rs = st.executeQuery();
-        if (rs.next()) {
-            return rs.getString("location_name");
-        }
-    } catch (Exception e) {
-        e.printStackTrace();
-    }
-    return "Unknown Location";
-}
-    public List<ProductDTO> getProductsAvailableToAdd() {
-    List<ProductDTO> list = new ArrayList<>();
-    String sql = "SELECT p.product_id, p.product_name, p.status " +
-                 "FROM products p " +
-                 "LEFT JOIN inventory i ON p.product_id = i.product_id " +
-                 "WHERE i.product_id IS NULL AND p.status = 1"; 
 
-    try (Connection conn = DBContext.getConnection(); 
-         PreparedStatement st = conn.prepareStatement(sql)) {
-        ResultSet rs = st.executeQuery();
-        while (rs.next()) {
-            list.add(new ProductDTO(
-                rs.getInt("product_id"),
-                rs.getString("product_name"),
-                rs.getInt("status")
-            ));
+    public String getLocationNameById(int locationId) {
+        String sql = "SELECT location_name FROM locations WHERE location_id = ?";
+        try (Connection conn = DBContext.getConnection(); PreparedStatement st = conn.prepareStatement(sql)) {
+            st.setInt(1, locationId);
+            ResultSet rs = st.executeQuery();
+            if (rs.next()) {
+                return rs.getString("location_name");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-    } catch (Exception e) {
-        e.printStackTrace();
+        return "Unknown Location";
     }
-    return list;
-}
+
+    public List<ProductDTO> getProductsAvailableToAdd() {
+        List<ProductDTO> list = new ArrayList<>();
+        String sql = "SELECT p.product_id, p.product_name, p.status "
+                + "FROM products p "
+                + "LEFT JOIN inventory i ON p.product_id = i.product_id "
+                + "WHERE i.product_id IS NULL AND p.status = 1";
+
+        try (Connection conn = DBContext.getConnection(); PreparedStatement st = conn.prepareStatement(sql)) {
+            ResultSet rs = st.executeQuery();
+            while (rs.next()) {
+                list.add(new ProductDTO(
+                        rs.getInt("product_id"),
+                        rs.getString("product_name"),
+                        rs.getInt("status")
+                ));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
 
     public List<ProductDTO> getProductsNotInInventory() {
         List<ProductDTO> list = new ArrayList<>();
-  
+
         String sql = "SELECT p.product_id, p.product_name, p.status "
                 + "FROM products p "
                 + "WHERE p.status = 1 "
@@ -267,18 +267,18 @@ public class InventoryDAO {
     }
 
     public boolean addProductToInventory(int productID, int locationId) throws Exception {
-        
+
         String checkSQL = "SELECT COUNT(*) FROM inventory WHERE product_id = ? AND location_id = ?";
         String insertSQL = "INSERT INTO inventory (product_id, location_id, stock_quantity, last_updated) VALUES (?, ?, 0, ?)";
 
         try (Connection conn = DBContext.getConnection()) {
-            
+
             try (PreparedStatement check = conn.prepareStatement(checkSQL)) {
                 check.setInt(1, productID);
                 check.setInt(2, locationId);
                 ResultSet rs = check.executeQuery();
                 if (rs.next() && rs.getInt(1) > 0) {
-                    return false; 
+                    return false;
                 }
             }
 
@@ -293,4 +293,51 @@ public class InventoryDAO {
             throw e;
         }
     }
+
+    public List<Model.ProductDetail> getDetailsByProductId(int productId) {
+    List<Model.ProductDetail> list = new ArrayList<>();
+    String sql = "SELECT * FROM product_details WHERE product_id = ? AND status = 1";
+    try (Connection conn = DBContext.getConnection(); 
+         PreparedStatement ps = conn.prepareStatement(sql)) {
+        ps.setInt(1, productId);
+        ResultSet rs = ps.executeQuery();
+        while (rs.next()) {
+            Model.ProductDetail d = new Model.ProductDetail();
+            d.setProductDetailId(rs.getInt("product_detail_id"));
+            d.setCpu(rs.getString("cpu"));
+            d.setRam(rs.getString("ram"));
+            d.setStorage(rs.getString("storage"));
+            list.add(d);
+        }
+    } catch (Exception e) {
+        e.printStackTrace();
+    }
+    return list;
+}
+
+    public boolean addProductItem(int detailId, String serial, String status) {
+        String sql = "INSERT INTO product_items (product_detail_id, serial_number, status) VALUES (?, ?, ?)";
+        try (Connection conn = DBContext.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, detailId);
+            ps.setString(2, serial);
+            ps.setString(3, status);
+            return ps.executeUpdate() > 0;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public void updateInventoryStock(int productId, int locationId) {
+        String sql = "UPDATE inventory SET stock_quantity = stock_quantity + 1, last_updated = NOW() "
+                + "WHERE product_id = ? AND location_id = ?";
+        try (Connection conn = DBContext.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, productId);
+            ps.setInt(2, locationId);
+            ps.executeUpdate();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
 }

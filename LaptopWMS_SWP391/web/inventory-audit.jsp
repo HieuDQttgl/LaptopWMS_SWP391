@@ -11,96 +11,118 @@
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <title>Audit Inventory - Product ID: ${productId}</title>
         <style>
-    body {
-        font-family: Arial;
-        margin: 20px;
-        background-color: #ffffff;
-    }
+            body {
+                font-family: Arial;
+                margin: 20px;
+                background-color: #ffffff;
+            }
 
-    h1 {
-        font-size: 22px;
-        margin-bottom: 10px;
-    }
+            h1 {
+                font-size: 22px;
+                margin-bottom: 10px;
+            }
 
-    table {
-        width: 100%;
-        border-collapse: collapse;
-        margin-top: 15px;
-    }
+            table {
+                width: 100%;
+                border-collapse: collapse;
+                margin-top: 15px;
+            }
 
-    th, td {
-        border: 1px solid #ccc;
-        padding: 8px;
-        font-size: 14px;
-    }
+            th, td {
+                border: 1px solid #ccc;
+                padding: 8px;
+                font-size: 14px;
+            }
 
-    th {
-        background-color: #eee;
-        text-align: left;
-    }
+            th {
+                background-color: #eee;
+                text-align: left;
+            }
 
-    select, input[type="text"] {
-        width: 100%;
-        padding: 5px;
-        font-size: 13px;
-    }
+            select, input[type="text"] {
+                width: 100%;
+                padding: 5px;
+                font-size: 13px;
+            }
 
-    button {
-        margin-top: 15px;
-        padding: 8px 16px;
-        font-size: 14px;
-        cursor: pointer;
-    }
+            button {
+                margin-top: 15px;
+                padding: 8px 16px;
+                font-size: 14px;
+                cursor: pointer;
+            }
 
-    .back-link {
-        display: inline-block;
-        margin-bottom: 10px;
-        font-size: 14px;
-    }
+            .back-link {
+                display: inline-block;
+                margin-bottom: 10px;
+                font-size: 14px;
+            }
 
-    .no-items {
-        margin-top: 20px;
-        padding: 10px;
-        border: 1px solid #ccc;
-    }
+            .no-items {
+                margin-top: 20px;
+                padding: 10px;
+                border: 1px solid #ccc;
+            }
 
-    .spec-summary {
-        font-size: 13px;
-    }
+            .spec-summary {
+                font-size: 13px;
+            }
 
-    .status-available {
-        background-color: #f0fff0;
-    }
+            .status-available {
+                background-color: #f0fff0;
+            }
 
-    .status-lost {
-        background-color: #fff0f0;
-    }
+            .status-lost {
+                background-color: #fff0f0;
+            }
 
-    .status-damaged {
-        background-color: #fffbe6;
-    }
+            .status-damaged {
+                background-color: #fffbe6;
+            }
 
-    .status-sold {
-        background-color: #f0f8ff;
-    }
-</style>
+            .status-sold {
+                background-color: #f0f8ff;
+            }
+        </style>
 
     </head>
     <body>
         <a href="inventory" class="back-link">← Back to Inventory</a>
-        
+        <div style="margin-top: 30px; padding: 15px; border: 1px solid #ddd; background: #f9f9f9;">
+            <h3>Add New Unit (Serial Number)</h3>
+            <form action="add-product-item" method="POST">
+                <input type="hidden" name="productId" value="${productId}">
+                <input type="hidden" name="locationId" value="${locationId}">
+
+                <label>Select Specification:</label>
+                <select name="detailId" required style="width: auto; margin-bottom: 10px;">
+                    <option value="">-- Choose Specs --</option>
+                    <c:forEach items="${productDetails}" var="d">
+                        <option value="${d.productDetailId}">
+                            ${d.cpu} / RAM: ${d.ram} / Storage: ${d.storage}
+                        </option>
+                    </c:forEach>
+                </select>
+
+                <br>
+                <label>Serial Number:</label>
+                <input type="text" name="serialNumber" placeholder="Enter Serial..." required style="width: 200px;">
+
+                <button type="submit" style="background-color: #28a745; color: white;">Add to Inventory</button>
+            </form>
+        </div>
         <h1>Audit Inventory - Product ID: ${productId}</h1>
-        
+
         <c:if test="${empty items}">
             <div class="no-items">
                 <p>No items found for this product. Please add product items first.</p>
             </div>
         </c:if>
-        
+
         <c:if test="${not empty items}">
             <form action="audit-inventory" method="post">
                 <input type="hidden" name="productId" value="${productId}">
-                
+
                 <table border="1">
                     <thead>
                         <tr>
@@ -156,10 +178,10 @@
                         </c:forEach>
                     </tbody>
                 </table>
-                
+
                 <button type="submit">Update Audit & Recalculate Stock</button>
             </form>
         </c:if>
-        
+
     </body>
 </html>
