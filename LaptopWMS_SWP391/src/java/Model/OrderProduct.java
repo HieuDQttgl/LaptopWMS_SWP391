@@ -6,18 +6,17 @@ public class OrderProduct {
 
     private Integer orderProductId;
     private Integer orderId;
-    private Integer productId;
+    private Integer productDetailId;
     private Integer quantity;
     private BigDecimal unitPrice;
 
     public OrderProduct() {
     }
 
-    // Constructor đầy đủ
-    public OrderProduct(Integer orderProductId, Integer orderId, Integer productId, Integer quantity, BigDecimal unitPrice) {
+    public OrderProduct(Integer orderProductId, Integer orderId, Integer productDetailId, Integer quantity, BigDecimal unitPrice) {
         this.orderProductId = orderProductId;
         this.orderId = orderId;
-        this.productId = productId;
+        this.productDetailId = productDetailId;
         this.quantity = quantity;
         this.unitPrice = unitPrice;
     }
@@ -40,12 +39,12 @@ public class OrderProduct {
         this.orderId = orderId;
     }
 
-    public Integer getProductId() {
-        return productId;
+    public Integer getProductDetailId() {
+        return productDetailId;
     }
 
-    public void setProductId(Integer productId) {
-        this.productId = productId;
+    public void setProductDetailId(Integer productDetailId) {
+        this.productDetailId = productDetailId;
     }
 
     public Integer getQuantity() {
@@ -66,6 +65,6 @@ public class OrderProduct {
     
     @Override
     public String toString() {
-        return "OrderProduct{" + "orderProductId=" + orderProductId + ", productId=" + productId + ", quantity=" + quantity + ", unitPrice=" + unitPrice + '}';
+        return "OrderProduct{" + "orderProductId=" + orderProductId + ", productDetailId=" + productDetailId + ", quantity=" + quantity + ", unitPrice=" + unitPrice + '}';
     }
 }

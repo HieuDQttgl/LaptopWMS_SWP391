@@ -54,7 +54,6 @@ public class OrderDetailServlet extends HttpServlet {
 
             List<OrderProductDetailDTO> orderProducts = opDAO.getProductsDetailByOrderId(orderId);
 
-            // Set Attributes và Forward
             request.setAttribute("order", order); 
             request.setAttribute("orderProducts", orderProducts); 
             

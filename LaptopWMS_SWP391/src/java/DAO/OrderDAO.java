@@ -231,108 +231,91 @@ public class OrderDAO extends DBContext {
 
     public boolean addOrder(Order order, List<OrderProduct> details) {
         Connection conn = null;
-        PreparedStatement psOrder = null;
-        PreparedStatement psDetail = null;
         boolean success = false;
 
         String sqlOrder = "INSERT INTO orders (order_code, customer_id, supplier_id, description, order_status, created_by, created_at) "
                 + "VALUES (?, ?, ?, ?, ?, ?, ?)";
 
-        String sqlDetail = "INSERT INTO order_products (order_id, product_id, quantity, unit_price) "
+        String sqlDetail = "INSERT INTO order_products (order_id, product_detail_id, quantity, unit_price) "
                 + "VALUES (?, ?, ?, ?)";
 
         try {
             conn = getConnection();
-
             String newOrderCode = generateNewOrderCode(conn, order);
             order.setOrderCode(newOrderCode);
 
             conn.setAutoCommit(false);
 
-            psOrder = conn.prepareStatement(sqlOrder, PreparedStatement.RETURN_GENERATED_KEYS);
+            try (PreparedStatement psOrder = conn.prepareStatement(sqlOrder, PreparedStatement.RETURN_GENERATED_KEYS)) {
+                psOrder.setString(1, order.getOrderCode());
 
-            psOrder.setString(1, order.getOrderCode());
-
-            if (order.getCustomerId() != null && order.getCustomerId() > 0) {
-                psOrder.setInt(2, order.getCustomerId());
-                psOrder.setNull(3, java.sql.Types.INTEGER);
-            } else if (order.getSupplierId() != null && order.getSupplierId() > 0) {
-                psOrder.setNull(2, java.sql.Types.INTEGER);
-                psOrder.setInt(3, order.getSupplierId());
-            } else {
-                psOrder.setNull(2, java.sql.Types.INTEGER);
-                psOrder.setNull(3, java.sql.Types.INTEGER);
-            }
-
-            psOrder.setString(4, order.getDescription());
-            psOrder.setString(5, order.getOrderStatus());
-            psOrder.setInt(6, order.getCreatedBy());
-            psOrder.setTimestamp(7, new java.sql.Timestamp(System.currentTimeMillis())); // created_at
-
-            int affectedRows = psOrder.executeUpdate();
-            if (affectedRows == 0) {
-                throw new SQLException("Creating order failed, no rows affected.");
-            }
-
-            int newOrderId = -1;
-            try (ResultSet generatedKeys = psOrder.getGeneratedKeys()) {
-                if (generatedKeys.next()) {
-                    newOrderId = generatedKeys.getInt(1);
+                if (order.getCustomerId() != null && order.getCustomerId() > 0) {
+                    psOrder.setInt(2, order.getCustomerId());
+                    psOrder.setNull(3, java.sql.Types.INTEGER);
+                } else if (order.getSupplierId() != null && order.getSupplierId() > 0) {
+                    psOrder.setNull(2, java.sql.Types.INTEGER);
+                    psOrder.setInt(3, order.getSupplierId());
                 } else {
-                    throw new SQLException("Creating order failed, no ID obtained.");
-                }
-            }
-
-            if (newOrderId != -1 && details != null && !details.isEmpty()) {
-                psDetail = conn.prepareStatement(sqlDetail);
-
-                for (OrderProduct detail : details) {
-                    psDetail.setInt(1, newOrderId);
-                    psDetail.setInt(2, detail.getProductId());
-                    psDetail.setInt(3, detail.getQuantity());
-                    psDetail.setBigDecimal(4, detail.getUnitPrice());
-
-                    psDetail.addBatch();
+                    psOrder.setNull(2, java.sql.Types.INTEGER);
+                    psOrder.setNull(3, java.sql.Types.INTEGER);
                 }
 
-                int[] results = psDetail.executeBatch();
+                psOrder.setString(4, order.getDescription());
+                psOrder.setString(5, order.getOrderStatus());
+                psOrder.setInt(6, order.getCreatedBy());
+                psOrder.setTimestamp(7, new java.sql.Timestamp(System.currentTimeMillis()));
 
-                for (int result : results) {
-                    if (result <= 0) {
-                        throw new SQLException("Creating order details failed.");
+                int affectedRows = psOrder.executeUpdate();
+                if (affectedRows == 0) {
+                    throw new SQLException("Creating order failed, no rows affected.");
+                }
+
+                int newOrderId = -1;
+                try (ResultSet generatedKeys = psOrder.getGeneratedKeys()) {
+                    if (generatedKeys.next()) {
+                        newOrderId = generatedKeys.getInt(1);
+                    } else {
+                        throw new SQLException("Creating order failed, no ID obtained.");
                     }
                 }
+
+                if (newOrderId != -1 && details != null && !details.isEmpty()) {
+                    try (PreparedStatement psDetail = conn.prepareStatement(sqlDetail)) {
+                        for (OrderProduct detail : details) {
+                            psDetail.setInt(1, newOrderId);
+                            psDetail.setInt(2, detail.getProductDetailId());
+                            psDetail.setInt(3, detail.getQuantity());
+                            psDetail.setBigDecimal(4, detail.getUnitPrice());
+                            psDetail.addBatch();
+                        }
+                        psDetail.executeBatch();
+                    }
+                }
+
+                conn.commit();
+                success = true;
+                System.out.println("✅ Order created successfully: " + order.getOrderCode());
+
+            } catch (SQLException e) {
+                if (conn != null) {
+                    System.err.println("⚠️ Error detected! Rolling back transaction...");
+                    conn.rollback();
+                }
+                throw e;
             }
-            conn.commit();
-            success = true;
 
         } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
             if (conn != null) {
                 try {
-                    System.err.print("Transaction is being rolled back");
-                    conn.rollback();
-                } catch (SQLException ex) {
-                    ex.printStackTrace();
-                }
-            }
-            e.printStackTrace();
-
-        } finally {
-            try {
-                if (psDetail != null) {
-                    psDetail.close();
-                }
-                if (psOrder != null) {
-                    psOrder.close();
-                }
-                if (conn != null) {
+                    conn.setAutoCommit(true);
                     conn.close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
                 }
-            } catch (SQLException e) {
-                e.printStackTrace();
             }
         }
-
         return success;
     }
 
@@ -409,65 +392,5 @@ public class OrderDAO extends DBContext {
                 return null;
             }
         }
-    }
-
-    public static void main(String[] args) {
-        OrderDAO orderDAO = new OrderDAO();
-        System.out.println("--- Bắt đầu Test OrderDAO.addOrder ---");
-
-        try {
-            // 1. Tạo đối tượng Order (Đơn hàng Export/Xuất Hàng)
-            Order newOrder = createTestOrder();
-
-            // 2. Tạo danh sách Chi tiết Đơn hàng
-            List<OrderProduct> details = createTestOrderDetails();
-
-            // 3. Thực hiện thêm đơn hàng
-            boolean success = orderDAO.addOrder(newOrder, details);
-
-            if (success) {
-                System.out.println("\n✅ TEST THÀNH CÔNG!");
-                System.out.println("Đơn hàng đã được thêm thành công vào DB.");
-                System.out.println("Mã Đơn hàng: " + newOrder.getOrderCode());
-            } else {
-                System.out.println("\n❌ TEST THẤT BẠI.");
-                System.out.println("Kiểm tra lại Console/Log để xem chi tiết SQLException.");
-            }
-
-        } catch (Exception e) {
-            System.out.println("\n🚨 ĐÃ XẢY RA NGOẠI LỆ KHI THỰC HIỆN TEST:");
-            e.printStackTrace();
-        }
-    }
-
-    private static Order createTestOrder() {
-        Order order = new Order();
-
-        order.setCustomerId(1);
-        order.setSupplierId(0);
-
-        order.setDescription("Đơn hàng test tự động từ Main.");
-        order.setOrderStatus("Pending");
-        order.setCreatedBy(1);
-
-        return order;
-    }
-
-    private static List<OrderProduct> createTestOrderDetails() {
-        List<OrderProduct> details = new ArrayList<>();
-
-        OrderProduct detail1 = new OrderProduct();
-        detail1.setProductId(1);
-        detail1.setQuantity(2);
-        detail1.setUnitPrice(new BigDecimal("5000.50"));
-        details.add(detail1);
-
-        OrderProduct detail2 = new OrderProduct();
-        detail2.setProductId(5);
-        detail2.setQuantity(1);
-        detail2.setUnitPrice(new BigDecimal("1250.00"));
-        details.add(detail2);
-
-        return details;
     }
 }
