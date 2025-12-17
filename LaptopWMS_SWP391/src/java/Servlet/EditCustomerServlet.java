@@ -13,10 +13,13 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import java.util.List;
 
-@WebServlet(name = "CustomerListServlet", urlPatterns = {"/customer-list"})
-public class CustomerListServlet extends HttpServlet {
+/**
+ *
+ * @author PC
+ */
+@WebServlet(name = "EditCustomerServlet", urlPatterns = {"/edit-customer"})
+public class EditCustomerServlet extends HttpServlet {
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -35,10 +38,10 @@ public class CustomerListServlet extends HttpServlet {
             out.println("<!DOCTYPE html>");
             out.println("<html>");
             out.println("<head>");
-            out.println("<title>Servlet CustomerListServlet</title>");
+            out.println("<title>Servlet EditCustomerServlet</title>");
             out.println("</head>");
             out.println("<body>");
-            out.println("<h1>Servlet CustomerListServlet at " + request.getContextPath() + "</h1>");
+            out.println("<h1>Servlet EditCustomerServlet at " + request.getContextPath() + "</h1>");
             out.println("</body>");
             out.println("</html>");
         }
@@ -53,47 +56,17 @@ public class CustomerListServlet extends HttpServlet {
      * @throws ServletException if a servlet-specific error occurs
      * @throws IOException if an I/O error occurs
      */
-    private final CustomerDAO dao = new CustomerDAO();
-
     @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp)
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-
-        String keyword = req.getParameter("keyword");
-        String status = req.getParameter("status");
-        String sortField = req.getParameter("sort_field");
-        if (sortField == null || sortField.isBlank()) {
-            sortField = "customer_id";
-        }
-
-        String sortOrder = req.getParameter("sort_order");
-        if (sortOrder == null || sortOrder.isBlank()) {
-            sortOrder = "ASC";
-        }
-
-        int page = parseInt(req.getParameter("page"), 1);
-        int pageSize = 5;
-
-        List<Customer> customers = dao.getCustomers(
-                keyword, status, sortField, sortOrder, page, pageSize);
-
-        int total = dao.countCustomers(keyword, status);
-        int totalPages = (int) Math.ceil((double) total / pageSize);
-
-        req.setAttribute("customers", customers);
-        req.setAttribute("currentPage", page);
-        req.setAttribute("totalPages", totalPages);
-        req.setAttribute("totalCount", total);
-
-        req.getRequestDispatcher("customer-list.jsp")
-                .forward(req, resp);
-    }
-
-    private int parseInt(String s, int def) {
-        try {
-            return Integer.parseInt(s);
-        } catch (Exception e) {
-            return def;
+        String idParam = request.getParameter("id");
+        if (idParam != null) {
+            CustomerDAO dao = new CustomerDAO();
+            Customer c = dao.getCustomerById(Integer.parseInt(idParam));
+            request.setAttribute("customer", c);
+            request.getRequestDispatcher("edit-customer.jsp").forward(request, response);
+        } else {
+            response.sendRedirect("customer-list");
         }
     }
 
@@ -108,7 +81,23 @@ public class CustomerListServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        processRequest(request, response);
+        int id = Integer.parseInt(request.getParameter("id"));
+        String name = request.getParameter("name");
+        String email = request.getParameter("email");
+        String phone = request.getParameter("phone");
+        String address = request.getParameter("address");
+
+        Customer c = new Customer();
+        c.setCustomerId(id);
+        c.setCustomerName(name);
+        c.setEmail(email);
+        c.setPhone(phone);
+        c.setAddress(address);
+
+        CustomerDAO dao = new CustomerDAO();
+        dao.updateCustomer(c);
+
+        response.sendRedirect("customer-list");
     }
 
     /**
@@ -118,7 +107,7 @@ public class CustomerListServlet extends HttpServlet {
      */
     @Override
     public String getServletInfo() {
-        return "Short description";
+        return "Mama mia";
     }// </editor-fold>
 
 }
