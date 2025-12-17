@@ -15,18 +15,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
-/**
- * SessionValidationFilter
- * 
- * This filter checks if a user's password has been changed after their session
- * was created.
- * If so, it invalidates the session to force re-authentication with the new
- * password.
- * 
- * This ensures that when a user changes their password, all their active
- * sessions
- * (on other devices/browsers) are automatically logged out for security.
- */
 @WebFilter(filterName = "SessionValidationFilter", urlPatterns = { "/*" })
 public class SessionValidationFilter implements Filter {
 
@@ -58,7 +46,6 @@ public class SessionValidationFilter implements Filter {
 
         // Get request path
         String path = req.getRequestURI().substring(req.getContextPath().length());
-
         // Check if path is excluded from validation
         for (String excluded : EXCLUDED_PATHS) {
             if (path.startsWith(excluded) || path.equals("/") || path.isEmpty()) {

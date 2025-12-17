@@ -1,4 +1,4 @@
-package Utils;
+package Filter;
 
 import Model.Users;
 import jakarta.servlet.*;
@@ -12,15 +12,15 @@ import java.util.List;
  *
  * @author super
  */
-@WebFilter(filterName = "PermissionFilter", urlPatterns = {"/*"})
+@WebFilter(filterName = "PermissionFilter", urlPatterns = { "/*" })
 public class PermissionFilter implements Filter {
 
     private static final List<String> PUBLIC_PAGES = Arrays.asList(
             "/landing",
             "/login",
             "/register",
-            "/forgot-password"
-    );
+            "/forgot",
+            "/notifications");
 
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
@@ -32,7 +32,7 @@ public class PermissionFilter implements Filter {
 
         String requestURI = req.getRequestURI();
         String contextPath = req.getContextPath();
-        
+
         String path = requestURI.substring(contextPath.length());
 
         if (path.startsWith("/css/") || path.startsWith("/js/")

@@ -1,125 +1,213 @@
 <%@ page contentType="text/html;charset=UTF-8" %>
 <!DOCTYPE html>
 <html>
-<head>
-    <jsp:include page="header.jsp"/>
-    <title>Forgot Password</title>
-    <style>
-        body {
-            margin: 0;
-            padding: 0;
-            font-family: "Segoe UI", sans-serif;
-            background: linear-gradient(135deg, #dbeafe, #eff6ff, #f9fafb);
-            height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
 
-        .container {
-            background: #ffffff;
-            padding: 35px 40px;
-            border-radius: 14px;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-            width: 360px;
-        }
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Forgot Password</title>
+        <style>
+            :root {
+                --primary-color: #2563eb;
+                --primary-hover: #1d4ed8;
+                --danger-color: #dc2626;
+                --bg-color: #f3f4f6;
+                --card-bg: #ffffff;
+                --border-color: #e5e7eb;
+                --text-main: #111827;
+                --text-muted: #6b7280;
+                --radius-lg: 12px;
+                --shadow-soft: 0 10px 25px rgba(15, 23, 42, 0.12);
+            }
 
-        h2 {
-            margin: 0 0 15px;
-            font-size: 24px;
-            font-weight: 600;
-            color: #1e3a8a;
-            text-align: center;
-        }
+            * {
+                box-sizing: border-box;
+            }
 
-        label {
-            font-size: 14px;
-            font-weight: 500;
-            color: #374151;
-        }
+            body {
+                margin: 0;
+                font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+                background: radial-gradient(circle at top left, #dbeafe 0, #eff6ff 25%, #f9fafb 60%);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                min-height: 100vh;
+                color: var(--text-main);
+            }
 
-        input[type="email"] {
-            width: 100%;
-            padding: 10px 12px;
-            margin-top: 6px;
-            margin-bottom: 18px;
-            border: 1px solid #cbd5e1;
-            border-radius: 8px;
-            font-size: 14px;
-            outline: none;
-            transition: .2s ease;
-        }
+            .auth-wrapper {
+                width: 100%;
+                max-width: 420px;
+                padding: 16px;
+            }
 
-        input[type="email"]:focus {
-            border-color: #2563eb;
-            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
-        }
+            .card {
+                background: var(--card-bg);
+                border-radius: var(--radius-lg);
+                box-shadow: var(--shadow-soft);
+                padding: 28px 26px 26px;
+                border: 1px solid var(--border-color);
+            }
 
-        button {
-            width: 100%;
-            padding: 10px;
-            border-radius: 8px;
-            border: none;
-            background: #2563eb;
-            color: white;
-            font-size: 15px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: .2s ease;
-        }
+            .card-header {
+                margin-bottom: 20px;
+                text-align: center;
+            }
 
-        button:hover {
-            background: #1d4ed8;
-        }
+            .card-header h1 {
+                margin: 0 0 6px;
+                font-size: 24px;
+                font-weight: 600;
+            }
 
-        .msg-success {
-            margin-top: 15px;
-            background: #e0f7e9;
-            padding: 10px;
-            border-radius: 6px;
-            color: #0f5132;
-            font-size: 14px;
-            border-left: 4px solid #2ecc71;
-        }
+            .card-header p {
+                margin: 0;
+                font-size: 14px;
+                color: var(--text-muted);
+            }
 
-        .msg-error {
-            margin-top: 15px;
-            background: #fde2e1;
-            padding: 10px;
-            border-radius: 6px;
-            color: #842029;
-            font-size: 14px;
-            border-left: 4px solid #e74c3c;
-        }
-    </style>
-</head>
-<body>
+            .form-group {
+                margin-bottom: 14px;
+            }
 
-<div class="container">
-    <h2>Forgot Password</h2>
+            label {
+                display: block;
+                margin-bottom: 4px;
+                font-size: 13px;
+                font-weight: 500;
+                color: var(--text-muted);
+            }
 
-    <form method="post" action="<%= request.getContextPath() %>/forgot">
-        <label>Email:</label>
-        <input type="email" name="email" placeholder="Enter your registered email" required>
+            .input-field {
+                position: relative;
+            }
 
-        <button type="submit">Reset Password</button>
-    </form>
+            .input-field input[type="email"] {
+                width: 100%;
+                padding: 9px 10px;
+                border-radius: 8px;
+                border: 1px solid var(--border-color);
+                font-size: 14px;
+                outline: none;
+                transition: border-color 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease;
+                background-color: #f9fafb;
+            }
 
-    <% 
-        String msg = (String) request.getAttribute("msg");
-        if (msg != null) { 
-    %>
-        <div class="msg-success"><%= msg %></div>
-    <% } %>
+            .input-field input:focus {
+                border-color: var(--primary-color);
+                box-shadow: 0 0 0 1px rgba(37, 99, 235, 0.14);
+                background-color: #ffffff;
+            }
 
-    <% 
-        String error = (String) request.getAttribute("error");
-        if (error != null) { 
-    %>
-        <div class="msg-error"><%= error %></div>
-    <% } %>
+            .error-message {
+                margin-bottom: 12px;
+                padding: 8px 10px;
+                border-radius: 8px;
+                background-color: #fee2e2;
+                border: 1px solid #fecaca;
+                color: var(--danger-color);
+                font-size: 13px;
+            }
 
-</div>
-<jsp:include page="footer.jsp"/>
-</body>
+            .success-message {
+                margin-bottom: 12px;
+                padding: 8px 10px;
+                border-radius: 8px;
+                background-color: #dcfce7;
+                border: 1px solid #bbf7d0;
+                color: #16a34a;
+                font-size: 13px;
+            }
+
+            .actions {
+                margin-top: 6px;
+            }
+
+            .btn-primary {
+                width: 100%;
+                padding: 9px 12px;
+                border-radius: 8px;
+                border: none;
+                background: linear-gradient(135deg, var(--primary-color), #3b82f6);
+                color: #ffffff;
+                font-weight: 600;
+                font-size: 14px;
+                cursor: pointer;
+                transition: background 0.15s ease, transform 0.05s ease, box-shadow 0.05s ease;
+                box-shadow: 0 8px 18px rgba(37, 99, 235, 0.35);
+            }
+
+            .btn-primary:hover {
+                background: linear-gradient(135deg, var(--primary-hover), #2563eb);
+                transform: translateY(-1px);
+                box-shadow: 0 10px 22px rgba(37, 99, 235, 0.4);
+            }
+
+            .btn-primary:active {
+                transform: translateY(0);
+                box-shadow: 0 6px 14px rgba(37, 99, 235, 0.3);
+            }
+
+            .meta {
+                margin-top: 10px;
+                text-align: center;
+                font-size: 12px;
+                color: var(--text-muted);
+            }
+
+            @media (max-width: 480px) {
+                .card {
+                    padding: 22px 18px 20px;
+                }
+            }
+        </style>
+    </head>
+
+    <body>
+        <div class="auth-wrapper">
+            <div class="card">
+                <div class="card-header">
+                    <h1>Forgot Password</h1>
+                    <p>Enter your email to request a password reset</p>
+                </div>
+
+                <% String msg = (String) request.getAttribute("msg");
+                    String error = (String) request.getAttribute("error");
+                %>
+
+                <% if (msg != null) {%>
+                <div class="success-message">
+                    <%= msg%>
+                </div>
+                <% } %>
+
+                <% if (error != null) {%>
+                <div class="error-message">
+                    <%= error%>
+                </div>
+                <% }%>
+
+                <form method="post" action="<%= request.getContextPath()%>/forgot">
+                    <div class="form-group">
+                        <label for="email">Email Address</label>
+                        <div class="input-field">
+                            <input type="email" id="email" name="email"
+                                   placeholder="Enter your registered email" required>
+                        </div>
+                    </div>
+
+                    <div class="actions">
+                        <button type="submit" class="btn-primary">Reset Password</button>
+                    </div>
+                    <div class="meta">
+                        <a href="<%= request.getContextPath()%>/login"
+                           style="color: var(--primary-color); text-decoration: none;">
+                            Back to Login
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </body>
+
 </html>
