@@ -345,6 +345,54 @@ public class UserDAO extends DBContext {
         return false;
     }
 
+    /**
+     * Update password_changed_at timestamp when password changes
+     * Used to invalidate all active sessions
+     */
+    public boolean updatePasswordChangedAt(int userId) {
+        String sql = "UPDATE users SET password_changed_at = CURRENT_TIMESTAMP WHERE user_id = ?";
+        try (Connection conn = getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, userId);
+            return ps.executeUpdate() > 0;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    /**
+     * Get password_changed_at timestamp for session validation
+     */
+    public Timestamp getPasswordChangedAt(int userId) {
+        String sql = "SELECT password_changed_at FROM users WHERE user_id = ?";
+        try (Connection conn = getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, userId);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                return rs.getTimestamp("password_changed_at");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    /**
+     * Get email of first active Admin for notifications
+     */
+    public String getAdminEmail() {
+        String sql = "SELECT email FROM users WHERE role_id = 1 AND status = 'active' LIMIT 1";
+        try (Connection conn = getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                return rs.getString("email");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
     // Test method
     public static void main(String[] args) {
         UserDAO userDAO = new UserDAO();

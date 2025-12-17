@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-@WebServlet(name = "LoginServlet", urlPatterns = {"/login"})
+@WebServlet(name = "LoginServlet", urlPatterns = { "/login" })
 public class LoginServlet extends HttpServlet {
 
     @Override
@@ -52,11 +52,13 @@ public class LoginServlet extends HttpServlet {
                 userDao.updateLastLogin(user.getUserId());
                 PermissionDAO permissionDAO = new PermissionDAO();
                 List<String> userPermissions = permissionDAO.getPermissionUrlsByRoleId(user.getRoleId());
-                
+
                 HttpSession session = request.getSession();
                 session.setAttribute("username", user.getUsername());
                 session.setAttribute("fullName", user.getFullName());
-                session.setAttribute("currentUser", user);                
+                session.setAttribute("currentUser", user);
+                session.setAttribute("sessionCreatedAt", System.currentTimeMillis()); // NEW: Track session creation
+                                                                                      // time
                 session.setAttribute("userPermissions", userPermissions);
                 response.sendRedirect(request.getContextPath() + "/landing");
             } catch (Exception ex) {

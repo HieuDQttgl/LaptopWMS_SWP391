@@ -14,7 +14,7 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
-@WebServlet(name = "ChangePasswordServlet", urlPatterns = {"/change-password"})
+@WebServlet(name = "ChangePasswordServlet", urlPatterns = { "/change-password" })
 public class ChangePasswordServlet extends HttpServlet {
 
     @Override
@@ -39,25 +39,44 @@ public class ChangePasswordServlet extends HttpServlet {
         String newPass = request.getParameter("newPassword");
         String confirm = request.getParameter("confirmPassword");
 
+        // Validation 1: Check current password is correct
         if (!currentUser.getPassword().equals(currentPass)) {
             request.setAttribute("error", "Current password is incorrect.");
             request.getRequestDispatcher("change-password.jsp").forward(request, response);
             return;
         }
 
+        // Validation 2: Check new passwords match
         if (!newPass.equals(confirm)) {
             request.setAttribute("error", "New passwords do not match.");
             request.getRequestDispatcher("change-password.jsp").forward(request, response);
             return;
         }
 
+        // NEW Validation 3: New password must be different from current
+        if (newPass.equals(currentPass)) {
+            request.setAttribute("error", "New password must be different from current password.");
+            request.getRequestDispatcher("change-password.jsp").forward(request, response);
+            return;
+        }
+
+        // Update password in database
         UserDAO dao = new UserDAO();
-        dao.updatePassword(currentUser.getUserId(), newPass);
+        boolean success = dao.updatePassword(currentUser.getUserId(), newPass);
 
-        currentUser.setPassword(newPass);
-        request.getSession().setAttribute("currentUser", currentUser);
+        if (success) {
+            // NEW: Update password_changed_at timestamp to invalidate all old sessions
+            dao.updatePasswordChangedAt(currentUser.getUserId());
 
-        request.setAttribute("msg", "Password changed successfully!");
-        request.getRequestDispatcher("change-password.jsp").forward(request, response);
+            // NEW: Logout - Invalidate current session
+            request.getSession().invalidate();
+
+            // NEW: Redirect to login with success message
+            response.sendRedirect(request.getContextPath() +
+                    "/login?msg=Password changed successfully. Please login with your new password.");
+        } else {
+            request.setAttribute("error", "Failed to update password. Please try again.");
+            request.getRequestDispatcher("change-password.jsp").forward(request, response);
+        }
     }
 }
