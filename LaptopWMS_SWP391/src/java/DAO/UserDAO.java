@@ -11,8 +11,9 @@ import java.sql.Timestamp;
 public class UserDAO extends DBContext {
 
     public List<Users> getListUsers() {
-        return getListUsers(null, null, null, null, "user_id", "ASC");
+        return getListUsers(null, null, null, null, "user_id", "ASC", 0, Integer.MAX_VALUE);
     }
+
 
     public List<Users> getListUsers(
             String keyword,
@@ -20,15 +21,16 @@ public class UserDAO extends DBContext {
             Integer roleIdFilter,
             String statusFilter,
             String sortField,
-            String sortOrder) {
+            String sortOrder,
+            int offset,
+            int limit) {
 
         List<Users> users = new ArrayList<>();
         List<Object> params = new ArrayList<>();
-
         StringBuilder sql = new StringBuilder(
                 "SELECT u.*, r.role_name "
-                        + "FROM users u JOIN roles r ON u.role_id = r.role_id "
-                        + "WHERE 1=1 ");
+                + "FROM users u JOIN roles r ON u.role_id = r.role_id "
+                + "WHERE 1=1 ");
 
         if (keyword != null && !keyword.trim().isEmpty()) {
             sql.append("AND (u.full_name LIKE ? OR u.email LIKE ? OR u.phone_number LIKE ?) ");
@@ -37,17 +39,14 @@ public class UserDAO extends DBContext {
             params.add(wildcardKeyword);
             params.add(wildcardKeyword);
         }
-
         if (genderFilter != null && !genderFilter.equalsIgnoreCase("all")) {
             sql.append("AND u.gender = ? ");
             params.add(genderFilter);
         }
-
         if (roleIdFilter != null && roleIdFilter > 0) {
             sql.append("AND u.role_id = ? ");
             params.add(roleIdFilter);
         }
-
         if (statusFilter != null && !statusFilter.equalsIgnoreCase("all")) {
             sql.append("AND u.status = ? ");
             params.add(statusFilter);
@@ -56,14 +55,17 @@ public class UserDAO extends DBContext {
         String safeSortField = (sortField != null && !sortField.isEmpty()) ? sortField : "user_id";
         String safeSortOrder = (sortOrder != null && sortOrder.equalsIgnoreCase("DESC")) ? "DESC" : "ASC";
         String finalSortField = safeSortField.equals("role_name") ? "r.role_name" : "u." + safeSortField;
+        sql.append(String.format("ORDER BY %s %s ", finalSortField, safeSortOrder));
 
-        sql.append(String.format("ORDER BY %s %s", finalSortField, safeSortOrder));
+        sql.append("LIMIT ? OFFSET ?");
 
         try (Connection conn = getConnection(); PreparedStatement ps = conn.prepareStatement(sql.toString())) {
 
             for (int i = 0; i < params.size(); i++) {
                 ps.setObject(i + 1, params.get(i));
             }
+            ps.setInt(params.size() + 1, limit);
+            ps.setInt(params.size() + 2, offset);
 
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
@@ -82,15 +84,61 @@ public class UserDAO extends DBContext {
                             rs.getTimestamp("updated_at"),
                             rs.getObject("created_by", Integer.class));
                     user.setRoleName(rs.getString("role_name"));
-
                     users.add(user);
                 }
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
-
         return users;
+    }
+    
+    public int getTotalUsers(
+            String keyword,
+            String genderFilter,
+            Integer roleIdFilter,
+            String statusFilter) {
+
+        int total = 0;
+        List<Object> params = new ArrayList<>();
+        StringBuilder sql = new StringBuilder(
+                "SELECT COUNT(*) "
+                + "FROM users u JOIN roles r ON u.role_id = r.role_id "
+                + "WHERE 1=1 ");
+
+        if (keyword != null && !keyword.trim().isEmpty()) {
+            sql.append("AND (u.full_name LIKE ? OR u.email LIKE ? OR u.phone_number LIKE ?) ");
+            String wildcardKeyword = "%" + keyword.trim() + "%";
+            params.add(wildcardKeyword);
+            params.add(wildcardKeyword);
+            params.add(wildcardKeyword);
+        }
+        if (genderFilter != null && !genderFilter.equalsIgnoreCase("all")) {
+            sql.append("AND u.gender = ? ");
+            params.add(genderFilter);
+        }
+        if (roleIdFilter != null && roleIdFilter > 0) {
+            sql.append("AND u.role_id = ? ");
+            params.add(roleIdFilter);
+        }
+        if (statusFilter != null && !statusFilter.equalsIgnoreCase("all")) {
+            sql.append("AND u.status = ? ");
+            params.add(statusFilter);
+        }
+
+        try (Connection conn = getConnection(); PreparedStatement ps = conn.prepareStatement(sql.toString())) {
+            for (int i = 0; i < params.size(); i++) {
+                ps.setObject(i + 1, params.get(i));
+            }
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    total = rs.getInt(1);
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return total;
     }
 
     public boolean addNew(Users user) {
@@ -346,8 +394,8 @@ public class UserDAO extends DBContext {
     }
 
     /**
-     * Update password_changed_at timestamp when password changes
-     * Used to invalidate all active sessions
+     * Update password_changed_at timestamp when password changes Used to
+     * invalidate all active sessions
      */
     public boolean updatePasswordChangedAt(int userId) {
         String sql = "UPDATE users SET password_changed_at = CURRENT_TIMESTAMP WHERE user_id = ?";

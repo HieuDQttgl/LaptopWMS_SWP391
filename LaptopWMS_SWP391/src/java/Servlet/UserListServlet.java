@@ -39,15 +39,15 @@ public class UserListServlet extends HttpServlet {
             request.getRequestDispatcher("/landing").forward(request, response);
             return;
         }
-           
+
         String action = request.getParameter("action");
         String userIdStr = request.getParameter("id");
-           
+
         if ("changeStatus".equals(action) && userIdStr != null && !userIdStr.isEmpty()) {
             handleStatusChangeAndRedirect(request, response, session);
             return;
         }
-        
+
         loadUserListAndForward(request, response);
     }
 
@@ -79,68 +79,91 @@ public class UserListServlet extends HttpServlet {
 
         response.sendRedirect(request.getContextPath() + "/user-list");
     }
-    
 
-    private void loadUserListAndForward(HttpServletRequest request, HttpServletResponse response) 
-        throws ServletException, IOException {
-    
-    String keyword = request.getParameter("keyword");
-    String genderFilter = request.getParameter("gender_filter");
-    String statusFilter = request.getParameter("status_filter");
+    private void loadUserListAndForward(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
 
-    String roleIdFilterStr = request.getParameter("role_filter");
-    Integer roleIdFilter = null;
-    try {
-        if (roleIdFilterStr != null && !roleIdFilterStr.isEmpty() && !roleIdFilterStr.equals("0")) {
-            roleIdFilter = Integer.valueOf(roleIdFilterStr);
+        String keyword = request.getParameter("keyword");
+        String genderFilter = request.getParameter("gender_filter");
+        String statusFilter = request.getParameter("status_filter");
+
+        String roleIdFilterStr = request.getParameter("role_filter");
+        Integer roleIdFilter = null;
+        try {
+            if (roleIdFilterStr != null && !roleIdFilterStr.isEmpty() && !roleIdFilterStr.equals("0")) {
+                roleIdFilter = Integer.valueOf(roleIdFilterStr);
+            }
+        } catch (NumberFormatException e) {
         }
-    } catch (NumberFormatException e) {
 
+        String sortField = request.getParameter("sort_field");
+        String sortOrder = request.getParameter("sort_order");
+
+        if (sortField == null || sortField.isEmpty()) {
+            sortField = "user_id";
+        }
+        if (sortOrder == null || sortOrder.isEmpty() || (!"ASC".equalsIgnoreCase(sortOrder) && !"DESC".equalsIgnoreCase(sortOrder))) {
+            sortOrder = "ASC";
+        }
+
+        int page = 1;
+        int recordsPerPage = 2;
+
+        String pageStr = request.getParameter("page");
+        if (pageStr != null && !pageStr.isEmpty()) {
+            try {
+                page = Integer.parseInt(pageStr);
+                if (page < 1) {
+                    page = 1;
+                }
+            } catch (NumberFormatException e) {
+                page = 1;
+            }
+        }
+
+        int offset = (page - 1) * recordsPerPage;
+
+        int totalRecords = userDAO.getTotalUsers(keyword, genderFilter, roleIdFilter, statusFilter);
+        int totalPages = (int) Math.ceil((double) totalRecords / recordsPerPage);
+
+        List<Users> users = userDAO.getListUsers(
+                keyword,
+                genderFilter,
+                roleIdFilter,
+                statusFilter,
+                sortField,
+                sortOrder,
+                offset,
+                recordsPerPage
+        );
+
+        try {
+            List<Role> allRoles = roleDAO.getAllRoles();
+            request.setAttribute("allRoles", allRoles);
+        } catch (Exception e) {
+            e.printStackTrace();
+            request.setAttribute("error", "Failed to load filter options.");
+        }
+
+        request.setAttribute("users", users);
+        request.setAttribute("keyword", keyword);
+        request.setAttribute("gender_filter", genderFilter);
+        request.setAttribute("role_filter", roleIdFilterStr);
+        request.setAttribute("status_filter", statusFilter);
+        request.setAttribute("sort_field", sortField);
+        request.setAttribute("sort_order", sortOrder);
+
+        request.setAttribute("currentPage", page);
+        request.setAttribute("totalPages", totalPages);
+        request.setAttribute("totalRecords", totalRecords);
+        request.setAttribute("recordsPerPage", recordsPerPage);
+
+        request.getRequestDispatcher("/user-list.jsp").forward(request, response);
     }
 
-    String sortField = request.getParameter("sort_field");
-    String sortOrder = request.getParameter("sort_order");
-
-    if (sortField == null || sortField.isEmpty()) {
-        sortField = "user_id";
-    }
-    if (sortOrder == null || sortOrder.isEmpty() || (!"ASC".equalsIgnoreCase(sortOrder) && !"DESC".equalsIgnoreCase(sortOrder))) {
-        sortOrder = "ASC";
-    }
-
-    List<Users> users = userDAO.getListUsers(
-            keyword,
-            genderFilter,
-            roleIdFilter,
-            statusFilter,
-            sortField,
-            sortOrder
-    );
-
-    try {
-        List<Role> allRoles = roleDAO.getAllRoles();
-
-        request.setAttribute("allRoles", allRoles);
-        
-    } catch (Exception e) {
-        e.printStackTrace();
-        request.setAttribute("error", "Failed to load filter options.");
-    }
-    
-    request.setAttribute("users", users);
-    request.setAttribute("keyword", keyword);
-    request.setAttribute("gender_filter", genderFilter);
-    request.setAttribute("role_filter", roleIdFilterStr);
-    request.setAttribute("status_filter", statusFilter);
-    request.setAttribute("sort_field", sortField);
-    request.setAttribute("sort_order", sortOrder);
-
-    request.getRequestDispatcher("/user-list.jsp").forward(request, response);
-}
-    
     private void handleAddUser(HttpServletRequest request, HttpServletResponse response, Users currentUser, HttpSession session)
             throws ServletException, IOException {
-        
+
         String username = request.getParameter("username");
         String password = request.getParameter("password");
         String fullName = request.getParameter("fullName");
@@ -159,7 +182,7 @@ public class UserListServlet extends HttpServlet {
 
         Map<String, String> errors = new HashMap<>();
         int roleId = -1;
-        
+
         if (roleIdStr == null || roleIdStr.trim().isEmpty()) {
             errors.put("roleId", "Role ID is required.");
         } else {
@@ -173,11 +196,11 @@ public class UserListServlet extends HttpServlet {
                 errors.put("roleId", "Role ID must be a number.");
             }
         }
-        
+
         if (username != null && !username.trim().isEmpty() && userDAO.isUsernameExists(username)) {
             errors.put("username", "This username is already taken.");
         }
-        
+
         if (email != null && !email.trim().isEmpty() && userDAO.isEmailExists(email)) {
             errors.put("email", "This email is already taken.");
         }
@@ -185,7 +208,7 @@ public class UserListServlet extends HttpServlet {
         if (!errors.isEmpty()) {
             request.setAttribute("errors", errors);
             request.setAttribute("tempUser", tempUser);
-            
+
             loadUserListAndForward(request, response);
             return;
         }
@@ -223,10 +246,10 @@ public class UserListServlet extends HttpServlet {
 
     private void handleStatusChangeAndRedirect(HttpServletRequest request, HttpServletResponse response, HttpSession session)
             throws IOException {
-           
+
         String userIdStr = request.getParameter("id");
         int userId = -1;
-           
+
         try {
             userId = Integer.parseInt(userIdStr);
             Users userToChange = userDAO.getUserById(userId);
@@ -237,7 +260,7 @@ public class UserListServlet extends HttpServlet {
                 String currentStatus = userToChange.getStatus();
                 String newStatus = "active".equalsIgnoreCase(currentStatus) ? "inactive" : "active";
 
-                String username = userDAO.updateStatus(userId, newStatus); 
+                String username = userDAO.updateStatus(userId, newStatus);
 
                 if (username != null) {
                     session.setAttribute("message", "Status for user " + username + " successfully changed to '" + newStatus + "'.");

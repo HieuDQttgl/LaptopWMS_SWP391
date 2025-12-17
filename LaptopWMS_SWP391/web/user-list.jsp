@@ -118,7 +118,7 @@
                 gap: 10px;
                 margin-top: 20px;
             }
-            
+
             .btn-close {
                 background-color: #95a5a6;
                 color: white;
@@ -288,6 +288,39 @@
             th a:hover {
                 text-decoration: underline;
             }
+            .pagination {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                gap: 8px;
+                margin: 25px 0;
+                flex-wrap: wrap;
+            }
+            .pagination a,
+            .pagination span {
+                padding: 8px 12px;
+                border: 1px solid #ddd;
+                border-radius: 4px;
+                text-decoration: none;
+                color: #2c3e50;
+                font-weight: 600;
+                transition: all 0.3s;
+            }
+            .pagination a:hover {
+                background-color: #3498db;
+                color: white;
+                border-color: #3498db;
+            }
+            .pagination .current-page {
+                background-color: #3498db;
+                color: white;
+                border-color: #3498db;
+            }
+            .pagination .disabled {
+                color: #bdc3c7;
+                cursor: not-allowed;
+                pointer-events: none;
+            }
         </style>
     </head>
     <body>
@@ -369,11 +402,12 @@
                     </div>
 
                     <div class="filter-group">
-                        <select name="role_filter" id="roleFilter" onchange="this.form.submit()" style="padding: 6px; border: 1px solid #ccc; border-radius: 4px;">
-                            <option value="0" ${currentRole == '0' ? 'selected' : ''}>All Roles</option>
+                        <select name="role_filter" id="roleFilter" onchange="this.form.submit()" 
+                                style="padding: 6px; border: 1px solid #ccc; border-radius: 4px;">
+                            <option value="0" ${empty role_filter || role_filter == '0' ? 'selected' : ''}>All Roles</option>
                             <c:forEach var="r" items="${allRoles}">
                                 <c:if test="${r.status eq 'active'}">
-                                    <option value="${r.roleId}" ${currentRole == r.roleId ? 'selected' : ''}>
+                                    <option value="${r.roleId}" ${role_filter == r.roleId.toString() ? 'selected' : ''}>
                                         ${r.roleName}
                                     </option>
                                 </c:if>
@@ -621,7 +655,76 @@
                 </tbody>
             </table>
 
-            <p id="totalUsers" style="margin-top: 20px; color: #7f8c8d; display: <%= showFormOnLoad ? "none" : "block"%>;">Total Users: <%= users != null ? users.size() : 0%></p>
+            <%
+                Integer currentPage = (Integer) request.getAttribute("currentPage");
+                Integer totalPages = (Integer) request.getAttribute("totalPages");
+                Integer totalRecords = (Integer) request.getAttribute("totalRecords");
+
+                if (currentPage == null) {
+                    currentPage = 1;
+                }
+                if (totalPages == null) {
+                    totalPages = 1;
+                }
+                if (totalRecords == null)
+                    totalRecords = 0;
+            %>
+
+            <div class="pagination" id="paginationContainer">
+                <% if (currentPage > 1) {%>
+                <a href="#" onclick="window.location.href = createPaginationUrl(<%= currentPage - 1%>); return false;">« Previous</a>
+                <% } else { %>
+                <span class="disabled">« Previous</span>
+                <% } %>
+
+                <%
+                    int startPage = Math.max(1, currentPage - 2);
+                    int endPage = Math.min(totalPages, currentPage + 2);
+                    if (startPage > 1) {
+                %>
+                <a href="#" onclick="window.location.href = createPaginationUrl(1); return false;">1</a>
+                <% if (startPage > 2) { %>
+                <span>...</span>
+                <% } %>
+                <% } %>
+
+                <% for (int i = startPage; i <= endPage; i++) { %>
+                <% if (i == currentPage) {%>
+                <span class="current-page"><%= i%></span>
+                <% } else {%>
+                <a href="#" onclick="window.location.href = createPaginationUrl(<%= i%>); return false;"><%= i%></a>
+                <% } %>
+                <% } %>
+
+                <% if (endPage < totalPages) { %>
+                <% if (endPage < totalPages - 1) { %>
+                <span>...</span>
+                <% }%>
+                <a href="#" onclick="window.location.href = createPaginationUrl(<%= totalPages%>); return false;"><%= totalPages%></a>
+                <% } %>
+
+                <% if (currentPage < totalPages) {%>
+                <a href="#" onclick="window.location.href = createPaginationUrl(<%= currentPage + 1%>); return false;">Next »</a>
+                <% } else { %>
+                <span class="disabled">Next »</span>
+                <% }%>
+
+                <%
+                    Integer recordsPerPage = (Integer) request.getAttribute("recordsPerPage");
+                    if (recordsPerPage == null)
+                        recordsPerPage = 10;
+                %>
+                <span class="pagination-info" style="margin-left: 15px; color: #7f8c8d; font-weight: 600;">
+                    Showing
+                    <%= Math.min((currentPage - 1) * recordsPerPage + 1, totalRecords)%>
+                    -
+                    <%= Math.min(currentPage * recordsPerPage, totalRecords)%>
+                    of
+                    <%= totalRecords%>
+                    users
+                </span>
+            </div>
+
             <a id="backLanding" href="<%= request.getContextPath()%>/landing" class="btn-secondary" style="color: #34495e; text-decoration: none; font-weight: 600; display: <%= showFormOnLoad ? "none" : "block"%>;">Back to Landing Page</a>
         </div>
 
@@ -633,6 +736,7 @@
             var totalUsersParagraph = document.getElementById('totalUsers');
             var backLandingLink = document.getElementById('backLanding');
             var filterContainer = document.getElementById('filterContainer');
+            var paginationContainer = document.getElementById('paginationContainer');
 
             function hideTableElements() {
                 if (userTable)
@@ -643,6 +747,8 @@
                     backLandingLink.style.display = 'none';
                 if (filterContainer)
                     filterContainer.style.display = 'none';
+                if (paginationContainer)
+                    paginationContainer.style.display = 'none';
             }
 
             function showTableElements() {
@@ -654,6 +760,8 @@
                     backLandingLink.style.display = 'block';
                 if (filterContainer)
                     filterContainer.style.display = 'flex';
+                if (paginationContainer)
+                    paginationContainer.style.display = 'flex';
             }
 
             function hideAddForm() {
@@ -731,7 +839,7 @@
             function clearErrors() {
                 const errorSpans = document.querySelectorAll('.field-error');
                 errorSpans.forEach(span => {
-                    if (span.id.endsWith('Error')) { // Chỉ xóa các span lỗi front-end
+                    if (span.id.endsWith('Error')) {
                         span.innerText = '';
                     }
                 });
@@ -788,6 +896,38 @@
                 }
 
                 return isValid;
+            }
+            function createPaginationUrl(page) {
+                var keyword = document.getElementById('keywordFilter').value;
+                var gender = document.getElementById('genderFilter').value;
+                var role = document.getElementById('roleFilter').value;
+                var status = document.getElementById('statusFilter').value;
+
+                var currentSortField = '<%= currentSortField%>';
+                var currentSortOrder = '<%= currentSortOrder%>';
+
+                var url = 'user-list?page=' + page;
+
+                if (keyword && keyword.trim() !== '') {
+                    url += '&keyword=' + encodeURIComponent(keyword.trim());
+                }
+                if (gender && gender !== 'all') {
+                    url += '&gender_filter=' + gender;
+                }
+                if (role && role !== '0') {
+                    url += '&role_filter=' + role;
+                }
+                if (status && status !== 'all') {
+                    url += '&status_filter=' + status;
+                }
+                if (currentSortField) {
+                    url += '&sort_field=' + currentSortField;
+                }
+                if (currentSortOrder) {
+                    url += '&sort_order=' + currentSortOrder;
+                }
+
+                return url;
             }
         </script>
         <jsp:include page="footer.jsp"/>
