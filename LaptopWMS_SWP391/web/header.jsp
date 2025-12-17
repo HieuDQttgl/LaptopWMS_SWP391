@@ -6,8 +6,8 @@
 <% Users currentUser = (Users) session.getAttribute("currentUser");
     int roleId = -1;
     if (currentUser != null) {
-                    roleId = currentUser.getRoleId();
-                }%>
+        roleId = currentUser.getRoleId();
+    }%>
 <style>
     .header {
         display: flex;
@@ -39,17 +39,19 @@
         <a href="#hero">About</a>
         <% if (currentUser != null) {%>
         <a href="<%= request.getContextPath()%>/profile">Profile</a>
-        <a href="<%= request.getContextPath()%>/product-list">Products</a>
-        <a href="<%= request.getContextPath()%>/order-list">Orders</a>
         <% if (roleId == 1) {%>
-        <a href="<%= request.getContextPath()%>/user-list">User</a>
-        <a href="<%= request.getContextPath()%>/role">Role</a>
+        <a href="<%= request.getContextPath()%>/user-list">Users</a>
+        <a href="<%= request.getContextPath()%>/role">Roles</a>
         <% } %>
-        <% if (roleId == 1 || roleId == 2) {%>
-        <a href="<%= request.getContextPath()%>/supplier-list">Supplier</a>
+        <% if (roleId == 2) {%>
+        <a href="<%= request.getContextPath()%>/profile">Profile</a>
+        <a href="<%= request.getContextPath()%>/product-list">Products</a>
+        <a href="<%= request.getContextPath()%>/order-list">Orders</a>  
         <% }%>
-        <% if (roleId == 1 || roleId == 7) {%>
-        <a href="<%= request.getContextPath()%>/customer-list">Customer</a>
+        <% if (roleId == 3) {%>
+        <a href="<%= request.getContextPath()%>/order-list">Orders</a>  
+        <a href="<%= request.getContextPath()%>/customer-list">Customers</a>
+        <a href="<%= request.getContextPath()%>/supplier-list">Suppliers</a>
         <% }%>
         <a href="<%= request.getContextPath()%>/logout">Logout</a>
         <% } else {%>

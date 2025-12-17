@@ -293,10 +293,10 @@
             <% String successMessage = (String) request.getSession().getAttribute("message");
                 String errorMessage = (String) request.getSession().getAttribute("error");
                 Users currentUser = (Users) request.getAttribute("currentUser");
-                boolean isAdmin = currentUser
-                        != null && currentUser.getRoleId() == 1;
+                boolean isSale = currentUser
+                        != null && currentUser.getRoleId() == 3;
                 boolean canChangeStatus = currentUser != null
-                        && (currentUser.getRoleId() == 1 || currentUser.getRoleId() == 2);
+                        && (currentUser.getRoleId() == 3);
                 String currentKeyword = (String) request.getAttribute("keyword");
                 String currentStatus = (String) request.getAttribute("status_filter");
                 String currentSortField = (String) request.getAttribute("sort_field");
@@ -325,7 +325,7 @@
             <% request.getSession().removeAttribute("message");
                                         } %>
 
-            <% if (isAdmin) {%>
+            <% if (isSale) {%>
             <a href="<%= request.getContextPath()%>/add-supplier" class="btn-add">Add
                 New Supplier</a>
                 <% }%>

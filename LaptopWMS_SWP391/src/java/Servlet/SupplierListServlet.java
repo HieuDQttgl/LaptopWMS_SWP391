@@ -21,8 +21,7 @@ import java.util.HashMap;
 @WebServlet(name = "SupplierListServlet", urlPatterns = { "/supplier-list" })
 public class SupplierListServlet extends HttpServlet {
 
-    private static final int ADMIN_ROLE_ID = 1;
-    private static final int WAREHOUSE_ROLE_ID = 2;
+    private static final int SALE_ROLE_ID = 3;
     private SupplierDAO supplierDAO = new SupplierDAO();
 
     @Override
@@ -38,7 +37,7 @@ public class SupplierListServlet extends HttpServlet {
         Users currentUser = (Users) session.getAttribute("currentUser");
 
         // Only Admin and Warehouse Keeper can view suppliers
-        if (currentUser.getRoleId() != ADMIN_ROLE_ID && currentUser.getRoleId() != WAREHOUSE_ROLE_ID) {
+        if (currentUser.getRoleId() != SALE_ROLE_ID) {
             request.setAttribute("error", "Access denied: You do not have permission to view this page.");
             request.getRequestDispatcher("/landing").forward(request, response);
             return;
@@ -130,8 +129,8 @@ public class SupplierListServlet extends HttpServlet {
         // Check access for specific actions
         if ("add".equals(action)) {
             // Only Admin can add suppliers
-            if (roleId != ADMIN_ROLE_ID) {
-                session.setAttribute("error", "Access denied: Only Admin can add suppliers.");
+            if (roleId != SALE_ROLE_ID) {
+                session.setAttribute("error", "Access denied: Only Sale can add suppliers.");
                 response.sendRedirect(request.getContextPath() + "/supplier-list");
                 return;
             }
@@ -141,7 +140,7 @@ public class SupplierListServlet extends HttpServlet {
 
         if ("changeStatus".equals(action)) {
             // Admin and Warehouse Keeper can change status
-            if (roleId != ADMIN_ROLE_ID && roleId != WAREHOUSE_ROLE_ID) {
+            if (roleId != SALE_ROLE_ID) {
                 session.setAttribute("error", "Access denied: You do not have permission to change supplier status.");
                 response.sendRedirect(request.getContextPath() + "/supplier-list");
                 return;
