@@ -13,12 +13,12 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.Statement;
- 
+
 public class DBContext {
     private static String DB_URL = "jdbc:mysql://localhost:3306/laptop_wms";
     private static String USER_NAME = "root";
-    private static String PASSWORD = "";
- 
+    private static String PASSWORD = "2312004lamvt";
+
     public static void main(String args[]) {
         try {
             // connect to database
@@ -29,7 +29,7 @@ public class DBContext {
             ResultSet rs = stmt.executeQuery("select * from users");
             // show data
             while (rs.next()) {
-                System.out.println(rs.getInt(1) + "  " + rs.getString(2) 
+                System.out.println(rs.getInt(1) + "  " + rs.getString(2)
                         + "  " + rs.getString(3));
             }
             // close connection
@@ -38,8 +38,8 @@ public class DBContext {
             ex.printStackTrace();
         }
     }
- 
- 
+
+
     public static Connection getConnection() {
         Connection conn = null;
         try {
