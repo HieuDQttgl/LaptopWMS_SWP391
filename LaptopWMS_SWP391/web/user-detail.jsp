@@ -1,6 +1,7 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ page import="Model.Users" %>
 <%@ page import="Model.Role" %>
+<%@ page import="java.util.List" %>
 <%@ page import="java.text.SimpleDateFormat" %>
 <!DOCTYPE html>
 <html>
@@ -294,19 +295,22 @@
                 <% } %>
 
                 <% if (user != null) {
-                        SimpleDateFormat sdf = new SimpleDateFormat(
-                                "dd/MM/yyyy HH:mm:ss");
+                        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
                         Role role = (Role) request.getAttribute("role");
                         Users creator = (Users) request.getAttribute("creator");
-                        String username = user.getUsername() != null ? user.getUsername() : "";
+                        String username = user.getUsername()
+                                != null ? user.getUsername() : "";
                         String fullName = user.getFullName() != null ? user.getFullName() : "";
                         String email = user.getEmail() != null ? user.getEmail() : "";
-                        String phoneNumber = user.getPhoneNumber() != null ? user.getPhoneNumber() : "";
+                        String phoneNumber = user.getPhoneNumber() != null ? user.getPhoneNumber()
+                                : "";
                         String gender = user.getGender() != null ? user.getGender() : "";%>
 
-                <form method="post" action="<%= request.getContextPath()%>/user-detail"
+                <form method="post"
+                      action="<%= request.getContextPath()%>/user-detail"
                       id="userForm">
-                    <input type="hidden" name="userId" value="<%= user.getUserId()%>">
+                    <input type="hidden" name="userId"
+                           value="<%= user.getUserId()%>">
 
                     <div class="detail-body">
                         <div class="field-group">
@@ -326,8 +330,9 @@
                         <% if (isAdmin) {%>
                         <div class="field-group edit-mode">
                             <span class="field-label">Username</span>
-                            <input type="text" name="username" class="field-input"
-                                   value="<%= username%>" required>
+                            <input type="text" name="username"
+                                   class="field-input" value="<%= username%>"
+                                   required>
                         </div>
                         <% }%>
 
@@ -342,7 +347,8 @@
                         <div class="field-group edit-mode">
                             <span class="field-label">Full Name</span>
                             <input type="text" name="fullName"
-                                   class="field-input" value="<%= fullName%>">
+                                   class="field-input"
+                                   value="<%= fullName%>">
                         </div>
                         <% }%>
 
@@ -355,7 +361,8 @@
                         </div>
                         <% if (isAdmin) {%>
                         <div class="field-group edit-mode">
-                            <span class="field-label">Email</span>
+                            <span
+                                class="field-label">Email</span>
                             <input type="email" name="email"
                                    class="field-input"
                                    value="<%= email%>">
@@ -367,13 +374,15 @@
                             <span class="field-label">Phone
                                 Number</span>
                             <span class="field-value">
-                                <%= phoneNumber.isEmpty() ? "—"
-                                        : phoneNumber%>
+                                <%= phoneNumber.isEmpty()
+                                        ? "—" : phoneNumber%>
                             </span>
                         </div>
                         <% if (isAdmin) {%>
-                        <div class="field-group edit-mode">
-                            <span class="field-label">Phone
+                        <div
+                            class="field-group edit-mode">
+                            <span
+                                class="field-label">Phone
                                 Number</span>
                             <input type="text"
                                    name="phoneNumber"
@@ -387,7 +396,8 @@
                             class="field-group view-mode">
                             <span
                                 class="field-label">Gender</span>
-                            <span class="field-value">
+                            <span
+                                class="field-value">
                                 <%= gender.isEmpty()
                                         ? "—" : gender%>
                             </span>
@@ -397,49 +407,123 @@
                             class="field-group edit-mode">
                             <span
                                 class="field-label">Gender</span>
-                            <select name="gender"
-                                    class="field-select">
+                            <select
+                                name="gender"
+                                class="field-select">
                                     <option value=""
                                     <%=gender.isEmpty()
                                                 ? "selected"
                                                 : ""%>>—
                                 </option>
-                                        <option value="Male"
+                                <option
+                                    value="Male"
                                     <%="Male"
-                                                .equals(gender)
-                                                ? "selected"
-                                                : ""%>>Male
+                                            .equals(gender)
+                                            ? "selected"
+                                            : ""%>>Male
                                 </option>
                                 <option
                                     value="Female"
                                     <%="Female"
                                             .equals(gender)
                                             ? "selected"
-                                            : ""%>>Female
+                                            : ""%>
+                                    >Female
                                 </option>
                                 <option
                                     value="Other"
                                     <%="Other"
                                             .equals(gender)
                                             ? "selected"
-                                            : ""%>>Other
+                                            : ""%>
+                                    >Other
                                 </option>
                             </select>
                         </div>
                         <% }%>
 
-                        <!-- Role (View Only) -->
+                        <!-- Role -->
                         <div
-                            class="field-group">
+                            class="field-group view-mode">
                             <span
                                 class="field-label">Role</span>
                             <span
                                 class="field-value">
-                                <%= role != null
-                                        ? role.getRoleName()
-                                        : "—"%>
+                                <%= role
+                                        != null
+                                                ? role.getRoleName()
+                                                : "—"%>
                             </span>
                         </div>
+                        <% // Get roles list for dropdown
+                            List<Role> roles = (List<Role>) request.getAttribute("roles");
+                            // Can edit role only if: admin is editing, target user is not admin, and not editing self
+                            boolean canEditRole
+                                    = isAdmin
+                                    && user.getRoleId()
+                                    != 1
+                                    && currentUser.getUserId()
+                                    != user.getUserId();
+                            if (canEditRole
+                                    && roles
+                                    != null) {
+                        %>
+                        <div
+                            class="field-group edit-mode">
+                            <span
+                                class="field-label">Role</span>
+                            <select
+                                name="roleId"
+                                class="field-select">
+                                <% for (Role r
+                                            : roles) {
+                                        // Don't show admin role as option
+                                        if (r.getRoleId()
+                                                != 1) {
+                                %>
+                                <option
+                                    value="<%= r.getRoleId()%>"
+                                    <%=r.getRoleId() == user.getRoleId()
+                                            ? "selected"
+                                            : ""%>
+                                    >
+                                    <%= r.getRoleName()%>
+                                </option>
+                                <% }
+                                    }
+                                %>
+                            </select>
+                        </div>
+                        <% } else if (isAdmin) {%>
+                        <div
+                            class="field-group edit-mode">
+                            <span
+                                class="field-label">Role</span>
+                            <span
+                                class="field-value"
+                                style="color: #6b7280; font-style: italic;">
+                                <%= role
+                                        != null
+                                                ? role.getRoleName()
+                                                : "—"%>
+                                <% if (user.getRoleId() == 1) {
+                                %>
+                                (Cannot
+                                change
+                                admin
+                                role)
+                                <% } else if (currentUser.getUserId() == user.getUserId()) {
+                                %>
+                                (Cannot
+                                change
+                                your
+                                own
+                                role)
+                                <% }
+                                %>
+                            </span>
+                        </div>
+                        <% }%>
 
                         <div
                             class="field-group">
@@ -529,8 +613,6 @@
                     <a href="<%= request.getContextPath()%>/user-list"
                        class="btn-secondary">Back to User List</a>
                     <% if (isAdmin) {%>
-                    <a href="<%= request.getContextPath()%>/edit-role?id=<%= user.getUserId()%>"
-                       class="btn-secondary">Edit Role</a>
                     <button type="button" onclick="enableEditMode()"
                             class="btn-primary">Edit User</button>
                     <% } %>
