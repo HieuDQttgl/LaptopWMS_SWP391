@@ -57,7 +57,6 @@ public class InventoryServlet extends HttpServlet {
         request.setAttribute("totalPages", totalPages);
         request.setAttribute("search", search);
         request.setAttribute("selectedLocation", locationId);
-
         request.getRequestDispatcher("inventory.jsp").forward(request, response);
     }
 

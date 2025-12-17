@@ -41,10 +41,9 @@ public class AddInventoryServlet extends HttpServlet {
         request.setAttribute("productDetails", details);
         request.setAttribute("productId", productId);
         request.setAttribute("locationId", locationId);
-        
         request.getRequestDispatcher("inventory-audit.jsp").forward(request, response);
     } catch (Exception e) {
-        response.sendRedirect("inventory?error=system");
+           response.sendRedirect("inventory?error=system");
     }
     }
     
