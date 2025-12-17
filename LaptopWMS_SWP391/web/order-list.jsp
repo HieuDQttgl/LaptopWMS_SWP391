@@ -222,6 +222,21 @@
             .action-links {
                 text-align: center !important;
             }
+            .btn-secondary {
+                display: inline-block;
+                padding: 10px 18px;
+                background-color: #95a5a6;
+                color: white;
+                text-decoration: none;
+                border-radius: 6px;
+                font-weight: 600;
+                margin-top: 20px;
+                transition: background-color 0.3s;
+            }
+
+            .btn-secondary:hover {
+                background-color: #7f8c8d;
+            }
         </style>
     </head>
     <body>
@@ -238,17 +253,17 @@
             </c:if>
             <c:if test="${param.success == 'status_updated'}">
                 <div class="success-box">
-                    ✅ Order <strong>${param.code}</strong> successfully changed status to <strong>${param.newStatus}</strong>!
+                    Order <strong>${param.code}</strong> successfully changed status to <strong>${param.newStatus}</strong>!
                 </div>
             </c:if>
             <c:if test="${param.error == 'transition_denied'}">
                 <div style="padding: 10px; background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; border-radius: 4px; margin-bottom: 15px;">
-                    ❌ **Permission/Business Logic Error:** You are not allowed to perform this status transition (or the transition status is invalid).
+                    **Permission/Business Logic Error:** You are not allowed to perform this status transition (or the transition status is invalid).
                 </div>
             </c:if>
             <c:if test="${param.error == 'order_not_found'}">
                 <div style="padding: 10px; background-color: #fff3cd; color: #856404; border: 1px solid #ffeeba; border-radius: 4px; margin-bottom: 15px;">
-                    ⚠️ Error: Order to be updated not found.
+                    Error: Order to be updated not found.
                 </div>
             </c:if>
             <div style="margin-bottom: 20px;">
@@ -378,12 +393,12 @@
 
                                     <td class="action-links">
                                         <a href="order-detail?id=${order.orderId}" title="View">View Detail</a>
-                                        
+
                                         <c:choose>
                                             <c:when test="${order.orderStatus == 'completed' || order.orderStatus == 'cancelled'}">
                                                 | <span style="color: #a94442; font-weight: 600;">Finalized</span>
                                             </c:when>
-                                            
+
                                             <c:otherwise>
                                                 | <a href="order-status?orderId=${order.orderId}" title="Change Status">
                                                     Change Status
@@ -404,6 +419,9 @@
                     </c:choose>
                 </tbody>
             </table>
+            <a id="backLanding"
+               href="<%= request.getContextPath()%>/landing"
+               class="btn-secondary">Back to Landing Page</a>
         </div>
 
         <jsp:include page="footer.jsp" /> 
