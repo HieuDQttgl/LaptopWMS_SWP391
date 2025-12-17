@@ -30,19 +30,15 @@ public class AddInventoryServlet extends HttpServlet {
           
         
        try {
-        int productId = Integer.parseInt(request.getParameter("productId"));
-        int locationId = Integer.parseInt(request.getParameter("locationId")); 
         
         InventoryDAO dao = new InventoryDAO();
-        List<ProductItem> items = dao.getItemsForAudit(productId);
-        List<Model.ProductDetail> details = dao.getDetailsByProductId(productId);
+        List<ProductDTO> products = dao.getProductsAvailableToAdd();
+        List<Location> locations = dao.getAllLocations();
         
-        request.setAttribute("items", items);
-        request.setAttribute("productDetails", details);
-        request.setAttribute("productId", productId);
-        request.setAttribute("locationId", locationId);
+        request.setAttribute("products", products);
+        request.setAttribute("locations", locations);
         
-        request.getRequestDispatcher("inventory-audit.jsp").forward(request, response);
+        request.getRequestDispatcher("add-inventory.jsp").forward(request, response);
     } catch (Exception e) {
         response.sendRedirect("inventory?error=system");
     }
