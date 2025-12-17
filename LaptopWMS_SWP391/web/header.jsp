@@ -47,6 +47,8 @@
         <a href="<%= request.getContextPath()%>/profile">Profile</a>
         <a href="<%= request.getContextPath()%>/product-list">Products</a>
         <a href="<%= request.getContextPath()%>/order-list">Orders</a>  
+        <a href="<%= request.getContextPath()%>/inventory">Inventory</a>  
+        
         <% }%>
         <% if (roleId == 3) {%>
         <a href="<%= request.getContextPath()%>/order-list">Orders</a>  
