@@ -175,13 +175,19 @@
                 <% String error = (String) request.getAttribute("error");
                     String usernameVal = (String) request.getAttribute("username");
                     String successMsg = (String) session.getAttribute("message");
-                    if (successMsg != null) {
-                        session.removeAttribute("message");
-                    } %>
+                    String urlMsg = request.getParameter("msg"); // NEW: Get message from URL if (successMsg !=null) {
+                    session.removeAttribute("message");
+                %>
 
                 <% if (successMsg != null) {%>
                 <div class="success-message">
                     <%= successMsg%>
+                </div>
+                <% } %>
+
+                <% if (urlMsg != null && !urlMsg.isEmpty()) {%>
+                <div class="success-message">
+                    <%= urlMsg%>
                 </div>
                 <% } %>
 
@@ -196,7 +202,8 @@
                         <label for="username">Username</label>
                         <div class="input-field">
                             <input type="text" id="username" name="username"
-                                   value="<%= usernameVal != null ? usernameVal : ""%>" required>
+                                   value="<%= usernameVal != null ? usernameVal : ""%>"
+                                   required>
                         </div>
                     </div>
 

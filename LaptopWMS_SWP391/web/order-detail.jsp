@@ -136,6 +136,7 @@
         </style>
     </head>
     <body>
+        <jsp:include page="header.jsp"/>
         
         <div class="container">
             <a href="order-list" class="back-button"><i class="fas fa-arrow-left"></i>Back </a>
@@ -221,7 +222,7 @@
                                     <td>${item.productId}</td>
                                     <td>${item.productName}</td> 
                                     <td class="text-right">${item.quantity}</td>
-                                    <td class="text-right"><fmt:formatNumber value="${item.unitPrice}" pattern="#,##0.00₫" /></td>
+                                    <td class="text-right"><fmt:formatNumber value="${item.unitPrice}" pattern="#,##0₫" /></td>
                                 </tr>
                             </c:forEach>
                         </tbody>
@@ -233,14 +234,8 @@
                     </div>
                 </c:otherwise>
             </c:choose>
-
-            <div style="margin-top: 30px; text-align: right;">
-                 <a href="order-edit?id=${order.orderId}" class="btn-primary" style="background-color: #f0ad4e;">
-                     <i class="fas fa-edit"></i> Edit
-                 </a>
-            </div>
-            
-        </div>
+        </div> 
         
+        <jsp:include page="footer.jsp"/>
     </body>
 </html>

@@ -327,7 +327,6 @@
             <table>
                 <thead>
                     <tr>
-                        <th>ID</th> 
                         <th>Order Code</th>
                         <th>Description</th>
                         <th>Customer</th>
@@ -344,7 +343,6 @@
                         <c:when test="${not empty orders}">
                             <c:forEach var="order" items="${orders}">
                                 <tr>
-                                    <td>${order.orderId}</td>
                                     <td>${order.orderCode}</td>
                                     <td>${order.description}</td>
                                     <td>
@@ -411,7 +409,7 @@
                         </c:when>
                         <c:otherwise>
                             <tr>
-                                <td colspan="10" style="text-align: center; color: #7f8c8d; padding: 20px;">
+                                <td colspan="9" style="text-align: center; color: #7f8c8d; padding: 20px;">
                                     No order found.
                                 </td>
                             </tr>

@@ -311,19 +311,19 @@
                     currentSortField = "supplier_id";
                 }
                 if (currentSortOrder == null) {
-                                    currentSortOrder = "ASC";
-                                }
-                                if (errorMessage != null) {%>
+                    currentSortOrder = "ASC";
+                }
+                if (errorMessage != null) {%>
             <p id="notification" class="message-error notification">
                 <%= errorMessage%>
             </p>
             <% request.getSession().removeAttribute("error");
-                                } else if (successMessage != null) {%>
+            } else if (successMessage != null) {%>
             <p id="notification" class="message-success notification">
                 <%= successMessage%>
             </p>
             <% request.getSession().removeAttribute("message");
-                                        } %>
+                } %>
 
             <% if (isSale) {%>
             <a href="<%= request.getContextPath()%>/add-supplier" class="btn-add">Add
@@ -344,12 +344,12 @@
                             <label for="statusFilter">Status:</label>
                             <select name="status_filter" id="statusFilter">
                                     <option value="all" <%="all".equals(currentStatus)
-                                                                            ? "selected" : ""%>>All</option>
+                                            ? "selected" : ""%>>All</option>
                                 <option value="active" <%="active"
-                                                                            .equals(currentStatus) ? "selected" : ""%>
+                                        .equals(currentStatus) ? "selected" : ""%>
                                         >Active</option>
                                 <option value="inactive" <%="inactive"
-                                                                            .equals(currentStatus) ? "selected" : ""%>
+                                        .equals(currentStatus) ? "selected" : ""%>
                                         >Inactive</option>
                             </select>
                         </div>
@@ -358,19 +358,19 @@
                             <label for="sortField">Sort By:</label>
                             <select name="sort_field" id="sortField">
                                 <option value="supplier_id" <%="supplier_id"
-                                                                            .equals(currentSortField) ? "selected" : ""%>
+                                        .equals(currentSortField) ? "selected" : ""%>
                                         >ID</option>
                                 <option value="supplier_name" <%="supplier_name"
-                                                                            .equals(currentSortField) ? "selected" : ""%>
+                                        .equals(currentSortField) ? "selected" : ""%>
                                         >Supplier Name</option>
                                 <option value="supplier_email" <%="supplier_email"
-                                                                            .equals(currentSortField) ? "selected" : ""%>
+                                        .equals(currentSortField) ? "selected" : ""%>
                                         >Email</option>
                                 <option value="supplier_phone" <%="supplier_phone"
-                                                                            .equals(currentSortField) ? "selected" : ""%>
+                                        .equals(currentSortField) ? "selected" : ""%>
                                         >Phone</option>
                                 <option value="status" <%="status"
-                                                                            .equals(currentSortField) ? "selected" : ""%>
+                                        .equals(currentSortField) ? "selected" : ""%>
                                         >Status</option>
                             </select>
                         </div>
@@ -379,10 +379,10 @@
                             <label for="sortOrder">Order:</label>
                             <select name="sort_order" id="sortOrder">
                                 <option value="ASC" <%="ASC"
-                                                                            .equals(currentSortOrder) ? "selected" : ""%>
+                                        .equals(currentSortOrder) ? "selected" : ""%>
                                         >Ascending</option>
                                 <option value="DESC" <%="DESC"
-                                                                            .equals(currentSortOrder) ? "selected" : ""%>
+                                        .equals(currentSortOrder) ? "selected" : ""%>
                                         >Descending</option>
                             </select>
                         </div>
@@ -422,11 +422,11 @@
                         </td>
                         <td>
                             <%= supplier.getSupplierEmail() != null
-                                                                                ? supplier.getSupplierEmail() : "—"%>
+                                    ? supplier.getSupplierEmail() : "—"%>
                         </td>
                         <td>
                             <%= supplier.getSupplierPhone() != null
-                                                                                ? supplier.getSupplierPhone() : "—"%>
+                                    ? supplier.getSupplierPhone() : "—"%>
                         </td>
                         <td>
                             <% if ("active".equalsIgnoreCase(supplier.getStatus())) { %>
@@ -462,7 +462,7 @@
                         </td>
                     </tr>
                     <% }
-                                                                } else {%>
+                    } else {%>
                     <tr>
                         <td colspan="6"
                             style="text-align: center; color: #7f8c8d;">
@@ -506,9 +506,9 @@
                 }
                 if (currentSortOrder != null
                         && !currentSortOrder.isEmpty()) {
-                                                        baseUrl += "sort_order="
-                                                                + currentSortOrder + "&";
-                                                    } %>
+                    baseUrl += "sort_order="
+                            + currentSortOrder + "&";
+                } %>
 
             <% if (totalPages > 1) { %>
             <div class="pagination-container">
@@ -533,7 +533,7 @@
                 <% } %>
 
                 <% for (int i = startPage; i
-                                                                                                    <= endPage; i++) { %>
+                            <= endPage; i++) { %>
                 <% if (i == currentPage) {%>
                 <span
                     class="page-current">
@@ -548,10 +548,10 @@
                 <% } %>
 
                 <% if (endPage
-                                                                                                                        < totalPages) { %>
+                            < totalPages) { %>
                 <% if (endPage
-                                                                                                                            < totalPages
-                                                                                                                            - 1) { %>
+                            < totalPages
+                            - 1) { %>
                 <span
                     class="page-disabled">...</span>
                 <% }
@@ -582,14 +582,14 @@
                     class="pagination-info">
                     Showing
                     <%= Math.min((currentPage
-                                                                                                                                                    - 1)
-                                                                                                                                                    * pageSize
-                                                                                                                                                    + 1,
-                                                                                                                                                    totalCount)%>
+                            - 1)
+                            * pageSize
+                            + 1,
+                            totalCount)%>
                     -
                     <%= Math.min(currentPage
-                                                                                                                                                        * pageSize,
-                                                                                                                                                        totalCount)%>
+                            * pageSize,
+                            totalCount)%>
                     of
                     <%= totalCount%>
                     suppliers

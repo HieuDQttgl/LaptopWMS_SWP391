@@ -203,6 +203,7 @@
                 cursor: pointer;
                 transition: background-color 0.3s;
                 font-weight: 600;
+                text-decoration: none;
             }
 
             .btn-clear:hover {
@@ -300,6 +301,23 @@
                 color: white;
             }
 
+            .btn-add {
+                background-color: #2ecc71;
+                color: white;
+                padding: 6px 14px;
+                border: none;
+                border-radius: 4px;
+                cursor: pointer;
+                font-weight: 700;
+                margin-bottom: 10px;
+                text-decoration: none;
+                display: inline-block;
+            }
+
+            .btn-add:hover {
+                background-color: #27ae60;
+            }
+
         </style>
     </head>
 
@@ -307,6 +325,8 @@
 
         <div class="container">
             <h1>Customer Management List</h1>
+
+            <a href="add-customer" class="btn-add">+ Add new customer</a>
 
             <div class="filter-container" id="filterContainer">
                 <form id="filterForm" action="${pageContext.request.contextPath}/customer-list" method="get">
@@ -335,11 +355,11 @@
                                 <option value="DESC" ${param.sort_order == 'DESC' ? 'selected' : ''}>DESC</option>
                             </select>
                         </div>
-                    </div>
 
-                    <div class="filter-actions">
-                        <button type="submit" class="btn-filter">Apply</button>
-                        <a href="${pageContext.request.contextPath}/customer-list" class="btn-clear">Clear</a>
+                        <div class="filter-group">
+                            <button type="submit" class="btn-filter">Apply</button>
+                            <a href="${pageContext.request.contextPath}/customer-list" class="btn-clear">Clear</a>
+                        </div>
                     </div>
                 </form>
 
@@ -373,7 +393,7 @@
                                         </a>
 
                                         <a class="btn btn-edit"
-                                           href="${pageContext.request.contextPath}/customer-edit?id=${c.customerId}">
+                                           href="${pageContext.request.contextPath}/edit-customer?id=${c.customerId}">
                                             Edit
                                         </a>
                                     </td>

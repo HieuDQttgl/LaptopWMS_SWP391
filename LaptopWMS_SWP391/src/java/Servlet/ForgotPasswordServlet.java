@@ -4,19 +4,17 @@
  */
 package Servlet;
 
+import DAO.NotificationDAO;
 import DAO.UserDAO;
 import Model.Users;
-import Utils.SendMail;
 import java.io.IOException;
-import java.io.PrintWriter;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import java.util.UUID;
 
-@WebServlet(name = "ForgotPasswordServlet", urlPatterns = {"/forgot"})
+@WebServlet(name = "ForgotPasswordServlet", urlPatterns = { "/forgot" })
 public class ForgotPasswordServlet extends HttpServlet {
 
     @Override
@@ -30,9 +28,9 @@ public class ForgotPasswordServlet extends HttpServlet {
             throws ServletException, IOException {
 
         String email = request.getParameter("email");
- 
-        UserDAO dao = new UserDAO();
-        Users user = dao.getUserByEmail(email);
+
+        UserDAO userDao = new UserDAO();
+        Users user = userDao.getUserByEmail(email);
 
         if (user == null) {
             request.setAttribute("error", "Email does not exist.");
@@ -40,27 +38,36 @@ public class ForgotPasswordServlet extends HttpServlet {
             return;
         }
 
-        String newPass = generateRandomPassword();
-        dao.updatePassword(user.getUserId(), newPass);
+        // Check if user is Admin - Admins cannot use this feature
+        if (user.getRoleId() == 1) {
+            request.setAttribute("error",
+                    "Admin accounts cannot use this feature. Please contact system administrator.");
+            request.getRequestDispatcher("forgot.jsp").forward(request, response);
+            return;
+        }
 
-        String loginUrl = request.getScheme() + "://"
-                + request.getServerName() + ":"
-                + request.getServerPort()
-                + request.getContextPath() + "/login";
+        // Get full user details for notification
+        Users fullUser = userDao.getUserById(user.getUserId());
 
-        String content = ""
-                + "Your new password"
-                + ". Your new password is: " + newPass + ""
-                + ". You can login here:" + loginUrl
-                + " Regards, Support Team";
+        if (fullUser == null) {
+            request.setAttribute("error", "System error: Cannot process request. Please try again.");
+            request.getRequestDispatcher("forgot.jsp").forward(request, response);
+            return;
+        }
 
-        SendMail.send(email, "Your new password", content);
+        // Create notification for admin instead of sending email
+        NotificationDAO notificationDao = new NotificationDAO();
+        boolean notificationCreated = notificationDao.createPasswordResetNotification(fullUser);
 
-        request.setAttribute("msg", "New password has been sent to your email!");
+        if (!notificationCreated) {
+            request.setAttribute("error",
+                    "System error: Cannot send notification to administrator. Please contact support.");
+            request.getRequestDispatcher("forgot.jsp").forward(request, response);
+            return;
+        }
+
+        request.setAttribute("msg",
+                "Your request has been sent to the administrator. You will receive your new password soon.");
         request.getRequestDispatcher("forgot.jsp").forward(request, response);
-    }
-
-    private String generateRandomPassword() {
-        return UUID.randomUUID().toString().substring(0, 8);
     }
 }

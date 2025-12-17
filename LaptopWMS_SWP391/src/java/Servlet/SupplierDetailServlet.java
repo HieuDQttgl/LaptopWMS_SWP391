@@ -29,7 +29,7 @@ public class SupplierDetailServlet extends HttpServlet {
 
         // Check if user has permission (Admin or Warehouse Keeper)
         int roleId = currentUser.getRoleId();
-        if (roleId != 1 && roleId != 2) {
+        if (roleId != 3) {
             response.sendRedirect(request.getContextPath() + "/landing");
             return;
         }
