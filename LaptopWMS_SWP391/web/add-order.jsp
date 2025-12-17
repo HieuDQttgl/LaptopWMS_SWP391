@@ -158,13 +158,13 @@
             <form action="add-order" method="post" id="orderForm" onsubmit="return prepareFormSubmission();">
 
                 <div class="form-group">
-                    <label>Loại Đơn hàng</label>
+                    <label>Order Type</label>
                     <div class="type-switcher">
                         <div id="export-btn" class="type-btn" data-type="export">
-                            Xuất Hàng (Sale)
+                            Export
                         </div>
                         <div id="import-btn" class="type-btn" data-type="import">
-                            Nhập Hàng (Purchase)
+                            Import
                         </div>
                     </div>
                     <c:if test="${not empty errors.party}">
@@ -172,13 +172,13 @@
                     </c:if>
                 </div>
 
-                <h3>Thông tin chung</h3>
+                <h3>Common Information</h3>
                 <div style="display: flex; gap: 20px;">
 
                     <div class="form-group partner-field" id="customer-group" style="flex: 1;">
-                        <label>Khách hàng (Export)</label>
+                        <label>Customer</label>
                         <select name="customerId" id="customerIdSelect">
-                            <option value="0">-- Chọn Khách hàng --</option>
+                            <option value="0"> Select Customer </option>
                             <c:forEach items="${allCustomers}" var="c">
                                 <option value="${c.customerId}"
                                         ${tempOrder.customerId == c.customerId ? 'selected' : ''}>
@@ -189,9 +189,9 @@
                     </div>
 
                     <div class="form-group partner-field" id="supplier-group" style="flex: 1;">
-                        <label>Nhà cung cấp (Import)</label>
+                        <label> Supplier </label>
                         <select name="supplierId" id="supplierIdSelect">
-                            <option value="0">-- Chọn Nhà cung cấp --</option>
+                            <option value="0"> Select Suppler </option>
                             <c:forEach items="${allSuppliers}" var="s">
                                 <option value="${s.supplierId}"
                                         ${tempOrder.supplierId == s.supplierId ? 'selected' : ''}>
@@ -203,11 +203,11 @@
                 </div>
 
                 <div class="form-group">
-                    <label>Mô tả / Ghi chú</label>
+                    <label>Description</label>
                     <textarea name="description" rows="3" placeholder="Nhập ghi chú cho đơn hàng...">${tempOrder.description}</textarea>
                 </div>
 
-                <div class="detail-header">Chi tiết Đơn hàng</div>
+                <div class="detail-header">Product Detail</div>
 
                 <c:if test="${not empty errors.details}">
                     <div class="error-box auto-hide" style="margin-top: 5px; margin-bottom: 15px;">
@@ -219,9 +219,9 @@
                     <table class="detail-table" style="width: 100%; border-collapse: collapse;">
                         <thead>
                             <tr>
-                                <th style="width: 40%;">Sản phẩm</th>
-                                <th style="width: 20%;">Số lượng</th>
-                                <th style="width: 25%;">Đơn giá</th>
+                                <th style="width: 40%;">Product</th>
+                                <th style="width: 20%;">Quantity</th>
+                                <th style="width: 25%;">Unit Price</th>
                                 <th style="width: 10%;"></th>
                             </tr>
                         </thead>
@@ -254,7 +254,7 @@
                                             <td>
                                                 <input type="text" list="products" name="productName"
                                                         value="${currentProductName}"
-                                                        placeholder="Gõ tên sản phẩm..." class="product-name-input" required>
+                                                        placeholder="Enter product name..." class="product-name-input" required>
                                                 
                                                 <input type="hidden" name="productId"
                                                         value="${currentProductId}"
@@ -306,7 +306,7 @@
                     </c:forEach>
                 </datalist>
 
-                <button type="button" class="btn-add-detail" onclick="addDetailRow()">+ Thêm Sản phẩm</button>
+                <button type="button" class="btn-add-detail" onclick="addDetailRow()">+ Add Product</button>
                 <button type="submit" class="btn-save">Create Order</button>
                 <a href="order-list" class="link-back">Cancel</a>
             </form>
@@ -389,7 +389,7 @@
                 if (tableBody.querySelectorAll('.order-detail-row').length > 1) {
                     row.remove();
                 } else {
-                    alert('Đơn hàng phải có ít nhất một sản phẩm.');
+                    alert('Order must have at leat one product.');
                 }
             }
 
@@ -451,7 +451,7 @@
                 const supplierSelect = document.getElementById('supplierIdSelect');
 
                 if (customerSelect.value === '0' && supplierSelect.value === '0') {
-                    alert('Vui lòng chọn Khách hàng (Export) hoặc Nhà cung cấp (Import).');
+                    alert('Please pick Import or Export.');
                     return false;
                 }
 
