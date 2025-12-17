@@ -30,7 +30,7 @@ public class CustomerDAO extends DBContext {
         SELECT *
         FROM customers
         WHERE 1=1
-    """;
+        """;
 
         List<Object> params = new ArrayList<>();
 
@@ -98,7 +98,7 @@ public class CustomerDAO extends DBContext {
             address
         FROM customers
         WHERE customer_id = ?
-    """;
+        """;
 
         try (Connection c = getConnection(); PreparedStatement ps = c.prepareStatement(sql)) {
 
@@ -174,7 +174,39 @@ public class CustomerDAO extends DBContext {
         }
         return list;
     }
-    
+
+    public void addCustomer(Customer c) {
+        String sql = "INSERT INTO customers (customer_name, email, phone, address) VALUES (?, ?, ?, ?)";
+
+        try (PreparedStatement ps = getConnection().prepareStatement(sql)) {
+            ps.setString(1, c.getCustomerName());
+            ps.setString(2, c.getEmail());
+            ps.setString(3, c.getPhone());
+            ps.setString(4, c.getAddress());
+
+            ps.executeUpdate();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void updateCustomer(Customer c) {
+        String sql = "UPDATE customers SET customer_name=?, email=?, phone=?, address=? WHERE customer_id=?";
+
+        try (PreparedStatement ps = getConnection().prepareStatement(sql)) {
+            ps.setString(1, c.getCustomerName());
+            ps.setString(2, c.getEmail());
+            ps.setString(3, c.getPhone());
+            ps.setString(4, c.getAddress());
+
+            ps.setInt(5, c.getCustomerId());
+
+            ps.executeUpdate();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     public static void main(String[] args) {
         CustomerDAO customerDAO = new CustomerDAO();
 
