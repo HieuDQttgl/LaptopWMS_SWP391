@@ -368,6 +368,8 @@
                     </c:forEach>
                 </div>
             </c:if>
+
+                            <a href="<%= request.getContextPath()%>/landing" style="color: #bab0b0; font-style: italic; text-decoration: none;"><- Back to homepage</a>
         </div>
 
         <script>

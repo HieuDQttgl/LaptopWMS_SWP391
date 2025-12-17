@@ -18,7 +18,7 @@ import jakarta.servlet.http.HttpSession;
 @WebServlet(name = "AddSupplierServlet", urlPatterns = { "/add-supplier" })
 public class AddSupplierServlet extends HttpServlet {
 
-    private static final int ADMIN_ROLE_ID = 1;
+    private static final int SALE_ROLE_ID = 3;
     private SupplierDAO supplierDAO = new SupplierDAO();
 
     @Override
@@ -34,7 +34,7 @@ public class AddSupplierServlet extends HttpServlet {
         Users currentUser = (Users) session.getAttribute("currentUser");
 
         // Only Admin can add suppliers
-        if (currentUser.getRoleId() != ADMIN_ROLE_ID) {
+        if (currentUser.getRoleId() != SALE_ROLE_ID) {
             session.setAttribute("error", "Access denied: You do not have permission to add suppliers.");
             response.sendRedirect(request.getContextPath() + "/supplier-list");
             return;
@@ -58,7 +58,7 @@ public class AddSupplierServlet extends HttpServlet {
         Users currentUser = (Users) session.getAttribute("currentUser");
 
         // Only Admin can add suppliers
-        if (currentUser.getRoleId() != ADMIN_ROLE_ID) {
+        if (currentUser.getRoleId() != SALE_ROLE_ID) {
             session.setAttribute("error", "Access denied: You do not have permission to add suppliers.");
             response.sendRedirect(request.getContextPath() + "/supplier-list");
             return;
