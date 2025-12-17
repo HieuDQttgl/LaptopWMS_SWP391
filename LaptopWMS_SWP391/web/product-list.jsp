@@ -48,6 +48,7 @@
                 text-decoration: none;
                 display: inline-block;
             }
+            
             .btn-add:hover {
                 background-color: #27ae60;
             }
