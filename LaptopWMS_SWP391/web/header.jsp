@@ -10,8 +10,8 @@
     if (currentUser != null) {
         roleId = currentUser.getRoleId();
         NotificationDAO notificationDAO = new NotificationDAO();
-                        notificationCount = notificationDAO.getUnreadCount(currentUser.getUserId());
-                    }%>
+        notificationCount = notificationDAO.getUnreadCount(currentUser.getUserId());
+    }%>
 <style>
     .header {
         display: flex;
@@ -43,6 +43,43 @@
     }
 
     .header-right a:hover {
+        color: #2563eb;
+    }
+
+    .dropdown {
+        position: relative;
+        display: inline-block;
+    }
+
+    .dropdown-content {
+        display: none;
+        position: absolute;
+        background-color: #ffffff;
+        min-width: 200px;
+        box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.15);
+        border-radius: 4px;
+        z-index: 999;
+        top: 100%;
+        padding: 5px 0;
+    }
+
+    /* Show dropdown on hover */
+    .dropdown:hover .dropdown-content {
+        display: block;
+    }
+
+    .dropdown-content a {
+        color: black;
+        padding: 10px 16px;
+        text-decoration: none;
+        display: block;
+        text-align: left;
+        margin: 0;
+        font-size: 14px;
+    }
+
+    .dropdown-content a:hover {
+        background-color: #f1f5f9;
         color: #2563eb;
     }
 
@@ -238,23 +275,41 @@
         <a href="#hero">About</a>
         <% if (currentUser != null) {%>
         <a href="<%= request.getContextPath()%>/profile">Profile</a>
+
         <% if (roleId == 1) {%>
         <a href="<%= request.getContextPath()%>/user-list">Users</a>
         <a href="<%= request.getContextPath()%>/role">Roles</a>
         <% } %>
+
         <% if (roleId == 2) {%>
         <a href="<%= request.getContextPath()%>/product-list">Products</a>
         <a href="<%= request.getContextPath()%>/order-list">Orders</a>
         <a href="<%= request.getContextPath()%>/inventory">Inventory</a>
         <a href="<%= request.getContextPath()%>/location-list">Locations</a>
         <% }%>
+
         <% if (roleId == 3) {%>
         <a href="<%= request.getContextPath()%>/order-list">Orders</a>
         <a href="<%= request.getContextPath()%>/customer-list">Customers</a>
         <a href="<%= request.getContextPath()%>/supplier-list">Suppliers</a>
         <% }%>
 
-        <!-- Notification Bell -->
+        <% if (roleId == 1 || roleId == 2 || roleId == 3) { %>
+        <div class="dropdown">
+            <a href="#" style="cursor: default">Reports ▼</a>
+            <div class="dropdown-content">
+                <% if (roleId == 2) { %>
+                <a href="<%= request.getContextPath()%>/report-import">Import</a>
+                <% } %>
+                <a href="<%= request.getContextPath()%>/report-export">Export</a>
+                <a href="<%= request.getContextPath()%>/report-balance">Inventory Balance</a>
+                <% if (roleId == 2) { %>
+                <a href="<%= request.getContextPath()%>/report-inventory">Inventory</a>
+                <% } %>
+            </div>
+        </div>
+        <% } %>
+
         <div class="notification-wrapper">
             <div class="notification-bell" id="notificationBell"
                  onclick="toggleNotificationDropdown()">
@@ -293,136 +348,135 @@
 
 <% if (currentUser != null) {%>
 <script>
-                            const contextPath = '<%= request.getContextPath()%>';
+    const contextPath = '<%= request.getContextPath()%>';
 
-                            function toggleNotificationDropdown() {
-                                const dropdown = document.getElementById('notificationDropdown');
-                                dropdown.classList.toggle('show');
-                                if (dropdown.classList.contains('show')) {
-                                    loadNotifications();
-                                }
-                            }
+    function toggleNotificationDropdown() {
+        const dropdown = document.getElementById('notificationDropdown');
+        dropdown.classList.toggle('show');
+        if (dropdown.classList.contains('show')) {
+            loadNotifications();
+        }
+    }
 
-                            // Close dropdown when clicking outside
-                            document.addEventListener('click', function (event) {
-                                const wrapper = document.querySelector('.notification-wrapper');
-                                const dropdown = document.getElementById('notificationDropdown');
-                                if (wrapper && dropdown && !wrapper.contains(event.target)) {
-                                    dropdown.classList.remove('show');
-                                }
-                            });
+    // Close dropdown when clicking outside
+    document.addEventListener('click', function (event) {
+        const wrapper = document.querySelector('.notification-wrapper');
+        const dropdown = document.getElementById('notificationDropdown');
+        if (wrapper && dropdown && !wrapper.contains(event.target)) {
+            dropdown.classList.remove('show');
+        }
+    });
 
-                            function loadNotifications() {
-                                fetch(contextPath + '/notifications?action=recent')
-                                        .then(response => response.json())
-                                        .then(notifications => {
-                                            const list = document.getElementById('notificationList');
-                                            if (notifications.length === 0) {
-                                                list.innerHTML = '<div class="notification-empty">No notifications</div>';
-                                                return;
-                                            }
+    function loadNotifications() {
+        fetch(contextPath + '/notifications?action=recent')
+                .then(response => response.json())
+                .then(notifications => {
+                    const list = document.getElementById('notificationList');
+                    if (notifications.length === 0) {
+                        list.innerHTML = '<div class="notification-empty">No notifications</div>';
+                        return;
+                    }
 
-                                            list.innerHTML = notifications.map(n => {
-                                                const iconClass = n.type === 'password_reset' ? 'password-reset' : '';
-                                                const icon = n.type === 'password_reset' ? '🔑' : '📢';
-                                                const unreadClass = !n.read ? 'unread' : '';
-                                                const timeAgo = getTimeAgo(new Date(n.createdAt));
-                                                const title = escapeHtml(n.title);
-                                                const message = escapeHtml(n.message.substring(0, 100));
+                    list.innerHTML = notifications.map(n => {
+                        const iconClass = n.type === 'password_reset' ? 'password-reset' : '';
+                        const icon = n.type === 'password_reset' ? '🔑' : '📢';
+                        const unreadClass = !n.read ? 'unread' : '';
+                        const timeAgo = getTimeAgo(new Date(n.createdAt));
+                        const title = escapeHtml(n.title);
+                        const message = escapeHtml(n.message.substring(0, 100));
 
-                                                return '<div class="notification-item ' + unreadClass + '" onclick="markAsRead(' + n.notificationId + ')">' +
-                                                        '<div class="notification-icon ' + iconClass + '">' + icon + '</div>' +
-                                                        '<div class="notification-content">' +
-                                                        '<div class="notification-title">' + title + '</div>' +
-                                                        '<div class="notification-message">' + message + '...</div>' +
-                                                        '<div class="notification-time">' + timeAgo + '</div>' +
-                                                        '</div>' +
-                                                        '</div>';
-                                            }).join('');
-                                        })
-                                        .catch(err => {
-                                            console.error('Failed to load notifications:', err);
-                                            document.getElementById('notificationList').innerHTML =
-                                                    '<div class="notification-empty">Failed to load notifications</div>';
-                                        });
-                            }
+                        return '<div class="notification-item ' + unreadClass + '" onclick="markAsRead(' + n.notificationId + ')">' +
+                                '<div class="notification-icon ' + iconClass + '">' + icon + '</div>' +
+                                '<div class="notification-content">' +
+                                '<div class="notification-title">' + title + '</div>' +
+                                '<div class="notification-message">' + message + '...</div>' +
+                                '<div class="notification-time">' + timeAgo + '</div>' +
+                                '</div>' +
+                                '</div>';
+                    }).join('');
+                })
+                .catch(err => {
+                    console.error('Failed to load notifications:', err);
+                    document.getElementById('notificationList').innerHTML =
+                            '<div class="notification-empty">Failed to load notifications</div>';
+                });
+    }
 
-                            function markAsRead(notificationId) {
-                                fetch(contextPath + '/notifications?action=markRead&id=' + notificationId, {
-                                    method: 'POST'
-                                })
-                                        .then(response => response.json())
-                                        .then(result => {
-                                            if (result.success) {
-                                                loadNotifications();
-                                                updateBadgeCount();
-                                            }
-                                        })
-                                        .catch(err => console.error('Failed to mark as read:', err));
-                            }
+    function markAsRead(notificationId) {
+        fetch(contextPath + '/notifications?action=markRead&id=' + notificationId, {
+            method: 'POST'
+        })
+                .then(response => response.json())
+                .then(result => {
+                    if (result.success) {
+                        loadNotifications();
+                        updateBadgeCount();
+                    }
+                })
+                .catch(err => console.error('Failed to mark as read:', err));
+    }
 
-                            function markAllAsRead() {
-                                fetch(contextPath + '/notifications?action=markAllRead', {
-                                    method: 'POST'
-                                })
-                                        .then(response => response.json())
-                                        .then(result => {
-                                            if (result.success) {
-                                                loadNotifications();
-                                                updateBadgeCount();
-                                            }
-                                        })
-                                        .catch(err => console.error('Failed to mark all as read:', err));
-                            }
+    function markAllAsRead() {
+        fetch(contextPath + '/notifications?action=markAllRead', {
+            method: 'POST'
+        })
+                .then(response => response.json())
+                .then(result => {
+                    if (result.success) {
+                        loadNotifications();
+                        updateBadgeCount();
+                    }
+                })
+                .catch(err => console.error('Failed to mark all as read:', err));
+    }
 
-                            function updateBadgeCount() {
-                                fetch(contextPath + '/notifications?action=count')
-                                        .then(response => response.json())
-                                        .then(data => {
-                                            const badge = document.getElementById('notificationBadge');
-                                            const bell = document.getElementById('notificationBell');
+    function updateBadgeCount() {
+        fetch(contextPath + '/notifications?action=count')
+                .then(response => response.json())
+                .then(data => {
+                    const badge = document.getElementById('notificationBadge');
+                    const bell = document.getElementById('notificationBell');
 
-                                            if (data.count > 0) {
-                                                if (badge) {
-                                                    badge.textContent = data.count;
-                                                } else {
-                                                    const newBadge = document.createElement('span');
-                                                    newBadge.className = 'notification-badge';
-                                                    newBadge.id = 'notificationBadge';
-                                                    newBadge.textContent = data.count;
-                                                    bell.appendChild(newBadge);
-                                                }
-                                            } else {
-                                                if (badge) {
-                                                    badge.remove();
-                                                }
-                                            }
-                                        })
-                                        .catch(err => console.error('Failed to update badge:', err));
-                            }
+                    if (data.count > 0) {
+                        if (badge) {
+                            badge.textContent = data.count;
+                        } else {
+                            const newBadge = document.createElement('span');
+                            newBadge.className = 'notification-badge';
+                            newBadge.id = 'notificationBadge';
+                            newBadge.textContent = data.count;
+                            bell.appendChild(newBadge);
+                        }
+                    } else {
+                        if (badge) {
+                            badge.remove();
+                        }
+                    }
+                })
+                .catch(err => console.error('Failed to update badge:', err));
+    }
 
-                            function getTimeAgo(date) {
-                                const now = new Date();
-                                const diff = Math.floor((now - date) / 1000);
+    function getTimeAgo(date) {
+        const now = new Date();
+        const diff = Math.floor((now - date) / 1000);
 
-                                if (diff < 60)
-                                    return 'Just now';
-                                if (diff < 3600)
-                                    return Math.floor(diff / 60) + ' min ago';
-                                if (diff < 86400)
-                                    return Math.floor(diff / 3600) + ' hours ago';
-                                if (diff < 604800)
-                                    return Math.floor(diff / 86400) + ' days ago';
-                                return date.toLocaleDateString();
-                            }
+        if (diff < 60)
+            return 'Just now';
+        if (diff < 3600)
+            return Math.floor(diff / 60) + ' min ago';
+        if (diff < 86400)
+            return Math.floor(diff / 3600) + ' hours ago';
+        if (diff < 604800)
+            return Math.floor(diff / 86400) + ' days ago';
+        return date.toLocaleDateString();
+    }
 
-                            function escapeHtml(text) {
-                                const div = document.createElement('div');
-                                div.textContent = text;
-                                return div.innerHTML;
-                            }
+    function escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
 
-                            // Refresh notification count every 30 seconds
-                            setInterval(updateBadgeCount, 30000);
+    setInterval(updateBadgeCount, 30000);
 </script>
 <% }%>

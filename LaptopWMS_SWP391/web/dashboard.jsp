@@ -15,7 +15,8 @@
             body {
                 font-family: "Segoe UI", sans-serif;
                 background: #f5f6fa;
-                padding: 20px;
+                padding: 0;
+                marginL: 0;
             }
 
             .welcome-banner {
@@ -23,6 +24,7 @@
                 padding: 20px;
                 border-radius: 8px;
                 margin-bottom: 20px;
+                margin-top: 40px;
                 box-shadow: 0 2px 5px rgba(0,0,0,0.05);
             }
             h1 {
