@@ -17,7 +17,7 @@ import java.sql.Statement;
 public class DBContext {
     private static String DB_URL = "jdbc:mysql://localhost:3306/laptop_wms";
     private static String USER_NAME = "root";
-    private static String PASSWORD = "2312004lamvt";
+    private static String PASSWORD = "123456";
  
     public static void main(String args[]) {
         try {

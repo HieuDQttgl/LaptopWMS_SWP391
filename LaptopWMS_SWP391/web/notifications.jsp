@@ -317,8 +317,7 @@
             <div class="page-header">
                 <h1>Notifications</h1>
                 <div class="header-actions">
-                    <% if (notifications != null && !notifications.isEmpty()
-                                && unreadCount > 0) { %>
+                    <% if (notifications != null && !notifications.isEmpty() && unreadCount > 0) { %>
                     <button class="btn btn-primary" onclick="markAllAsRead()">
                         ✓ Mark All Read
                     </button>
@@ -353,8 +352,8 @@
                 <% for (Notification n : notifications) {
                         String iconClass = "password_reset".equals(n.getType())
                                 ? "password-reset" : "default";
-                        String icon = "password_reset".equals(n.getType()) ? "🔑" : "📢";
-                        String unreadClass = !n.isRead() ? "unread" : "";%>
+                                                                    String icon = "password_reset".equals(n.getType()) ? "🔑" : "📢";
+                                                                    String unreadClass = !n.isRead() ? "unread" : "";%>
                 <div class="notification-item <%= unreadClass%>"
                      id="notification-<%= n.getNotificationId()%>">
                     <div class="notification-icon <%= iconClass%>">
@@ -369,15 +368,17 @@
                         </div>
                         <div class="notification-meta">
                             <span>📅 <%= n.getCreatedAt() != null ? new java.text.SimpleDateFormat("MMM dd, yyyy HH:mm").format(n.getCreatedAt())
-                                    : "Unknown"%></span>
+                                    : "Unknown" %></span>
                                 <% if (n.getRelatedUserFullName() != null) {
                                 %>
-                            <span>👤 <%= n.getRelatedUserFullName()%></span>
+                            <span>👤 <%=n.getRelatedUserFullName()%>
+                            </span>
                             <% } %>
                             <% if (n.isRead() && n.getReadAt()
-                                            != null) {%>
-                                <span>✓ Read at <%= new java.text.SimpleDateFormat("MMM dd, HH:mm").format(n.getReadAt())%></span>
-                                <% } %>
+                                                                                                != null) {%>
+                            <span>✓ Read at <%= new java.text.SimpleDateFormat("MMM dd, HH:mm").format(n.getReadAt())%>
+                            </span>
+                            <% } %>
                         </div>
                     </div>
                     <div class="notification-actions">
@@ -401,7 +402,7 @@
         <jsp:include page="footer.jsp" />
 
         <script>
-            const contextPath = '<%= request.getContextPath()%>';
+            // Note: contextPath is defined in header.jsp
 
             function markAsRead(notificationId) {
                 fetch(contextPath + '/notifications?action=markRead&id=' + notificationId, {
