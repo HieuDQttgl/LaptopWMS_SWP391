@@ -46,11 +46,25 @@ public class RoleServlet extends HttpServlet {
             return;
         }
         try {
+            int page = 1;
+            int pageSize = 5; 
             
+            String pageStr = request.getParameter("page");
+            if (pageStr != null && !pageStr.isEmpty()) {
+                try {
+                    page = Integer.parseInt(pageStr);
+                } catch (NumberFormatException e) {
+                    page = 1;
+                }
+            }
+            List<Role> roleList = roleDAO.getRolesByPage(page, pageSize);
+            int totalRecords = roleDAO.getTotalRolesCount();
+            int totalPages = (int) Math.ceil((double) totalRecords / pageSize);
             List<Users> userList = userDAO.getListUsers();
-            List<Role> roleList = roleDAO.getAllRoles();
             request.setAttribute("userList", userList);
             request.setAttribute("roleList", roleList);
+            request.setAttribute("currentPage", page);
+            request.setAttribute("totalPages", totalPages);
             request.getRequestDispatcher("role.jsp").forward(request, response);
             
         } catch (Exception e) {

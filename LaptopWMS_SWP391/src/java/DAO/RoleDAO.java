@@ -171,5 +171,44 @@ public class RoleDAO extends DBContext {
             throw e;
         }
     }
+    public int getTotalRolesCount() {
+        String sql = "SELECT COUNT(*) FROM roles";
+        try (Connection conn = getConnection(); 
+             PreparedStatement ps = conn.prepareStatement(sql); 
+             ResultSet rs = ps.executeQuery()) {
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
+    public List<Role> getRolesByPage(int page, int pageSize) {
+        List<Role> list = new ArrayList<>();
+        String sql = "SELECT * FROM roles ORDER BY role_id LIMIT ? OFFSET ?";
+        
+        try (Connection conn = getConnection(); 
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            
+            ps.setInt(1, pageSize); // page
+            ps.setInt(2, (page - 1) * pageSize); // offset
+
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    Role r = new Role(
+                            rs.getInt("role_id"),
+                            rs.getString("role_name"),
+                            rs.getString("role_description"), 
+                            rs.getString("status")
+                    );
+                    list.add(r);
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
 
 }

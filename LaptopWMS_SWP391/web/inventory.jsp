@@ -194,7 +194,7 @@
                 <a href="add-inventory" class="btn" style="background-color: #2ecc71; color: white; margin-bottom: 15px;">
                     <i class="fas fa-plus"></i> Add New Product to Inventory
                 </a>
-                
+
                 <div class="controls">
                     <form action="inventory" method="get" class="filter-group">
                         <select name="location" onchange="this.form.submit()">
@@ -264,10 +264,10 @@
                             <td class="<%= stockClass%>">
                                 <%= item.getStockQuantity()%>
                                 <% if (item.getStockQuantity() == 0) { %>
-                                    <i class="fas fa-exclamation-circle" title="Out of stock"></i>
+                                <i class="fas fa-exclamation-circle" title="Out of stock"></i>
                                 <% } else if (item.getStockQuantity() < 5) { %>
-                                    <i class="fas fa-exclamation-triangle" title="Low stock"></i>
-                                <% } %>
+                                <i class="fas fa-exclamation-triangle" title="Low stock"></i>
+                                <% }%>
                             </td>
                             <td><%= item.getLastUpdated()%></td>
                             <td>
@@ -292,35 +292,35 @@
                         %>
                     </tbody>
                 </table>
-                
+
                 <div style="margin-top: 20px; padding: 15px; background-color: #f9fafb; border-radius: 8px; display: flex; justify-content: space-between; align-items: center;">
                     <a href="javascript:history.back()" class="btn" style="background-color: #6c757d; color: white;">
                         <i class="fas fa-arrow-left"></i> Back
                     </a>
-                    
+
                     <div style="color: #6c757d; font-size: 14px; font-weight: 600;">
-                        <% if (list != null && !list.isEmpty()) { 
-                            int totalRecordsCalc = Integer.parseInt(request.getAttribute("totalPages").toString()) * 10;
-                            int startRecord = (currentPage - 1) * 10 + 1;
-                            int endRecord = Math.min(currentPage * 10, totalRecordsCalc);
+                        <% if (list != null && !list.isEmpty()) {
+                                int totalRecordsCalc = Integer.parseInt(request.getAttribute("totalPages").toString()) * 10;
+                                int startRecord = (currentPage - 1) * 10 + 1;
+                                int endRecord = Math.min(currentPage * 10, totalRecordsCalc);
                         %>
-                            <i class="fas fa-info-circle"></i>
-                            Page <%= currentPage%> of <%= totalPages%> 
-                            | Showing <%= list.size()%> items
+                        <i class="fas fa-info-circle"></i>
+                        Page <%= currentPage%> of <%= totalPages%> 
+                        | Showing <%= list.size()%> items
                         <% } else { %>
-                            <i class="fas fa-info-circle"></i> No records found
+                        <i class="fas fa-info-circle"></i> No records found
                         <% } %>
                     </div>
                 </div>
-                
+
                 <% if (totalPages > 1) { %>
                 <div class="pagination">
                     <%
-                        String baseLink = "inventory?search=" + searchParam + 
-                                        "&location=" + selectedLoc + 
-                                        "&sortBy=" + sortBy + 
-                                        "&sortOrder=" + sortOrder + 
-                                        "&page=";
+                        String baseLink = "inventory?search=" + searchParam
+                                + "&location=" + selectedLoc
+                                + "&sortBy=" + sortBy
+                                + "&sortOrder=" + sortOrder
+                                + "&page=";
 
                         if (currentPage > 1) {
                     %>
@@ -329,27 +329,27 @@
                     </a>
                     <% } %>
 
-                    <% 
+                    <%
                         int startPage = Math.max(1, currentPage - 2);
                         int endPage = Math.min(totalPages, currentPage + 2);
-                        
+
                         if (startPage > 1) {
                     %>
-                        <a href="<%= baseLink%>1">1</a>
-                        <% if (startPage > 2) { %>
-                            <span style="padding: 8px;">...</span>
-                        <% } %>
+                    <a href="<%= baseLink%>1">1</a>
+                    <% if (startPage > 2) { %>
+                    <span style="padding: 8px;">...</span>
                     <% } %>
-                        
-                    <% for (int i = startPage; i <= endPage; i++) { %>
+                    <% } %>
+
+                    <% for (int i = startPage; i <= endPage; i++) {%>
                     <a href="<%= baseLink + i%>" class="<%= i == currentPage ? "active" : ""%>"><%= i%></a>
                     <% } %>
-                    
+
                     <% if (endPage < totalPages) { %>
-                        <% if (endPage < totalPages - 1) { %>
-                            <span style="padding: 8px;">...</span>
-                        <% } %>
-                        <a href="<%= baseLink + totalPages%>"><%= totalPages%></a>
+                    <% if (endPage < totalPages - 1) { %>
+                    <span style="padding: 8px;">...</span>
+                    <% }%>
+                    <a href="<%= baseLink + totalPages%>"><%= totalPages%></a>
                     <% } %>
 
                     <% if (currentPage < totalPages) {%>
@@ -358,30 +358,30 @@
                     </a>
                     <% }%>
                 </div>
-                <% } %>
+                <% }%>
             </div>
         </div>
 
         <jsp:include page="footer.jsp"></jsp:include>
 
-        <script>
-            function sortTable(column) {
-                const currentSort = '<%= sortBy%>';
-                const currentOrder = '<%= sortOrder%>';
-                
-                let newOrder = 'ASC';
-                if (column === currentSort) {
-                    newOrder = currentOrder === 'ASC' ? 'DESC' : 'ASC';
+            <script>
+                function sortTable(column) {
+                    const currentSort = '<%= sortBy%>';
+                    const currentOrder = '<%= sortOrder%>';
+
+                    let newOrder = 'ASC';
+                    if (column === currentSort) {
+                        newOrder = currentOrder === 'ASC' ? 'DESC' : 'ASC';
+                    }
+
+                    const searchParam = '<%= searchParam%>';
+                    const locationParam = '<%= selectedLoc%>';
+
+                    window.location.href = 'inventory?search=' + searchParam +
+                            '&location=' + locationParam +
+                            '&sortBy=' + column +
+                            '&sortOrder=' + newOrder;
                 }
-                
-                const searchParam = '<%= searchParam%>';
-                const locationParam = '<%= selectedLoc%>';
-                
-                window.location.href = 'inventory?search=' + searchParam + 
-                                      '&location=' + locationParam + 
-                                      '&sortBy=' + column + 
-                                      '&sortOrder=' + newOrder;
-            }
         </script>
     </body>
 </html>
