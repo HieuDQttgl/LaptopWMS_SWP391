@@ -371,7 +371,7 @@ public class UserDAO extends DBContext {
             }
         } catch (Exception e) {
             e.printStackTrace();
-            return true;
+            return false;
         }
         return false;
     }
@@ -388,7 +388,7 @@ public class UserDAO extends DBContext {
             }
         } catch (Exception e) {
             e.printStackTrace();
-            return true;
+            return false;
         }
         return false;
     }

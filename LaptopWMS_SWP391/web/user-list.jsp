@@ -24,7 +24,8 @@
             }
             .container {
                 max-width: 1200px;
-                margin: 40px auto;
+                margin: auto;
+                margin-top: 40px;
                 background-color: white;
                 padding: 30px;
                 border-radius: 12px;
@@ -33,7 +34,7 @@
             h1 {
                 text-align: center;
                 color: #2c3e50;
-                font-weight: 700;
+                font-weight: 400;
                 margin-bottom: 25px;
             }
 
@@ -376,7 +377,8 @@
 
             <button id="showAddFormBtn" class="btn-add">Add new User</button>
 
-            <div class="filter-container" id="filterContainer" style="margin-bottom: 20px; padding: 15px; background: #fff; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.05);">
+            <div class="filter-container" id="filterContainer" style="margin-bottom: 20px; padding: 15px; background: #fff; border-radius: 8px;
+                 box-shadow: 0 2px 5px rgba(0,0,0,0.05);display: <%= showFormOnLoad ? "none" : "flex"%>;">
                 <form action="user-list" method="get" id="filterForm" style="display: flex; gap: 15px; align-items: center; flex-wrap: wrap;">
 
                     <input type="hidden" name="sort_field" value="${currentSortField}">
@@ -384,7 +386,7 @@
 
                     <div class="filter-group">
                         <input type="text" name="keyword" id="keywordFilter" placeholder="Search name, email or phone..." 
-                               value="${currentKeyword}" 
+                               value="${keyword}" 
                                style="padding: 6px 12px; border: 1px solid #ccc; border-radius: 4px; width: 220px;">
                     </div>
 
@@ -406,7 +408,7 @@
                                 style="padding: 6px; border: 1px solid #ccc; border-radius: 4px;">
                             <option value="0" ${empty role_filter || role_filter == '0' ? 'selected' : ''}>All Roles</option>
                             <c:forEach var="r" items="${allRoles}">
-                                <c:if test="${r.status eq 'active'}">
+                                <c:if test="${r.status eq 'active' and r.roleName ne 'Administrator'}">
                                     <option value="${r.roleId}" ${role_filter == r.roleId.toString() ? 'selected' : ''}>
                                         ${r.roleName}
                                     </option>
@@ -439,8 +441,8 @@
                         String fullNameValue = (tempUser != null && tempUser.getFullName() != null) ? tempUser.getFullName() : "";
                         String emailValue = (tempUser != null && tempUser.getEmail() != null) ? tempUser.getEmail() : "";
                         String phoneNumberValue = (tempUser != null && tempUser.getPhoneNumber() != null) ? tempUser.getPhoneNumber() : "";
-                        String genderValue = (tempUser != null && tempUser.getGender() != null) ? tempUser.getGender() : "Male";
-                        Integer roleIdValue = (tempUser != null) ? tempUser.getRoleId() : 1;
+                        String genderValue = (tempUser != null && tempUser.getGender() != null) ? tempUser.getGender() : "";
+                        Integer roleIdValue = (tempUser != null) ? tempUser.getRoleId() : 0;
                     %>
 
                     <label for="username">Username *:</label>
@@ -485,23 +487,29 @@
 
                     <label for="gender">Gender *:</label>
                     <select id="gender" name="gender">
+                        <option value="" <%= (genderValue == null || "".equals(genderValue)) ? "selected" : ""%>>Select Gender</option>
                         <option value="Male" <%= "Male".equals(genderValue) ? "selected" : ""%>>Male</option>
                         <option value="Female" <%= "Female".equals(genderValue) ? "selected" : ""%>>Female</option>
                         <option value="Other" <%= "Other".equals(genderValue) ? "selected" : ""%>>Other</option>
                     </select>
-
+                    <span class="field-error" id="genderError"></span>
+                    <% if (errors != null && errors.containsKey("gender")) {%>
+                    <span class="field-error"><%= errors.get("gender")%></span>
+                    <% }%>
+                    <br>
 
                     <label>Role *:</label>
                     <select name="roleId" id="roleIdSelect">
-                        <option value="0" ${currentRole == '0' ? 'selected' : ''}>Select Role</option> 
+                        <option value="0" <%= (roleIdValue == null || roleIdValue == 0) ? "selected" : ""%>>Select Role</option>
                         <c:forEach var="r" items="${allRoles}">
-                            <c:if test="${r.status eq 'active'}">
-                                <option value="${r.roleId}" ${roleIdValue == r.roleId ? 'selected' : ''}>
+                            <c:if test="${r.status eq 'active' and r.roleName ne 'Administrator'}">
+                                <option value="${r.roleId}" <%= (roleIdValue != null && roleIdValue.equals(((Role) pageContext.getAttribute("r")).getRoleId())) ? "selected" : ""%>>
                                     ${r.roleName}
                                 </option>
                             </c:if>
                         </c:forEach>
                     </select>
+
                     <span class="field-error" id="roleIdError"></span>
                     <% if (errors != null && errors.containsKey("roleId")) {%>
                     <span class="field-error"><%= errors.get("roleId")%></span>
@@ -670,7 +678,7 @@
                     totalRecords = 0;
             %>
 
-            <div class="pagination" id="paginationContainer">
+            <div class="pagination" id="paginationContainer" style="display: <%= showFormOnLoad ? "none" : "flex"%>;">
                 <% if (currentPage > 1) {%>
                 <a href="#" onclick="window.location.href = createPaginationUrl(<%= currentPage - 1%>); return false;">« Previous</a>
                 <% } else { %>
@@ -765,9 +773,30 @@
             }
 
             function hideAddForm() {
-                if (formContainer)
-                    formContainer.style.display = 'none';
+                document.getElementById('addFormContainer').style.display = 'none';
                 showTableElements();
+
+                var form = document.querySelector('#addFormContainer form');
+                if (form) {
+                    var inputs = form.querySelectorAll('input:not([type="hidden"])');
+                    inputs.forEach(function (input) {
+                        input.value = '';
+                    });
+
+                    var selects = form.querySelectorAll('select');
+                    selects.forEach(function (select) {
+                        select.selectedIndex = 0;
+                    });
+                }
+
+                var errorSpans = document.querySelectorAll('.field-error');
+                errorSpans.forEach(function (span) {
+                    span.innerHTML = '';
+                });
+
+                if (notificationElement) {
+                    notificationElement.style.display = 'none';
+                }
             }
 
             button.addEventListener('click', function () {
@@ -776,6 +805,8 @@
                 if (isHidden) {
                     formContainer.style.display = 'block';
                     hideTableElements();
+                    
+                    if (notificationElement) notificationElement.style.display = 'none';
                 } else {
                     hideAddForm();
                 }
@@ -888,6 +919,11 @@
                     displayError('phoneNumber', 'Phone Number must be 10-11 digits and contain only numbers.');
                     isValid = false;
                 }
+                const gender = document.getElementById('gender').value;
+                if (gender === '') {
+                    displayError('gender', 'Please select Gender.');
+                    isValid = false;
+                }
 
                 const roleId = document.getElementById('roleIdSelect').value;
                 if (roleId === '0') {
@@ -897,6 +933,7 @@
 
                 return isValid;
             }
+
             function createPaginationUrl(page) {
                 var keyword = document.getElementById('keywordFilter').value;
                 var gender = document.getElementById('genderFilter').value;
