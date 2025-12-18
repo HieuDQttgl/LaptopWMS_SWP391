@@ -67,6 +67,4 @@ public class ProductItem {
         this.specSummary = specSummary;
     }
 
-
-
 }

@@ -225,7 +225,13 @@
     }
 </style>
 <div class="header">
-    <div class="header-left"><a href="<%= request.getContextPath()%>/landing">@ WMS</a></div>
+    <div class="header-left">
+        <% if(roleId == -1) {%>
+        <a href="<%= request.getContextPath()%>/landing">@ WMS</a>
+        <% } else { %>
+        <a href="<%= request.getContextPath()%>/dashboard">@ WMS</a>
+        <% } %>
+    </div>
 
     <div class="header-right">
         <a href="#features">Features</a>
