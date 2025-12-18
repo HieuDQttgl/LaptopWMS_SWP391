@@ -1,5 +1,7 @@
 package DAO;
 
+import DTO.ExportReportDTO;
+import DTO.ImportReportDTO;
 import DTO.OrderDTO;
 import DTO.OrderSummary;
 import Model.Order;
@@ -158,8 +160,8 @@ public class OrderDAO extends DBContext {
 
         return orders;
     }
-    
-        public int getTotalOrders(
+
+    public int getTotalOrders(
             String keyword,
             String statusFilter,
             Integer createdByFilter,
@@ -409,11 +411,11 @@ public class OrderDAO extends DBContext {
 
                 conn.commit();
                 success = true;
-                System.out.println("✅ Order created successfully: " + order.getOrderCode());
+                System.out.println("Order created successfully: " + order.getOrderCode());
 
             } catch (SQLException e) {
                 if (conn != null) {
-                    System.err.println("⚠️ Error detected! Rolling back transaction...");
+                    System.err.println("Error detected! Rolling back transaction...");
                     conn.rollback();
                 }
                 throw e;
@@ -507,5 +509,152 @@ public class OrderDAO extends DBContext {
                 return null;
             }
         }
+    }
+
+    public List<ImportReportDTO> getImportReport(String from, String to, String supplierId, String status) {
+        List<ImportReportDTO> list = new ArrayList<>();
+        String sql = "SELECT o.order_code, o.created_at, o.order_status, s.supplier_name, "
+                + "COUNT(op.product_detail_id) as items, "
+                + "SUM(op.quantity * op.unit_price) as value "
+                + "FROM orders o "
+                + "JOIN suppliers s ON o.supplier_id = s.supplier_id "
+                + "JOIN order_products op ON o.order_id = op.order_id "
+                + "WHERE 1=1 ";
+
+        if (from != null && !from.isEmpty()) {
+            sql += " AND o.created_at >= '" + from + "'";
+        }
+        if (to != null && !to.isEmpty()) {
+            sql += " AND o.created_at <= '" + to + "'";
+        }
+        if (supplierId != null && !supplierId.isEmpty()) {
+            sql += " AND o.supplier_id = " + supplierId;
+        }
+        if (status != null && !status.isEmpty()) {
+            sql += " AND o.order_status = '" + status + "'";
+        }
+
+        sql += " GROUP BY o.order_id";
+
+        try (Connection conn = DBContext.getConnection(); PreparedStatement ps = conn.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) {
+                ImportReportDTO d = new ImportReportDTO();
+                d.setOrderCode(rs.getString("order_code"));
+                d.setCreatedAt(rs.getDate("created_at"));
+                d.setSupplierName(rs.getString("supplier_name"));
+                d.setItems(rs.getInt("items"));
+                d.setValue(rs.getDouble("value"));
+                d.setStatus(rs.getString("order_status"));
+                list.add(d);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
+
+    public List<ExportReportDTO> getExportReport(String from, String to, String customerId, String status) {
+        List<ExportReportDTO> list = new ArrayList<>();
+        StringBuilder sql = new StringBuilder(
+                "SELECT o.order_code, o.created_at, o.order_status, c.customer_name, u.full_name, "
+                + "SUM(op.quantity * op.unit_price) as revenue "
+                + "FROM orders o "
+                + "JOIN customers c ON o.customer_id = c.customer_id "
+                + "JOIN order_products op ON o.order_id = op.order_id "
+                + "JOIN users u ON o.created_by = u.user_id "
+                + "WHERE o.customer_id IS NOT NULL "
+        );
+
+        if (from != null && !from.isEmpty()) {
+            sql.append(" AND o.created_at >= '").append(from).append("'");
+        }
+        if (to != null && !to.isEmpty()) {
+            sql.append(" AND o.created_at <= '").append(to).append("'");
+        }
+        if (customerId != null && !customerId.isEmpty()) {
+            sql.append(" AND o.customer_id = ").append(customerId);
+        }
+        if (status != null && !status.isEmpty()) {
+            sql.append(" AND o.order_status = '").append(status).append("'");
+        }
+
+        sql.append(" GROUP BY o.order_id");
+
+        try (Connection conn = DBContext.getConnection(); PreparedStatement ps = conn.prepareStatement(sql.toString()); ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) {
+                ExportReportDTO d = new ExportReportDTO();
+                d.setOrderCode(rs.getString("order_code"));
+                d.setCreatedAt(rs.getDate("created_at"));
+                d.setCustomerName(rs.getString("customer_name"));
+                d.setSaleName(rs.getString("full_name"));
+                d.setRevenue(rs.getDouble("revenue"));
+                d.setStatus(rs.getString("order_status"));
+                list.add(d);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
+
+    public List<ExportReportDTO.TopProduct> getTop5Products(String from, String to) {
+        List<ExportReportDTO.TopProduct> list = new ArrayList<>();
+
+        StringBuilder sql = new StringBuilder(
+                "SELECT p.product_name, SUM(op.quantity) as total_qty "
+                + "FROM order_products op "
+                + "JOIN orders o ON op.order_id = o.order_id "
+                + "JOIN product_details pd ON op.product_detail_id = pd.product_detail_id "
+                + "JOIN products p ON pd.product_id = p.product_id "
+                + "WHERE 1=1 "
+        );
+
+        if (from != null && !from.isEmpty()) {
+            sql.append(" AND o.created_at >= '").append(from).append("'");
+        }
+        if (to != null && !to.isEmpty()) {
+            sql.append(" AND o.created_at <= '").append(to).append("'");
+        }
+
+        // Thêm LIMIT 5 vào cuối câu lệnh sau khi GROUP BY và ORDER BY
+        sql.append(" GROUP BY p.product_name ORDER BY total_qty DESC LIMIT 5");
+
+        try (Connection conn = DBContext.getConnection(); PreparedStatement ps = conn.prepareStatement(sql.toString()); ResultSet rs = ps.executeQuery()) {
+
+            while (rs.next()) {
+                ExportReportDTO.TopProduct item = new ExportReportDTO.TopProduct(
+                        rs.getString("product_name"),
+                        rs.getInt("total_qty")
+                );
+                list.add(item);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
+
+    public List<ExportReportDTO.StaffRevenue> getRevenueByStaff() {
+        List<ExportReportDTO.StaffRevenue> list = new ArrayList<>();
+        String sql = "SELECT u.full_name, SUM(op.quantity * op.unit_price) as total_revenue "
+                + "FROM orders o "
+                + "JOIN users u ON o.created_by = u.user_id "
+                + "JOIN order_products op ON o.order_id = op.order_id "
+                + "WHERE o.customer_id IS NOT NULL "
+                + "GROUP BY u.full_name ORDER BY total_revenue DESC";
+
+        try (Connection conn = DBContext.getConnection(); PreparedStatement ps = conn.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
+
+            while (rs.next()) {
+                ExportReportDTO.StaffRevenue item = new ExportReportDTO.StaffRevenue(
+                        rs.getString("full_name"),
+                        rs.getDouble("total_revenue")
+                );
+                list.add(item);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return list;
     }
 }
