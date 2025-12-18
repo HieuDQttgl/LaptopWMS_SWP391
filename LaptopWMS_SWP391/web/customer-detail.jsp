@@ -8,15 +8,15 @@
         <title>Laptop Warehouse Management System</title>
         <style>
             body {
-                font-family: Arial, sans-serif;
+                font-family: "Segoe UI", sans-serif;
                 background-color: #f5f5f5;
                 margin: 0;
-                padding: 20px;
+                padding: 0;
             }
 
             .container {
                 max-width: 1200px;
-                margin: 0 auto;
+                margin: 40px auto;
                 background-color: white;
                 padding: 30px;
                 border-radius: 10px;
