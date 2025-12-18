@@ -15,11 +15,12 @@
             body {
                 font-family: "Segoe UI", sans-serif;
                 background: #f5f6fa;
-                padding: 40px;
+                margin: 0;
+                padding: 0;
             }
             .form-container {
                 max-width: 500px;
-                margin: 0 auto;
+                margin: 40px auto;
                 background: white;
                 padding: 30px;
                 border-radius: 8px;
@@ -129,7 +130,7 @@
 
                 <button type="submit" class="btn-save">Update Configuration</button>
 
-                <a href="product-detail?id=${detail.productId}" class="link-back">Cancel</a>
+                <a href="product-list" class="link-back">Cancel</a>
             </form>
         </div>
 
