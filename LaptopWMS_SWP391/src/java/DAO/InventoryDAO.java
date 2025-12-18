@@ -381,7 +381,6 @@ public class InventoryDAO {
                 d.setCategory(rs.getString("category"));
                 d.setStock(rs.getInt("stock_quantity"));
 
-
                 if (d.getStock() <= 0) {
                     d.setStatus("Out");
                 } else if (d.getStock() <= 5) {
@@ -397,35 +396,98 @@ public class InventoryDAO {
         }
         return list;
     }
+
     public List<String> getAllBrands() {
-    List<String> list = new ArrayList<>();
-    String sql = "SELECT DISTINCT brand FROM products WHERE brand IS NOT NULL AND brand != '' ORDER BY brand";
-    try (Connection conn = DBContext.getConnection(); 
-         PreparedStatement ps = conn.prepareStatement(sql); 
-         ResultSet rs = ps.executeQuery()) {
-        while (rs.next()) {
-            list.add(rs.getString("brand"));
+        List<String> list = new ArrayList<>();
+        String sql = "SELECT DISTINCT brand FROM products WHERE brand IS NOT NULL AND brand != '' ORDER BY brand";
+        try (Connection conn = DBContext.getConnection(); PreparedStatement ps = conn.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) {
+                list.add(rs.getString("brand"));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-    } catch (Exception e) {
-        e.printStackTrace();
+        return list;
     }
-    return list;
-}
 
-
-public List<String> getAllCategories() {
-    List<String> list = new ArrayList<>();
-    String sql = "SELECT DISTINCT category FROM products WHERE category IS NOT NULL AND category != '' ORDER BY category";
-    try (Connection conn = DBContext.getConnection(); 
-         PreparedStatement ps = conn.prepareStatement(sql); 
-         ResultSet rs = ps.executeQuery()) {
-        while (rs.next()) {
-            list.add(rs.getString("category"));
+    public List<String> getAllCategories() {
+        List<String> list = new ArrayList<>();
+        String sql = "SELECT DISTINCT category FROM products WHERE category IS NOT NULL AND category != '' ORDER BY category";
+        try (Connection conn = DBContext.getConnection(); PreparedStatement ps = conn.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) {
+                list.add(rs.getString("category"));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-    } catch (Exception e) {
-        e.printStackTrace();
+        return list;
     }
-    return list;
-}
+    
+    public int getTotalAuditItemsCount(int productId) {
+        String sql = "SELECT COUNT(*) FROM product_items pi " +
+                     "JOIN product_details pd ON pi.product_detail_id = pd.product_detail_id " +
+                     "WHERE pd.product_id = ?";
+        try (Connection conn = DBContext.getConnection(); 
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, productId);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1);
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
 
+
+    public List<ProductItem> getAuditItemsByPage(int productId, int page, int pageSize) {
+        List<ProductItem> list = new ArrayList<>();
+        
+
+        String sql = "SELECT pi.items_id, pi.product_detail_id, pi.serial_number, pi.status, pi.items_note, " +
+                     "pd.cpu, pd.ram, pd.storage, pd.gpu " +
+                     "FROM product_items pi " +
+                     "JOIN product_details pd ON pi.product_detail_id = pd.product_detail_id " +
+                     "WHERE pd.product_id = ? " +
+                     "ORDER BY pi.items_id " + 
+                     "LIMIT ? OFFSET ?";
+        
+        try (Connection conn = DBContext.getConnection(); 
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            
+            ps.setInt(1, productId);
+            ps.setInt(2, pageSize);
+            ps.setInt(3, (page - 1) * pageSize);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    ProductItem item = new ProductItem();
+                    
+                    item.setItemId(rs.getInt("items_id"));       
+                    item.setProductDetailId(rs.getInt("product_detail_id"));
+                    item.setSerialNumber(rs.getString("serial_number"));
+                    item.setStatus(rs.getString("status"));
+                    item.setItemNote(rs.getString("items_note")); 
+
+                    String cpu = rs.getString("cpu") != null ? rs.getString("cpu") : "";
+                    String ram = rs.getString("ram") != null ? rs.getString("ram") : "";
+                    String storage = rs.getString("storage") != null ? rs.getString("storage") : "";
+                    String gpu = rs.getString("gpu") != null ? rs.getString("gpu") : "";
+                    
+        
+                    String specs = String.format("%s / %s / %s / %s", cpu, ram, storage, gpu);
+                    specs = specs.replaceAll(" /  / ", " / ").replaceAll("^ / ", "").replaceAll(" / $", "");
+                    
+                    item.setSpecSummary(specs); 
+
+                    list.add(item);
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
 }

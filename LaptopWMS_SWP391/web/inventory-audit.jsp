@@ -211,12 +211,58 @@
                 color: #7f8c8d;
                 border: 2px dashed #dcdde1;
                 border-radius: 8px;
+            }
+            .custom-pagination {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                margin-top: 30px;
+                gap: 8px;
+            }
+
+            .custom-pagination a {
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                min-width: 36px;
+                height: 36px;
+                padding: 0 12px;
+                font-size: 14px;
+                font-weight: 500;
+                color: #4b5563; 
+                background-color: #ffffff;
+                border: 1px solid #d1d5db;
+                border-radius: 8px;
+                text-decoration: none;
+                transition: all 0.2s ease;
+                box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+            }
+
+            .custom-pagination a:hover {
+                border-color: #10b981;
+                color: #10b981;
+                background-color: #ecfdf5;
+                transform: translateY(-1px);
+            }
+
+            .custom-pagination .active {
+                background-color: #10b981 !important;
+                border-color: #10b981 !important;
+                color: #ffffff !important;
+                pointer-events: none;
+                box-shadow: 0 4px 6px rgba(16, 185, 129, 0.3);
+            }
+
+            .custom-pagination span {
+                color: #9ca3af;
+                font-size: 14px;
+            }
             </style>
             <title>Laptop Warehouse Management System</title></title
     </head>
     <body>
         <jsp:include page="header.jsp"></jsp:include>
-            <a href="inventory" class="btn btn-back">Back to Inventory</a>
+            
             <div style="margin-top: 30px;
                  padding: 15px;
                  border: 1px solid #ddd;
@@ -225,7 +271,6 @@
                 <form action="add-product-item" method="POST">
                     <input type="hidden" name="productId" value="${productId}">
                 <input type="hidden" name="locationId" value="${locationId}">
-
                 <label>Select Specification:</label>
                 <select name="detailId" required style="width: auto;
                         margin-bottom: 10px;">
@@ -311,8 +356,26 @@
                         </c:forEach>
                     </tbody>
                 </table>
+                <c:if test="${totalPages > 1}">
+                        <div class="custom-pagination">
+                            <c:set var="baseLink" value="audit-inventory?productId=${productId}&locationId=${locationId}&page=" />
+                            
+                            <c:if test="${currentPage > 1}">
+                                <a href="${baseLink}${currentPage - 1}">&laquo; Prev</a>
+                            </c:if>
+
+                            <c:forEach begin="1" end="${totalPages}" var="i">
+                                <a href="${baseLink}${i}" class="${currentPage == i ? 'active' : ''}">${i}</a>
+                            </c:forEach>
+
+                            <c:if test="${currentPage < totalPages}">
+                                <a href="${baseLink}${currentPage + 1}">Next &raquo;</a>
+                            </c:if>
+                        </div>
+                    </c:if>
 
                 <div class="action-bar">
+                    <a href="inventory" class="btn btn-back">Back to Inventory</a>
                     <button type="submit" class="btn btn-update">
                         Update Audit & Recalculate Stock
                     </button>
