@@ -238,8 +238,15 @@
         <% } %>
         <% if (roleId == 2) {%>
         <a href="<%= request.getContextPath()%>/product-list">Products</a>
+<<<<<<< HEAD
         <a href="<%= request.getContextPath()%>/order-list">Orders</a>
         <a href="<%= request.getContextPath()%>/inventory">Inventory</a>
+=======
+        <a href="<%= request.getContextPath()%>/order-list">Orders</a>  
+
+        <a href="<%= request.getContextPath()%>/inventory">Inventory</a>  
+        
+>>>>>>> 93565ab8b22238e6a1f4d6711f82725f50824b4f
         <% }%>
         <% if (roleId == 3) {%>
         <a href="<%= request.getContextPath()%>/order-list">Orders</a>
@@ -283,6 +290,7 @@
         <% }%>
     </div>
 </div>
+<<<<<<< HEAD
 
 <% if (currentUser != null) {%>
 <script>
@@ -419,3 +427,5 @@
                             setInterval(updateBadgeCount, 30000);
 </script>
 <% }%>
+=======
+>>>>>>> 93565ab8b22238e6a1f4d6711f82725f50824b4f

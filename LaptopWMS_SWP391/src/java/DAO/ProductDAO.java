@@ -286,12 +286,52 @@ public class ProductDAO extends DBContext {
             ps.setString(4, d.getGpu());
             ps.setDouble(5, d.getScreen());
             ps.setBoolean(6, d.isStatus());
-            
+
             ps.setInt(7, d.getProductDetailId());
 
             ps.executeUpdate();
         } catch (Exception e) {
             e.printStackTrace();
+        }
+    }
+
+    public List<ProductDetail> getAllProductDetails() {
+        List<ProductDetail> list = new ArrayList<>();
+        // Truy vấn đầy đủ các cột cấu hình để hiển thị ở Cách 1
+        String sql = "SELECT product_detail_id, product_id, ram, storage, cpu, gpu, screen, status "
+                + "FROM product_details WHERE status = 1";
+
+        
+        try (PreparedStatement ps = getConnection().prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
+
+            while (rs.next()) {
+                ProductDetail d = new ProductDetail();
+                d.setProductDetailId(rs.getInt("product_detail_id"));
+                d.setProductId(rs.getInt("product_id"));
+                d.setRam(rs.getString("ram"));
+                d.setStorage(rs.getString("storage"));
+                d.setCpu(rs.getString("cpu"));
+                d.setGpu(rs.getString("gpu"));
+                d.setScreen(rs.getDouble("screen"));
+                d.setStatus(rs.getBoolean("status"));
+
+                list.add(d);
+            }
+        } catch (Exception e) {
+            System.err.println("Lỗi tại getAllProductDetails: " + e.getMessage());
+            e.printStackTrace();
+        }
+        return list;
+    }
+    
+    public static void main(String[] args) {
+        ProductDAO userDAO = new ProductDAO();
+
+        System.out.println("=== Testing ===");
+        List<ProductDetail> allUsers = userDAO.getAllProductDetails();
+        System.out.println("Found " + allUsers.size() + " Users:");
+        for (ProductDetail user : allUsers) {
+            System.out.println(user);
         }
     }
 }

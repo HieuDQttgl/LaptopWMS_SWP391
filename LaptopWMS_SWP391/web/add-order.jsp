@@ -1,10 +1,10 @@
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <!DOCTYPE html>
 <html>
     <head>
-        <title>Create New Order</title>
+        <meta charset="UTF-8">
+        <title>Create new Order</title>
         <style>
             body {
                 font-family: "Segoe UI", sans-serif;
@@ -12,7 +12,7 @@
                 padding: 40px;
             }
             .form-container {
-                max-width: 900px;
+                max-width: 1000px;
                 margin: 0 auto;
                 background: white;
                 padding: 30px;
@@ -26,6 +26,7 @@
             }
             .form-group {
                 margin-bottom: 15px;
+                position: relative;
             }
             label {
                 display: block;
@@ -33,50 +34,24 @@
                 font-weight: 600;
                 color: #333;
             }
-            input[type="text"], input[type="number"], textarea, select {
+            input, select, textarea {
                 width: 100%;
                 padding: 10px;
                 border: 1px solid #ddd;
                 border-radius: 4px;
                 box-sizing: border-box;
             }
-            .btn-save, .btn-add-detail {
-                width: 100%;
-                padding: 12px;
-                background: #2ecc71;
-                color: white;
-                border: none;
-                border-radius: 4px;
-                cursor: pointer;
-                font-size: 16px;
-                font-weight: bold;
-                margin-top: 10px;
-            }
-            .btn-save:hover {
-                background: #27ae60;
-            }
-            .link-back {
+
+            .error-text {
+                color: #e74c3c;
+                font-size: 11px;
+                margin-top: 4px;
                 display: block;
-                text-align: center;
-                margin-top: 15px;
-                color: #7f8c8d;
-                text-decoration: none;
+                min-height: 15px;
             }
-            .error-message {
-                color: #dc3545;
-                font-size: 0.9em;
-                margin-top: 5px;
-                font-weight: 600;
-            }
-            .error-box {
-                color: #721c24;
-                background-color: #f8d7da;
-                border: 1px solid #f5c6cb;
-                padding: 10px;
-                margin-bottom: 15px;
-                border-radius: 4px;
-                opacity: 1;
-                transition: opacity 1s ease-out;
+            .input-error {
+                border-color: #e74c3c !important;
+                background-color: #fffafa;
             }
 
             .type-switcher {
@@ -87,405 +62,420 @@
             }
             .type-btn {
                 flex: 1;
-                padding: 10px;
+                padding: 12px;
                 text-align: center;
                 cursor: pointer;
                 background: #ecf0f1;
-                border: 1px solid #ddd;
                 font-weight: 600;
-                transition: background 0.3s;
+                transition: 0.3s;
+                border: 1px solid #ddd;
             }
             .type-btn.active {
                 background: #3498db;
                 color: white;
                 border-color: #2980b9;
             }
-            .type-btn:not(.active):hover {
-                background: #e0e6e8;
+
+            .detail-table {
+                width: 100%;
+                border-collapse: collapse;
+                margin-top: 10px;
+            }
+            .detail-table th {
+                background: #f8f9fa;
+                padding: 12px;
+                text-align: left;
+                border-bottom: 2px solid #dee2e6;
+            }
+            .detail-table td {
+                padding: 10px;
+                vertical-align: top;
+                border-bottom: 1px solid #eee;
             }
 
-            #detail-table-body td {
-                vertical-align: middle;
-                padding: 8px 5px;
+            .detail-selection-wrapper {
+                display: none;
             }
-            .detail-table input, .detail-table select, .detail-table button {
-                padding: 8px;
-                font-size: 14px;
+            .row-active .detail-selection-wrapper {
+                display: block;
+            }
+            .price-qty-fields {
+                display: none;
+                gap: 10px;
+                margin-top: 10px;
+            }
+            .detail-selected .price-qty-fields {
+                display: flex;
+            }
+
+            .btn-save {
+                width: 100%;
+                padding: 15px;
+                background: #2ecc71;
+                color: white;
+                border: none;
+                border-radius: 4px;
+                cursor: pointer;
+                font-size: 16px;
+                font-weight: bold;
+                margin-top: 20px;
+            }
+            .btn-add-detail {
+                background: #3498db;
+                color: white;
+                padding: 10px 20px;
+                border: none;
+                border-radius: 4px;
+                cursor: pointer;
+                margin-top: 10px;
             }
             .btn-remove {
                 background: #e74c3c;
-                width: 40px;
-                height: 40px;
-                border-radius: 4px;
                 color: white;
                 border: none;
+                padding: 8px 12px;
+                border-radius: 4px;
                 cursor: pointer;
-                font-size: 16px;
             }
-            .detail-header {
-                margin-top: 25px;
-                margin-bottom: 10px;
-                font-size: 1.1em;
-                font-weight: bold;
-                color: #34495e;
+            .small-label {
+                font-size: 12px;
+                color: #7f8c8d;
+                margin-bottom: 2px;
+                display: block;
             }
-            .table-responsive {
-                overflow-x: auto;
-            }
-            .detail-table th {
-                padding: 10px;
-                background-color: #ecf0f1;
-                text-align: left;
-            }
-
             .partner-field {
                 display: none;
+            }
+            .link-back {
+                display: block;
+                text-align: center;
+                margin-top: 15px;
+                color: #7f8c8d;
+                text-decoration: none;
             }
         </style>
     </head>
     <body>
+
         <jsp:include page="header.jsp" />
 
         <div class="form-container">
             <h2>Create New Order</h2>
 
-            <c:if test="${not empty errors.general}">
-                <div class="error-box auto-hide">
-                    <strong>Error:</strong> ${errors.general}
-                </div>
-            </c:if>
-
-            <form action="add-order" method="post" id="orderForm" onsubmit="return prepareFormSubmission();">
-
+            <form action="add-order" method="post" id="orderForm" onsubmit="return validateForm();">
                 <div class="form-group">
                     <label>Order Type</label>
                     <div class="type-switcher">
-                        <div id="export-btn" class="type-btn" data-type="export">
-                            Export
-                        </div>
-                        <div id="import-btn" class="type-btn" data-type="import">
-                            Import
-                        </div>
+                        <div id="export-btn" class="type-btn active" onclick="switchOrderType('export')">EXPORT (Bán lẻ)</div>
+                        <div id="import-btn" class="type-btn" onclick="switchOrderType('import')">IMPORT (Nhập kho)</div>
                     </div>
-                    <c:if test="${not empty errors.party}">
-                        <div class="error-message">${errors.party}</div>
-                    </c:if>
                 </div>
 
-                <h3>Common Information</h3>
                 <div style="display: flex; gap: 20px;">
-
                     <div class="form-group partner-field" id="customer-group" style="flex: 1;">
                         <label>Customer</label>
-                        <select name="customerId" id="customerIdSelect">
-                            <option value="0"> Select Customer </option>
-                            <c:forEach items="${allCustomers}" var="c">
-                                <option value="${c.customerId}"
-                                        ${tempOrder.customerId == c.customerId ? 'selected' : ''}>
-                                    ${c.customerName}
-                                </option>
-                            </c:forEach>
-                        </select>
+                        <input type="text" list="customerList" id="customerSearch" placeholder="Search customer name..." autocomplete="off">
+                        <span id="err-customer" class="error-text"></span>
+                        <input type="hidden" name="customerId" id="customerIdHidden" value="0">
                     </div>
-
                     <div class="form-group partner-field" id="supplier-group" style="flex: 1;">
-                        <label> Supplier </label>
-                        <select name="supplierId" id="supplierIdSelect">
-                            <option value="0"> Select Suppler </option>
-                            <c:forEach items="${allSuppliers}" var="s">
-                                <option value="${s.supplierId}"
-                                        ${tempOrder.supplierId == s.supplierId ? 'selected' : ''}>
-                                    ${s.supplierName}
-                                </option>
-                            </c:forEach>
-                        </select>
+                        <label>Supplier</label>
+                        <input type="text" list="supplierList" id="supplierSearch" placeholder="Search supplier name..." autocomplete="off">
+                        <span id="err-supplier" class="error-text"></span>
+                        <input type="hidden" name="supplierId" id="supplierIdHidden" value="0">
                     </div>
                 </div>
 
                 <div class="form-group">
                     <label>Description</label>
-                    <textarea name="description" rows="3" placeholder="Nhập ghi chú cho đơn hàng...">${tempOrder.description}</textarea>
+                    <textarea name="description" rows="2" placeholder="Enter order notes..."></textarea>
                 </div>
 
-                <div class="detail-header">Product Detail</div>
+                <h3 style="margin-top: 25px; border-bottom: 2px solid #3498db; padding-bottom: 5px;">Product List</h3>
 
-                <c:if test="${not empty errors.details}">
-                    <div class="error-box auto-hide" style="margin-top: 5px; margin-bottom: 15px;">
-                        <strong>Error:</strong> ${errors.details}
-                    </div>
-                </c:if>
+                <table class="detail-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 35%;">Product Name</th>
+                            <th style="width: 55%;">Configuration Details</th>
+                            <th style="width: 10%;">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="detail-table-body">
+                        <tr class="order-detail-row">
+                            <td>
+                                <span class="small-label">Product Name</span>
+                                <input type="text" list="productList" class="product-search" placeholder="Search laptop..." autocomplete="off">
+                                <span class="error-msg error-text"></span>
+                                <input type="hidden" class="product-id-hidden">
+                            </td>
+                            <td>
+                                <div class="detail-selection-wrapper">
+                                    <span class="small-label">Select RAM / SSD / CPU</span>
+                                    <select name="productDetailId" class="detail-select">
+                                        <option value="">-- Select configuration --</option>
+                                    </select>
+                                    <span class="error-msg-detail error-text"></span>
 
-                <div class="table-responsive">
-                    <table class="detail-table" style="width: 100%; border-collapse: collapse;">
-                        <thead>
-                            <tr>
-                                <th style="width: 40%;">Product</th>
-                                <th style="width: 20%;">Quantity</th>
-                                <th style="width: 25%;">Unit Price</th>
-                                <th style="width: 10%;"></th>
-                            </tr>
-                        </thead>
-                        <tbody id="detail-table-body">
-                            
-                            <c:set var="detailsToRender" value="${not empty tempDetails ? tempDetails : null}" />
-                            <c:if test="${empty detailsToRender}"><c:set var="detailsToRender" value="${[]}" /></c:if>
+                                    <div class="price-qty-fields">
+                                        <div style="flex: 1;">
+                                            <span class="small-label">Quantity</span>
+                                            <input type="number" name="quantity" value="1" min="1" class="qty-input">
+                                        </div>
+                                        <div style="flex: 2;">
+                                            <span class="small-label">Unit Price ($)</span>
+                                            <div style="position: relative; display: flex; align-items: center;">
+                                                <span style="position: absolute; left: 10px; color: #7f8c8d; font-weight: bold;">$</span>
+                                                <input type="number" name="unitPrice" step="0.01" min="0" placeholder="0.00" style="padding-left: 25px;" class="price-input">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <span class="small-label">&nbsp;</span>
+                                <button type="button" class="btn-remove" onclick="removeRow(this)">X</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
 
-                            
-                            <jsp:useBean id="productMap" class="java.util.HashMap" scope="page" />
-                            <c:forEach items="${allProducts}" var="p">
-                                <c:set target="${productMap}" property="${p.productId}" value="${p.productName}" />
-                            </c:forEach>
-
-                            <c:set var="errorNames" value="${not empty errorProductNames ? errorProductNames : null}" />
-
-                            <c:choose>
-                                <c:when test="${fn:length(detailsToRender) > 0}">
-                                    <c:forEach items="${detailsToRender}" var="detail" varStatus="loop">
-                                        
-                                        <c:choose><c:when test="${not empty errorNames[loop.index]}">
-                                                <c:set var="currentProductName" value="${errorNames[loop.index]}" />
-                                                <c:set var="currentProductId" value="" />
-                                            </c:when><c:otherwise>
-                                                <c:set var="currentProductName" value="${productMap[detail.productId]}" />
-                                                <c:set var="currentProductId" value="${detail.productId}" />
-                                            </c:otherwise></c:choose>
-
-                                            <tr class="order-detail-row" data-index="${loop.index}">
-                                            <td>
-                                                <input type="text" list="products" name="productName"
-                                                        value="${currentProductName}"
-                                                        placeholder="Enter product name..." class="product-name-input" required>
-                                                
-                                                <input type="hidden" name="productId"
-                                                        value="${currentProductId}"
-                                                        class="product-id-input">
-                                                <c:if test="${not empty errors['details_line_' + loop.index]}">
-                                                    <div class="error-message" style="margin-top: 5px; color: #dc3545;">${errors['details_line_' + loop.index]}</div>
-                                                </c:if>
-                                            </td>
-                                            <td>
-                                                <input type="number" name="quantity" min="1" required value="${empty detail.quantity || detail.quantity < 1 ? 1 : detail.quantity}">
-                                            </td>
-
-                                            <td>
-                                                <input type="text" name="unitPrice" required value="${detail.unitPrice}"
-                                                        placeholder="Ví dụ: 15000000.00">
-                                            </td>
-                                            <td>
-                                                <button type="button" class="btn-remove" onclick="removeDetailRow(this)">X</button>
-                                            </td>
-                                        </tr>
-                                    </c:forEach>
-                                </c:when>
-                                <c:otherwise>
-                                    
-                                    <tr class="order-detail-row" data-index="0">
-                                        <td>
-                                            <input type="text" list="products" name="productName" placeholder="Gõ tên sản phẩm..." class="product-name-input" required>
-                                            <input type="hidden" name="productId" value="" class="product-id-input">
-                                        </td>
-                                        <td>
-                                            <input type="number" name="quantity" min="1" required value="1">
-                                        </td>
-                                        <td>
-                                            <input type="text" name="unitPrice" required placeholder="Ví dụ: 15000000.00">
-                                        </td>
-                                        <td>
-                                            <button type="button" class="btn-remove" onclick="removeDetailRow(this)">X</button>
-                                        </td>
-                                    </tr>
-                                </c:otherwise>
-                            </c:choose>
-                        </tbody>
-                    </table>
-                </div>
-
-                <datalist id="products">
-                    <c:forEach items="${allProducts}" var="p">
-                        <option data-product-id="${p.productId}" value="${p.productName}"></option>
-                    </c:forEach>
-                </datalist>
-
-                <button type="button" class="btn-add-detail" onclick="addDetailRow()">+ Add Product</button>
-                <button type="submit" class="btn-save">Create Order</button>
+                <button type="button" class="btn-add-detail" onclick="addRow()">+ Add More Product</button>
+                <div id="global-error" class="error-text" style="text-align: center; font-size: 14px; margin-bottom: 10px; font-weight: bold;"></div>
+                <button type="submit" class="btn-save">SUBMIT ORDER</button>
                 <a href="order-list" class="link-back">Cancel</a>
             </form>
         </div>
 
+        <datalist id="customerList">
+            <c:forEach items="${allCustomers}" var="c"><option data-id="${c.customerId}" value="${c.customerName}"></option></c:forEach>
+            </datalist>
+            <datalist id="supplierList">
+            <c:forEach items="${allSuppliers}" var="s"><option data-id="${s.supplierId}" value="${s.supplierName}"></option></c:forEach>
+            </datalist>
+            <datalist id="productList">
+            <c:forEach items="${allProducts}" var="p"><option data-id="${p.productId}" value="${p.productName}"></option></c:forEach>
+            </datalist>
+
+            <div id="raw-details" style="display: none;">
+            <c:forEach items="${allProductDetails}" var="pd">
+                <span class="pd-data" data-pid="${pd.productId}" data-id="${pd.productDetailId}" data-info="CPU: ${pd.cpu} | RAM: ${pd.ram} | SSD: ${pd.storage}"></span>
+            </c:forEach>
+        </div>
+
 
         <jsp:include page="footer.jsp" />
-
+        
         <script>
-            let detailIndex = 0;
-
-            function initializeDetailIndex() {
-                const detailRows = document.querySelectorAll('#detail-table-body .order-detail-row');
-                let maxIndex = -1;
-
-                detailRows.forEach(row => {
-                    const index = parseInt(row.getAttribute('data-index'));
-                    if (!isNaN(index) && index > maxIndex) {
-                        maxIndex = index;
-                    }
-                });
-                
-                detailIndex = maxIndex + 1;
-            }
-            
-            document.addEventListener('DOMContentLoaded', initializeDetailIndex);
-
-
-            document.addEventListener('input', function (e) {
-                if (e.target.classList.contains('product-name-input')) {
-                    const inputElement = e.target;
-                    const dataList = document.getElementById(inputElement.getAttribute('list'));
-                    const hiddenIdInput = inputElement.closest('td').querySelector('.product-id-input');
-
-                    const selectedOption = Array.from(dataList.options).find(
-                            option => option.value === inputElement.value
-                    );
-
-                    if (selectedOption) {
-                        hiddenIdInput.value = selectedOption.getAttribute('data-product-id');
-                    } else {
-                        hiddenIdInput.value = '';  
-                    }
-                }
-            });
-
-            function getDetailRowTemplate() {
-                const currentId = detailIndex;
-
-                const template = `
-                    <tr class="order-detail-row" data-index="${currentId}">
-                        <td>
-                            <input type="text" list="products" name="productName" placeholder="Gõ tên sản phẩm..." class="product-name-input" required>
-                            <input type="hidden" name="productId" value="" class="product-id-input">
-                        </td>
-                        <td>
-                            <input type="number" name="quantity" min="1" required value="1">
-                        </td>
-                        <td>
-                            <input type="text" name="unitPrice" required placeholder="Ví dụ: 15000000.00">
-                        </td>
-                        <td>
-                            <button type="button" class="btn-remove" onclick="removeDetailRow(this)">X</button>
-                        </td>
-                    </tr>
-                `;
-                detailIndex++;
-                return template;
-            }
-
-            function addDetailRow() {
-                const tableBody = document.getElementById('detail-table-body');
-                tableBody.insertAdjacentHTML('beforeend', getDetailRowTemplate());
-            }
-
-            function removeDetailRow(buttonElement) {
-                const row = buttonElement.closest('.order-detail-row');
-                const tableBody = document.getElementById('detail-table-body');
-
-                if (tableBody.querySelectorAll('.order-detail-row').length > 1) {
-                    row.remove();
-                } else {
-                    alert('Order must have at leat one product.');
-                }
-            }
-
             function switchOrderType(type) {
-                const customerGroup = document.getElementById('customer-group');
-                const supplierGroup = document.getElementById('supplier-group');
-                const customerSelect = document.getElementById('customerIdSelect');
-                const supplierSelect = document.getElementById('supplierIdSelect');
-                const exportBtn = document.getElementById('export-btn');
-                const importBtn = document.getElementById('import-btn');
+                const isExp = (type === 'export');
+                document.getElementById('customer-group').style.display = isExp ? 'block' : 'none';
+                document.getElementById('supplier-group').style.display = isExp ? 'none' : 'block';
+                document.getElementById('export-btn').classList.toggle('active', isExp);
+                document.getElementById('import-btn').classList.toggle('active', !isExp);
 
-                if (type === 'export') {
-                    customerGroup.style.display = 'block';
-                    supplierGroup.style.display = 'none';
-                    supplierSelect.value = '0';
-                    exportBtn.classList.add('active');
-                    importBtn.classList.remove('active');
+                document.getElementById('customerIdHidden').value = '0';
+                document.getElementById('supplierIdHidden').value = '0';
+                document.getElementById('err-customer').innerText = "";
+                document.getElementById('err-supplier').innerText = "";
+            }
+
+            function initPartnerSearch(inputId, hiddenId, listId, errorId) {
+                const inputEl = document.getElementById(inputId);
+                inputEl.addEventListener('input', function () {
+                    const options = document.getElementById(listId).options;
+                    let foundId = '0';
+                    for (let opt of options) {
+                        if (opt.value === this.value) {
+                            foundId = opt.getAttribute('data-id');
+                            break;
+                        }
+                    }
+                    document.getElementById(hiddenId).value = foundId;
+
+                    if (foundId !== '0') {
+                        this.classList.remove('input-error');
+                        document.getElementById(errorId).innerText = "";
+                    }
+                });
+            }
+
+            function loadDetailsToSelect(productId, selectEl) {
+                const rawData = document.querySelectorAll('.pd-data');
+                selectEl.innerHTML = '<option value="">-- Select Configuration Details --</option>';
+                rawData.forEach(item => {
+                    if (String(item.getAttribute('data-pid')) === String(productId)) {
+                        const opt = document.createElement('option');
+                        opt.value = item.getAttribute('data-id');
+                        opt.textContent = item.getAttribute('data-info');
+                        selectEl.appendChild(opt);
+                    }
+                });
+            }
+
+            const tableBody = document.getElementById('detail-table-body');
+
+            tableBody.addEventListener('input', function (e) {
+                const row = e.target.closest('tr');
+
+                if (e.target.classList.contains('product-search')) {
+                    const hiddenInput = row.querySelector('.product-id-hidden');
+                    const detailSelect = row.querySelector('.detail-select');
+                    const options = document.getElementById('productList').options;
+                    let foundId = null;
+
+                    for (let opt of options) {
+                        if (opt.value === e.target.value) {
+                            foundId = opt.getAttribute('data-id');
+                            break;
+                        }
+                    }
+
+                    if (foundId) {
+                        hiddenInput.value = foundId;
+                        row.classList.add('row-active');
+                        loadDetailsToSelect(foundId, detailSelect);
+                        e.target.classList.remove('input-error');
+                        row.querySelector('.error-msg').innerText = ""; // Xóa lỗi tên sp
+                    } else {
+                        hiddenInput.value = '';
+                        row.classList.remove('row-active', 'detail-selected');
+                    }
+                }
+            });
+
+            tableBody.addEventListener('change', function (e) {
+                if (e.target.classList.contains('detail-select')) {
+                    const currentSelect = e.target;
+                    const row = currentSelect.closest('tr');
+                    const errorSpan = row.querySelector('.error-msg-detail');
+                    const allSelects = document.querySelectorAll('.detail-select');
+
+                    let isDuplicate = false;
+                    allSelects.forEach(s => {
+                        if (s !== currentSelect && s.value === currentSelect.value && s.value !== "") {
+                            isDuplicate = true;
+                        }
+                    });
+
+                    if (isDuplicate) {
+                        errorSpan.innerText = "⚠️ Cấu hình này đã được chọn!";
+                        currentSelect.value = "";
+                        currentSelect.classList.add('input-error');
+                        row.classList.remove('detail-selected');
+                    } else {
+                        errorSpan.innerText = "";
+                        currentSelect.classList.remove('input-error');
+                        if (currentSelect.value !== "")
+                            row.classList.add('detail-selected');
+                        else
+                            row.classList.remove('detail-selected');
+                    }
+                    document.getElementById('global-error').innerText = "";
+                }
+            });
+
+            function addRow() {
+                const tbody = document.getElementById('detail-table-body');
+                const template = tbody.querySelector('.order-detail-row');
+                const newRow = template.cloneNode(true);
+
+                newRow.classList.remove('row-active', 'detail-selected');
+                newRow.querySelectorAll('input').forEach(i => {
+                    i.classList.remove('input-error');
+                    i.value = (i.name === 'quantity') ? "1" : "";
+                });
+                newRow.querySelector('.detail-select').innerHTML = '<option value="">-- Select configuration --</option>';
+                newRow.querySelectorAll('.error-text, .error-msg, .error-msg-detail').forEach(span => span.innerText = "");
+
+                tbody.appendChild(newRow);
+            }
+
+            function removeRow(btn) {
+                const rows = document.querySelectorAll('.order-detail-row');
+                if (rows.length > 1) {
+                    btn.closest('tr').remove();
                 } else {
-                    customerGroup.style.display = 'none';
-                    supplierGroup.style.display = 'block';
-                    customerSelect.value = '0';
-                    exportBtn.classList.remove('active');
-                    importBtn.classList.add('active');
+                    const row = btn.closest('tr');
+                    row.classList.remove('row-active', 'detail-selected');
+                    row.querySelector('.product-search').value = "";
+                    row.querySelector('.product-id-hidden').value = "";
+                    row.querySelector('.detail-select').innerHTML = '<option value="">-- Select configuration --</option>';
+                    row.querySelector('.qty-input').value = "1";
+                    row.querySelector('.price-input').value = "";
+                    row.querySelectorAll('.error-text, .error-msg, .error-msg-detail').forEach(s => s.innerText = "");
                 }
             }
 
-            document.addEventListener('DOMContentLoaded', function () {
-                document.querySelectorAll('.error-box.auto-hide').forEach(errorBox => {
-                    setTimeout(() => {
-                        errorBox.style.opacity = '0';
-                        setTimeout(() => {
-                            errorBox.style.display = 'none';
-                        }, 1000);
-                    }, 10000);
-                });
+            function validateForm() {
+                let isValid = true;
+                const globalError = document.getElementById('global-error');
+                globalError.innerText = "";
 
-                const initialCustomerId = document.getElementById('customerIdSelect').value;
-                const initialSupplierId = document.getElementById('supplierIdSelect').value;
-
-                let initialType = 'export';
-                if ((initialSupplierId !== '0' && initialSupplierId !== '') || 
-                    (initialCustomerId === '0' && initialSupplierId === '0' && document.getElementById('supplier-group').style.display === 'block')) {
-                    initialType = 'import';
+                const isExp = document.getElementById('export-btn').classList.contains('active');
+                if (isExp) {
+                    const cId = document.getElementById('customerIdHidden').value;
+                    if (cId === '0' || document.getElementById('customerSearch').value === "") {
+                        document.getElementById('err-customer').innerText = "Customer not found.";
+                        document.getElementById('customerSearch').classList.add('input-error');
+                        isValid = false;
+                    }
                 } else {
-                    initialType = 'export';
+                    const sId = document.getElementById('supplierIdHidden').value;
+                    if (sId === '0' || document.getElementById('supplierSearch').value === "") {
+                        document.getElementById('err-supplier').innerText = "Supplier not found.";
+                        document.getElementById('supplierSearch').classList.add('input-error');
+                        isValid = false;
+                    }
                 }
 
-                switchOrderType(initialType);
+                const rows = document.querySelectorAll('.order-detail-row');
+                let hasValidRow = false;
 
-                document.querySelectorAll('.type-btn').forEach(button => {
-                    button.addEventListener('click', function () {
-                        switchOrderType(this.dataset.type);
-                    });
-                });
-            });
+                rows.forEach(row => {
+                    const pSearch = row.querySelector('.product-search');
+                    const dSelect = row.querySelector('.detail-select');
+                    const qty = row.querySelector('.qty-input');
+                    const price = row.querySelector('.price-input');
 
-            function prepareFormSubmission() {
-                const customerSelect = document.getElementById('customerIdSelect');
-                const supplierSelect = document.getElementById('supplierIdSelect');
-
-                if (customerSelect.value === '0' && supplierSelect.value === '0') {
-                    alert('Please pick Import or Export.');
-                    return false;
-                }
-
-                const detailRows = document.querySelectorAll('#detail-table-body .order-detail-row');
-                let validDetailCount = 0;
-                let productsAreValid = true;
-
-                detailRows.forEach((row) => {
-                    const productIdInput = row.querySelector('.product-id-input');
-                    const productNameInput = row.querySelector('.product-name-input');
-                    
-                    if (productIdInput.value !== '' && productIdInput.value !== '0' && 
-                        productIdInput.value !== null && parseInt(productIdInput.value) > 0) {
-                        
-                        validDetailCount++;
-                    } else {
-                        if (productNameInput.value.trim() !== '') {
-                            productsAreValid = false;
+                    if (pSearch.value.trim() !== "") {
+                        if (dSelect.value === "") {
+                            row.querySelector('.error-msg-detail').innerText = "No configuration selected!";
+                            dSelect.classList.add('input-error');
+                            isValid = false;
+                        } else {
+                            hasValidRow = true;
+                            if (qty.value <= 0) {
+                                qty.classList.add('input-error');
+                                isValid = false;
+                            }
+                            if (price.value === "" || price.value < 0) {
+                                price.classList.add('input-error');
+                                isValid = false;
+                            }
                         }
                     }
                 });
 
-                if (!productsAreValid) {
-                    alert('Vui lòng chọn sản phẩm hợp lệ từ danh sách gợi ý cho tất cả các chi tiết đã điền tên.');
-                    return false;
+                if (!hasValidRow) {
+                    globalError.innerText = "❌ Lỗi: Order must have at least 1 product.";
+                    isValid = false;
                 }
 
-                if (validDetailCount === 0) {
-                    alert('Đơn hàng phải có ít nhất một chi tiết sản phẩm hợp lệ.');
-                    return false;
+                if (!isValid) {
+                    const firstErr = document.querySelector('.input-error');
+                    if (firstErr)
+                        firstErr.scrollIntoView({behavior: 'smooth', block: 'center'});
                 }
 
-                return true;  
+                return isValid;
             }
+
+            document.addEventListener('DOMContentLoaded', () => {
+                initPartnerSearch('customerSearch', 'customerIdHidden', 'customerList', 'err-customer');
+                initPartnerSearch('supplierSearch', 'supplierIdHidden', 'supplierList', 'err-supplier');
+                switchOrderType('export');
+            });
         </script>
     </body>
 </html>

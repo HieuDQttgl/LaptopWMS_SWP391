@@ -151,7 +151,6 @@
                         <td><%= item.getStockQuantity()%></td>
                         <td><%= item.getLastUpdated()%></td>
                         <td>
-                            <a href="inventory-detail?id=<%= item.getInventoryId()%>" class="btn btn-view">View Details</a>
                             <a href="audit-inventory?productId=<%= item.getProductId()%>" class="btn btn-audit" style="background-color: #e67e22; margin-left: 5px;">Audit</a>
                         </td>
                     </tr>
@@ -167,7 +166,7 @@
                     %>
                 </tbody>
             </table>
-
+            <a href="javascript:history.back()" class="btn" style="background-color: #2ecc71; color: white; margin-bottom: 15px; display: inline-block;"> Back</a>
             <div class="pagination">
                 <%
                     int currentPage = (int) request.getAttribute("currentPage");
