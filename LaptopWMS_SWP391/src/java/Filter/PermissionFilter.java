@@ -1,4 +1,4 @@
-package Utils;
+package Filter;
 
 import Model.Users;
 import jakarta.servlet.*;
@@ -19,7 +19,7 @@ public class PermissionFilter implements Filter {
             "/landing",
             "/login",
             "/register",
-            "/forgot-password"
+            "/forgot"
     );
 
     @Override
@@ -32,7 +32,7 @@ public class PermissionFilter implements Filter {
 
         String requestURI = req.getRequestURI();
         String contextPath = req.getContextPath();
-        
+
         String path = requestURI.substring(contextPath.length());
 
         if (path.startsWith("/css/") || path.startsWith("/js/")

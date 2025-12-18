@@ -57,10 +57,9 @@ public class LoginServlet extends HttpServlet {
                 session.setAttribute("username", user.getUsername());
                 session.setAttribute("fullName", user.getFullName());
                 session.setAttribute("currentUser", user);
-                session.setAttribute("sessionCreatedAt", System.currentTimeMillis()); // NEW: Track session creation
-                                                                                      // time
+                session.setAttribute("sessionCreatedAt", System.currentTimeMillis()); 
                 session.setAttribute("userPermissions", userPermissions);
-                response.sendRedirect(request.getContextPath() + "/landing");
+                response.sendRedirect(request.getContextPath() + "/dashboard");
             } catch (Exception ex) {
                 Logger.getLogger(LoginServlet.class.getName()).log(Level.SEVERE, null, ex);
             }
