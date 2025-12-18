@@ -226,9 +226,9 @@
 </style>
 <div class="header">
     <div class="header-left">
-        <% if(roleId == -1) {%>
+        <% if (roleId == -1) {%>
         <a href="<%= request.getContextPath()%>/landing">@ WMS</a>
-        <% } else { %>
+        <% } else {%>
         <a href="<%= request.getContextPath()%>/dashboard">@ WMS</a>
         <% } %>
     </div>
@@ -241,11 +241,13 @@
         <% if (roleId == 1) {%>
         <a href="<%= request.getContextPath()%>/user-list">Users</a>
         <a href="<%= request.getContextPath()%>/role">Roles</a>
+        <a href="<%= request.getContextPath()%>/location-list">Locations</a>
         <% } %>
         <% if (roleId == 2) {%>
         <a href="<%= request.getContextPath()%>/product-list">Products</a>
         <a href="<%= request.getContextPath()%>/order-list">Orders</a>
         <a href="<%= request.getContextPath()%>/inventory">Inventory</a>
+        <a href="<%= request.getContextPath()%>/location-list">Locations</a>
         <% }%>
         <% if (roleId == 3) {%>
         <a href="<%= request.getContextPath()%>/order-list">Orders</a>
