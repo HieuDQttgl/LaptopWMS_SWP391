@@ -4,6 +4,12 @@
     Author     : super
 --%>
 
+<%-- 
+    Document   : add-product
+    Created on : Dec 15, 2025, 10:23:08 AM
+    Author     : super
+--%>
+
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <!DOCTYPE html>
@@ -90,7 +96,8 @@
 
                 <div class="form-group">
                     <label>Brand</label>
-                    <select name="brand">
+                    <select name="brand" id="brandSelect" required>
+                        <option value="">-- Select Brand --</option>
                         <option value="Dell">Dell</option>
                         <option value="HP">HP</option>
                         <option value="ASUS">ASUS</option>
@@ -111,14 +118,12 @@
                 </div>
 
                 <div class="form-group">
-                    <label>Supplier</label>
-                    <select name="supplierId" required>
-                        <option value="" disabled selected>-- Select a Supplier --</option>
-
+                    <label>Distributor (Auto-Selected)</label>
+                    <select name="supplierId" id="supplierSelect" required style="pointer-events: none; background-color: #e9ecef;">
+                        <option value="" disabled selected>-- Waiting for Brand --</option>
                         <c:forEach items="${supplierList}" var="s">
                             <option value="${s.supplierId}">${s.supplierName}</option>
                         </c:forEach>
-
                     </select>
                 </div>
 
@@ -127,7 +132,38 @@
             </form>
         </div>
 
-
         <jsp:include page="footer.jsp" />
+
+        <script>
+            document.addEventListener("DOMContentLoaded", function () {
+                const brandSelect = document.getElementById('brandSelect');
+                const supplierSelect = document.getElementById('supplierSelect');
+
+                const brandToSupplierMap = {
+                    "Dell": "1",
+                    "Apple": "2",
+                    "Lenovo": "3",
+                    "ASUS": "4",
+                    "Acer": "5",
+                    "MSI": "6",
+                    "HP": "7"
+                };
+
+                brandSelect.addEventListener('change', function () {
+                    const selectedBrand = this.value;
+                    const correctSupplierId = brandToSupplierMap[selectedBrand];
+
+                    if (correctSupplierId) {
+                        supplierSelect.value = correctSupplierId;
+                        supplierSelect.style.backgroundColor = "#d4edda";
+                        supplierSelect.style.color = "#155724";
+                    } else {
+                        supplierSelect.value = "";
+                        supplierSelect.style.backgroundColor = "#e9ecef";
+                        supplierSelect.style.color = "";
+                    }
+                });
+            });
+        </script>
     </body>
 </html>
