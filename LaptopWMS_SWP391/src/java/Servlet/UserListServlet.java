@@ -165,9 +165,9 @@ public class UserListServlet extends HttpServlet {
             throws ServletException, IOException {
 
         String username = request.getParameter("username");
+        String email = request.getParameter("email");
         String password = request.getParameter("password");
         String fullName = request.getParameter("fullName");
-        String email = request.getParameter("email");
         String phoneNumber = request.getParameter("phoneNumber");
         String gender = request.getParameter("gender");
         String roleIdStr = request.getParameter("roleId");
@@ -180,31 +180,18 @@ public class UserListServlet extends HttpServlet {
         tempUser.setPhoneNumber(phoneNumber);
         tempUser.setGender(gender);
 
+        int roleId = (roleIdStr != null && !roleIdStr.isEmpty()) ? Integer.parseInt(roleIdStr) : 0;
+        tempUser.setRoleId(roleId);
+
         Map<String, String> errors = new HashMap<>();
-        int roleId = -1;
 
-        if (roleIdStr == null || roleIdStr.trim().isEmpty()) {
-            errors.put("roleId", "Role ID is required.");
-        } else {
-            try {
-                roleId = Integer.parseInt(roleIdStr);
-                tempUser.setRoleId(roleId);
-                if (roleId < 1 || roleId > 3) {
-                    errors.put("roleId", "Invalid Role ID value.");
-                }
-            } catch (NumberFormatException e) {
-                errors.put("roleId", "Role ID must be a number.");
-            }
-        }
-
-        if (username != null && !username.trim().isEmpty() && userDAO.isUsernameExists(username)) {
+        if (userDAO.isUsernameExists(username)) {
             errors.put("username", "This username is already taken.");
         }
 
-        if (email != null && !email.trim().isEmpty() && userDAO.isEmailExists(email)) {
+        if (userDAO.isEmailExists(email)) {
             errors.put("email", "This email is already taken.");
         }
-
         if (!errors.isEmpty()) {
             request.setAttribute("errors", errors);
             request.setAttribute("tempUser", tempUser);
@@ -214,31 +201,16 @@ public class UserListServlet extends HttpServlet {
         }
 
         try {
-            Users newUser = new Users(
-                    0,
-                    username,
-                    password,
-                    fullName,
-                    email,
-                    phoneNumber,
-                    gender,
-                    roleId,
-                    "active",
-                    null,
-                    null,
-                    null,
-                    currentUser.getUserId()
-            );
+            Users newUser = new Users(0, username, password, fullName, email, phoneNumber, gender, roleId, "active", null, null, null, currentUser.getUserId());
 
             if (userDAO.addNew(newUser)) {
                 session.setAttribute("message", "User " + username + " added successfully!");
             } else {
-                session.setAttribute("error", "Failed to add user. An unexpected error occurred in DB.");
+                session.setAttribute("error", "Failed to add user to Database.");
             }
-
         } catch (Exception e) {
             e.printStackTrace();
-            session.setAttribute("error", "An unexpected error occurred during user creation.");
+            session.setAttribute("error", "System error: " + e.getMessage());
         }
 
         response.sendRedirect(request.getContextPath() + "/user-list");
