@@ -11,7 +11,7 @@
     <head>
         <jsp:include page="header.jsp"/>
         <meta charset="UTF-8">
-        <title>User Role Management</title>
+        <title>Laptop Warehouse Management System</title>
         
         <style>
             body {

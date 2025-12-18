@@ -11,7 +11,7 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>Laptop Inventory</title>
+        <title>Laptop Warehouse Management System</title>
 
         <style>
             body {

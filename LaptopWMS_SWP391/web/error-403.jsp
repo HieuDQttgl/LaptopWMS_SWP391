@@ -8,7 +8,7 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>Access Denied</title>
+        <title>Laptop Warehouse Management System</title>
         <style>
             body {
                 font-family: Arial, sans-serif;

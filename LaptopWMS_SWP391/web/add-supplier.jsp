@@ -6,7 +6,7 @@
         <jsp:include page="header.jsp" />
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Add Supplier</title>
+        <title>Laptop Warehouse Management System</title>
         <style>
             body {
                 font-family: Arial, sans-serif;

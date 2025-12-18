@@ -8,7 +8,7 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>Add Configuration</title>
+        <title>Laptop Warehouse Management System</title>
         <style>
             body {
                 font-family: "Segoe UI", sans-serif;

@@ -12,15 +12,15 @@ import java.util.List;
  *
  * @author super
  */
-@WebFilter(filterName = "PermissionFilter", urlPatterns = {"/*"})
+@WebFilter(filterName = "PermissionFilter", urlPatterns = { "/*" })
 public class PermissionFilter implements Filter {
 
     private static final List<String> PUBLIC_PAGES = Arrays.asList(
             "/landing",
             "/login",
             "/register",
-            "/forgot"
-    );
+            "/forgot",
+            "/notifications");
 
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)

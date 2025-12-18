@@ -4,7 +4,7 @@
 <html>
     <head>
         <meta charset="UTF-8">
-        <title>Create new Order</title>
+        <title>Laptop Warehouse Management System</title>
         <style>
             body {
                 font-family: "Segoe UI", sans-serif;

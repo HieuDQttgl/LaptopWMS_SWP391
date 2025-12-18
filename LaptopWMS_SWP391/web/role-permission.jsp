@@ -3,6 +3,7 @@
 <%@ page import="Model.Role" %>
 <%@ page import="Model.Permission" %>
 
+<title>Laptop Warehouse Management System</title>
 <%
     List<Role> roles = (List<Role>) request.getAttribute("roles");
     List<Permission> permissions = (List<Permission>) request.getAttribute("permissions");

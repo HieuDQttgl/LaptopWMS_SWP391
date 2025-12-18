@@ -9,7 +9,7 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>Edit Product</title>
+        <title>Laptop Warehouse Management System</title>
         <style>
             body {
                 font-family: "Segoe UI", sans-serif;

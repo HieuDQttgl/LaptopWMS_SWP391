@@ -5,7 +5,7 @@
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Login</title>
+        <title>Laptop Warehouse Management System</title>
         <style>
             :root {
                 --primary-color: #2563eb;

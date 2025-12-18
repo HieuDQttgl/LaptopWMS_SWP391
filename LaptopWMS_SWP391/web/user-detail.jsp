@@ -10,7 +10,7 @@
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>User Details</title>
+        <title>Laptop Warehouse Management System</title>
 
         <style>
             :root {
@@ -230,6 +230,24 @@
                 box-shadow: 0 6px 14px rgba(37, 99, 235, 0.25);
             }
 
+            .btn-danger {
+                padding: 7px 14px;
+                border-radius: 999px;
+                border: none;
+                background: linear-gradient(135deg, #dc2626, #ef4444);
+                color: #ffffff;
+                font-weight: 500;
+                font-size: 13px;
+                cursor: pointer;
+                transition: background 0.15s ease, transform 0.05s ease, box-shadow 0.05s ease;
+                box-shadow: 0 8px 18px rgba(220, 38, 38, 0.3);
+            }
+
+            .btn-danger:hover {
+                background: linear-gradient(135deg, #b91c1c, #dc2626);
+                transform: translateY(-1px);
+            }
+
             @media (max-width: 540px) {
                 .card {
                     padding: 22px 18px 20px;
@@ -410,8 +428,8 @@
                             <select
                                 name="gender"
                                 class="field-select">
-                                    <option value=""
-                                    <%=gender.isEmpty()
+                                <option value=""
+                                        <%=gender.isEmpty()
                                                 ? "selected"
                                                 : ""%>>—
                                 </option>
@@ -449,24 +467,13 @@
                                 class="field-label">Role</span>
                             <span
                                 class="field-value">
-                                <%= role
-                                        != null
-                                                ? role.getRoleName()
-                                                : "—"%>
+                                <%= role != null ? role.getRoleName() : "—"%>
                             </span>
                         </div>
-                        <% // Get roles list for dropdown
+                        <%
                             List<Role> roles = (List<Role>) request.getAttribute("roles");
-                            // Can edit role only if: admin is editing, target user is not admin, and not editing self
-                            boolean canEditRole
-                                    = isAdmin
-                                    && user.getRoleId()
-                                    != 1
-                                    && currentUser.getUserId()
-                                    != user.getUserId();
-                            if (canEditRole
-                                    && roles
-                                    != null) {
+                            boolean canEditRole = isAdmin && user.getRoleId() != 1 && currentUser.getUserId() != user.getUserId();
+                            if (canEditRole && roles != null) {
                         %>
                         <div
                             class="field-group edit-mode">
@@ -475,19 +482,14 @@
                             <select
                                 name="roleId"
                                 class="field-select">
-                                <% for (Role r
-                                            : roles) {
-                                        // Don't show admin role as option
-                                        if (r.getRoleId()
-                                                != 1) {
+                                <% for (Role r : roles) {
+                                        if (r.getRoleId() != 1) {
                                 %>
                                 <option
                                     value="<%= r.getRoleId()%>"
-                                    <%=r.getRoleId() == user.getRoleId()
-                                            ? "selected"
-                                            : ""%>
+                                    <%=r.getRoleId() == user.getRoleId() ? "selected" : ""%>
                                     >
-                                    <%= r.getRoleName()%>
+                                    <%=r.getRoleName()%>
                                 </option>
                                 <% }
                                     }
@@ -502,10 +504,7 @@
                             <span
                                 class="field-value"
                                 style="color: #6b7280; font-style: italic;">
-                                <%= role
-                                        != null
-                                                ? role.getRoleName()
-                                                : "—"%>
+                                <%= role != null ? role.getRoleName() : "—"%>
                                 <% if (user.getRoleId() == 1) {
                                 %>
                                 (Cannot
@@ -531,10 +530,7 @@
                                 class="field-label">Status</span>
                             <span
                                 class="field-value">
-                                <%= user.getStatus()
-                                        != null
-                                                ? user.getStatus()
-                                                : "—"%>
+                                <%= user.getStatus() != null ? user.getStatus() : "—"%>
                             </span>
                         </div>
 
@@ -545,10 +541,7 @@
                                 Login</span>
                             <span
                                 class="field-value muted">
-                                <%= user.getLastLoginAt()
-                                        != null
-                                                ? sdf.format(user.getLastLoginAt())
-                                                : "Never logged in"%>
+                                <%= user.getLastLoginAt() != null ? sdf.format(user.getLastLoginAt()) : "Never logged in"%>
                             </span>
                         </div>
 
@@ -559,10 +552,7 @@
                                 At</span>
                             <span
                                 class="field-value muted">
-                                <%= user.getCreatedAt()
-                                        != null
-                                                ? sdf.format(user.getCreatedAt())
-                                                : "—"%>
+                                <%= user.getCreatedAt() != null ? sdf.format(user.getCreatedAt()) : "—"%>
                             </span>
                         </div>
 
@@ -573,10 +563,7 @@
                                 At</span>
                             <span
                                 class="field-value muted">
-                                <%= user.getUpdatedAt()
-                                        != null
-                                                ? sdf.format(user.getUpdatedAt())
-                                                : "—"%>
+                                <%= user.getUpdatedAt() != null ? sdf.format(user.getUpdatedAt()) : "—"%>
                             </span>
                         </div>
 
@@ -587,14 +574,7 @@
                                 By</span>
                             <span
                                 class="field-value muted">
-                                <%= creator
-                                        != null
-                                                ? creator.getUsername()
-                                                : (user.getCreatedBy()
-                                                != null
-                                                        ? "User ID: "
-                                                        + user.getCreatedBy()
-                                                        : "—")%>
+                                <%= creator != null ? creator.getUsername() : (user.getCreatedBy() != null ? "User ID: " + user.getCreatedBy() : "—")%>
                             </span>
                         </div>
                     </div>
@@ -615,8 +595,29 @@
                     <% if (isAdmin) {%>
                     <button type="button" onclick="enableEditMode()"
                             class="btn-primary">Edit User</button>
+                    <% // Show reset password only for non-admin users with email 
+                        if (user.getRoleId() != 1 && user.getEmail() != null && !user.getEmail().isEmpty()) { %>
+                    <button type="button" onclick="confirmResetPassword()"
+                            class="btn-danger">Reset Password</button>
+                    <% } %>
                     <% } %>
                 </div>
+
+                <% if (isAdmin && user.getRoleId() != 1) {%>
+                <form id="resetPasswordForm" method="post"
+                      action="<%= request.getContextPath()%>/admin-reset-password"
+                      style="display:none;">
+                    <input type="hidden" name="userId"
+                           value="<%= user.getUserId()%>">
+                </form>
+                <script>
+                    function confirmResetPassword() {
+                        if (confirm('Are you sure you want to reset the password for this user?\n\nA new random password will be generated and sent to their email address.')) {
+                            document.getElementById('resetPasswordForm').submit();
+                        }
+                    }
+                </script>
+                <% } %>
 
                 <% } else {%>
 

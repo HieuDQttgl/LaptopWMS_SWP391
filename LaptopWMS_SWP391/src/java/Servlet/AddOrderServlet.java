@@ -91,7 +91,7 @@ public class AddOrderServlet extends HttpServlet {
             newOrder.setSupplierId(supplierId);
             newOrder.setCustomerId(null);
         } else {
-            errors.put("party", "Vui lòng chọn Khách hàng hoặc Nhà cung cấp.");
+            errors.put("party", "Vui lòng điền Customer hoặc Supplier.");
         }
 
         newOrder.setDescription(description);
@@ -146,7 +146,6 @@ public class AddOrderServlet extends HttpServlet {
             errors.put("details", "Đơn hàng phải có ít nhất 1 sản phẩm.");
         }
 
-        // 3. Xử lý kết quả
         if (!errors.isEmpty() || hasDetailError) {
             request.setAttribute("errors", errors);
             request.setAttribute("tempOrder", newOrder);
