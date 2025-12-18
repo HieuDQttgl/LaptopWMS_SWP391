@@ -397,5 +397,35 @@ public class InventoryDAO {
         }
         return list;
     }
+    public List<String> getAllBrands() {
+    List<String> list = new ArrayList<>();
+    String sql = "SELECT DISTINCT brand FROM products WHERE brand IS NOT NULL AND brand != '' ORDER BY brand";
+    try (Connection conn = DBContext.getConnection(); 
+         PreparedStatement ps = conn.prepareStatement(sql); 
+         ResultSet rs = ps.executeQuery()) {
+        while (rs.next()) {
+            list.add(rs.getString("brand"));
+        }
+    } catch (Exception e) {
+        e.printStackTrace();
+    }
+    return list;
+}
+
+
+public List<String> getAllCategories() {
+    List<String> list = new ArrayList<>();
+    String sql = "SELECT DISTINCT category FROM products WHERE category IS NOT NULL AND category != '' ORDER BY category";
+    try (Connection conn = DBContext.getConnection(); 
+         PreparedStatement ps = conn.prepareStatement(sql); 
+         ResultSet rs = ps.executeQuery()) {
+        while (rs.next()) {
+            list.add(rs.getString("category"));
+        }
+    } catch (Exception e) {
+        e.printStackTrace();
+    }
+    return list;
+}
 
 }

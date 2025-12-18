@@ -62,7 +62,7 @@
                 border: none;
             }
 
-         
+
             .stats-row {
                 display: grid;
                 grid-template-columns: repeat(3, 1fr);
@@ -99,7 +99,7 @@
                 color: var(--danger);
             }
 
-           
+
             table {
                 width: 100%;
                 border-collapse: collapse;
@@ -153,14 +153,19 @@
                     </select>
                     <select name="brand">
                         <option value="">Brand: All</option>
-                        <option value="Dell" ${param.brand == 'Dell' ? 'selected' : ''}>Dell</option>
-                        <option value="Apple" ${param.brand == 'Apple' ? 'selected' : ''}>Apple</option>
-                        <option value="ASUS" ${param.brand == 'ASUS' ? 'selected' : ''}>ASUS</option>
+                        <c:forEach items="${listBrands}" var="b">
+                            <option value="${b}" ${currentBrand == b ? 'selected' : ''}>
+                                ${b}
+                            </option>
+                        </c:forEach>
                     </select>
                     <select name="category">
                         <option value="">Category: All</option>
-                        <option value="Gaming" ${param.category == 'Gaming' ? 'selected' : ''}>Gaming</option>
-                        <option value="Office" ${param.category == 'Office' ? 'selected' : ''}>Office</option>
+                        <c:forEach items="${listCategories}" var="c">
+                            <option value="${c}" ${currentCat == c ? 'selected' : ''}>
+                                ${c}
+                            </option>
+                        </c:forEach>
                     </select>
                     <button type="submit" class="btn-filter">Filter</button>
                 </form>
