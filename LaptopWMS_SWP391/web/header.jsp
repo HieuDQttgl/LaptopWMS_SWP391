@@ -241,7 +241,6 @@
         <% if (roleId == 1) {%>
         <a href="<%= request.getContextPath()%>/user-list">Users</a>
         <a href="<%= request.getContextPath()%>/role">Roles</a>
-        <a href="<%= request.getContextPath()%>/location-list">Locations</a>
         <% } %>
         <% if (roleId == 2) {%>
         <a href="<%= request.getContextPath()%>/product-list">Products</a>

@@ -2,6 +2,7 @@ package DAO;
 
 import DTO.ProductDTO;
 import DTO.InventoryDTO;
+import DTO.InventoryReportDTO;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import Model.Location;
@@ -349,6 +350,52 @@ public class InventoryDAO {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    public List<InventoryReportDTO> getSimpleInventoryReport(Integer locId, String brand, String category) {
+        List<InventoryReportDTO> list = new ArrayList<>();
+        StringBuilder sql = new StringBuilder(
+                "SELECT p.product_id, p.product_name, l.location_name, p.brand, p.category, i.stock_quantity "
+                + "FROM inventory i "
+                + "JOIN products p ON i.product_id = p.product_id "
+                + "JOIN locations l ON i.location_id = l.location_id WHERE 1=1 "
+        );
+
+        if (locId != null && locId > 0) {
+            sql.append(" AND l.location_id = ").append(locId);
+        }
+        if (brand != null && !brand.isEmpty()) {
+            sql.append(" AND p.brand = '").append(brand).append("'");
+        }
+        if (category != null && !category.isEmpty()) {
+            sql.append(" AND p.category = '").append(category).append("'");
+        }
+
+        try (Connection conn = DBContext.getConnection(); PreparedStatement ps = conn.prepareStatement(sql.toString()); ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) {
+                InventoryReportDTO d = new InventoryReportDTO();
+                d.setId(rs.getInt("product_id"));
+                d.setProductName(rs.getString("product_name"));
+                d.setLocationName(rs.getString("location_name"));
+                d.setBrand(rs.getString("brand"));
+                d.setCategory(rs.getString("category"));
+                d.setStock(rs.getInt("stock_quantity"));
+
+
+                if (d.getStock() <= 0) {
+                    d.setStatus("Out");
+                } else if (d.getStock() <= 5) {
+                    d.setStatus("Low");
+                } else {
+                    d.setStatus("Normal");
+                }
+
+                list.add(d);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return list;
     }
 
 }
