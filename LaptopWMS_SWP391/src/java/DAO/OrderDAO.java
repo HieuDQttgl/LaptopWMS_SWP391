@@ -15,7 +15,7 @@ import java.sql.SQLException;
 public class OrderDAO extends DBContext {
 
     public List<Order> getListOrders() {
-        return getListOrders(null, null, null, null, null, null);
+        return getListOrders(null, null, null, null, null, null, "order_id", "ASC", 0, Integer.MAX_VALUE);
     }
 
     public List<Order> getListOrders(
@@ -25,6 +25,21 @@ public class OrderDAO extends DBContext {
             String startDateFilter,
             String endDateFilter,
             String orderTypeFilter) {
+        return getListOrders(keyword, statusFilter, createdByFilter, startDateFilter, endDateFilter, orderTypeFilter, "order_id", "ASC", 0, Integer.MAX_VALUE);
+    }
+
+// Main method with filters, sorting, and pagination
+    public List<Order> getListOrders(
+            String keyword,
+            String statusFilter,
+            Integer createdByFilter,
+            String startDateFilter,
+            String endDateFilter,
+            String orderTypeFilter,
+            String sortField,
+            String sortOrder,
+            int offset,
+            int limit) {
 
         List<Order> orders = new ArrayList<>();
         List<Object> params = new ArrayList<>();
@@ -74,13 +89,39 @@ public class OrderDAO extends DBContext {
             }
         }
 
-        sql.append(" ORDER BY o.order_id ASC");
+        // Add sorting
+        String safeSortField = (sortField != null && !sortField.isEmpty()) ? sortField : "order_id";
+        String safeSortOrder = (sortOrder != null && sortOrder.equalsIgnoreCase("DESC")) ? "DESC" : "ASC";
+
+        // Map sort fields to actual database columns
+        String finalSortField;
+        switch (safeSortField) {
+            case "customer_name":
+                finalSortField = "c.customer_name";
+                break;
+            case "supplier_name":
+                finalSortField = "s.supplier_name";
+                break;
+            case "created_by_name":
+                finalSortField = "u.full_name";
+                break;
+            default:
+                finalSortField = "o." + safeSortField;
+                break;
+        }
+
+        sql.append(String.format(" ORDER BY %s %s", finalSortField, safeSortOrder));
+
+        // Add pagination
+        sql.append(" LIMIT ? OFFSET ?");
 
         try (Connection conn = getConnection(); PreparedStatement ps = conn.prepareStatement(sql.toString())) {
 
             for (int i = 0; i < params.size(); i++) {
                 ps.setObject(i + 1, params.get(i));
             }
+            ps.setInt(params.size() + 1, limit);
+            ps.setInt(params.size() + 2, offset);
 
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
@@ -92,14 +133,17 @@ public class OrderDAO extends DBContext {
                     order.setCreatedAt(rs.getTimestamp("created_at"));
                     order.setUpdatedAt(rs.getTimestamp("updated_at"));
                     order.setCreatedBy(rs.getInt("created_by"));
+
                     int customerId = rs.getInt("customer_id");
                     if (!rs.wasNull()) {
                         order.setCustomerId(customerId);
                     }
+
                     int supplierId = rs.getInt("supplier_id");
                     if (!rs.wasNull()) {
                         order.setSupplierId(supplierId);
                     }
+
                     order.setCustomerName(rs.getString("customer_name"));
                     order.setSupplierName(rs.getString("supplier_name"));
                     order.setCreatedByName(rs.getString("created_by_name"));
@@ -113,6 +157,77 @@ public class OrderDAO extends DBContext {
         }
 
         return orders;
+    }
+    
+        public int getTotalOrders(
+            String keyword,
+            String statusFilter,
+            Integer createdByFilter,
+            String startDateFilter,
+            String endDateFilter,
+            String orderTypeFilter) {
+
+        int total = 0;
+        List<Object> params = new ArrayList<>();
+
+        StringBuilder sql = new StringBuilder(
+                "SELECT COUNT(*) "
+                + "FROM orders o "
+                + "LEFT JOIN customers c ON o.customer_id = c.customer_id "
+                + "LEFT JOIN suppliers s ON o.supplier_id = s.supplier_id "
+                + "JOIN users u ON o.created_by = u.user_id "
+                + "WHERE 1=1 "
+        );
+
+        if (keyword != null && !keyword.trim().isEmpty()) {
+            sql.append("AND (o.order_code LIKE ? OR c.customer_name LIKE ? OR s.supplier_name LIKE ?) ");
+            String wildcardKeyword = "%" + keyword.trim() + "%";
+            params.add(wildcardKeyword);
+            params.add(wildcardKeyword);
+            params.add(wildcardKeyword);
+        }
+
+        if (statusFilter != null && !statusFilter.isEmpty() && !statusFilter.equalsIgnoreCase("all")) {
+            sql.append("AND o.order_status = ? ");
+            params.add(statusFilter);
+        }
+
+        if (createdByFilter != null && createdByFilter > 0) {
+            sql.append("AND o.created_by = ? ");
+            params.add(createdByFilter);
+        }
+
+        if (startDateFilter != null && !startDateFilter.isEmpty()) {
+            sql.append("AND DATE(o.created_at) >= ? ");
+            params.add(startDateFilter);
+        }
+
+        if (endDateFilter != null && !endDateFilter.isEmpty()) {
+            sql.append("AND DATE(o.created_at) <= ? ");
+            params.add(endDateFilter);
+        }
+
+        if (orderTypeFilter != null && !orderTypeFilter.isEmpty() && !orderTypeFilter.equalsIgnoreCase("all")) {
+            if (orderTypeFilter.equalsIgnoreCase("EXPORT")) {
+                sql.append("AND o.customer_id IS NOT NULL ");
+            } else if (orderTypeFilter.equalsIgnoreCase("IMPORT")) {
+                sql.append("AND o.supplier_id IS NOT NULL ");
+            }
+        }
+
+        try (Connection conn = getConnection(); PreparedStatement ps = conn.prepareStatement(sql.toString())) {
+            for (int i = 0; i < params.size(); i++) {
+                ps.setObject(i + 1, params.get(i));
+            }
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    total = rs.getInt(1);
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return total;
     }
 
     public Order getOrderById(int orderId) {

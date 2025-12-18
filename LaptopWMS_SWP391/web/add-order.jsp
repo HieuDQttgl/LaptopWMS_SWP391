@@ -9,11 +9,13 @@
             body {
                 font-family: "Segoe UI", sans-serif;
                 background: #f5f6fa;
-                padding: 40px;
+                margin: 0;
+                padding: 0px;
             }
             .form-container {
                 max-width: 1000px;
-                margin: 0 auto;
+                margin: auto;
+                margin-top: 40px;
                 background: white;
                 padding: 30px;
                 border-radius: 8px;
@@ -166,8 +168,8 @@
                 <div class="form-group">
                     <label>Order Type</label>
                     <div class="type-switcher">
-                        <div id="export-btn" class="type-btn active" onclick="switchOrderType('export')">EXPORT (Bán lẻ)</div>
-                        <div id="import-btn" class="type-btn" onclick="switchOrderType('import')">IMPORT (Nhập kho)</div>
+                        <div id="export-btn" class="type-btn active" onclick="switchOrderType('export')">EXPORT</div>
+                        <div id="import-btn" class="type-btn" onclick="switchOrderType('import')">IMPORT</div>
                     </div>
                 </div>
 

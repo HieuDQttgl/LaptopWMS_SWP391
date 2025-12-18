@@ -1,5 +1,4 @@
 package Servlet;
-
 import DAO.OrderDAO;
 import DAO.UserDAO;
 import Model.Order;
@@ -17,10 +16,11 @@ public class OrderListServlet extends HttpServlet {
     
     private final OrderDAO orderDAO = new OrderDAO();
     private final UserDAO userDAO = new UserDAO(); 
-
+    
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        request.setCharacterEncoding("UTF-8");
         
         String keyword = request.getParameter("keyword");
         String statusFilter = request.getParameter("statusFilter");
@@ -38,7 +38,33 @@ public class OrderListServlet extends HttpServlet {
             }
         }
         
-        List<Order> orders = orderDAO.getListOrders(
+        String sortField = request.getParameter("sort_field");
+        String sortOrder = request.getParameter("sort_order");
+        
+        if (sortField == null || sortField.isEmpty()) {
+            sortField = "order_id";
+        }
+        if (sortOrder == null || sortOrder.isEmpty() || 
+            (!"ASC".equalsIgnoreCase(sortOrder) && !"DESC".equalsIgnoreCase(sortOrder))) {
+            sortOrder = "DESC";
+        }
+        
+        int page = 1;
+        int recordsPerPage = 3;
+        
+        String pageStr = request.getParameter("page");
+        if (pageStr != null && !pageStr.isEmpty()) {
+            try {
+                page = Integer.parseInt(pageStr);
+                if (page < 1) page = 1;
+            } catch (NumberFormatException e) {
+                page = 1;
+            }
+        }
+        
+        int offset = (page - 1) * recordsPerPage;
+        
+        int totalRecords = orderDAO.getTotalOrders(
                 keyword, 
                 statusFilter, 
                 createdByFilter, 
@@ -46,10 +72,20 @@ public class OrderListServlet extends HttpServlet {
                 endDateFilter,
                 orderTypeFilter
         );
+        int totalPages = (int) Math.ceil((double) totalRecords / recordsPerPage);
         
-
-        //List<String> allStatuses = orderDAO.getDistinctStatuses(); 
-        //request.setAttribute("allStatuses", allStatuses);
+        List<Order> orders = orderDAO.getListOrders(
+                keyword, 
+                statusFilter, 
+                createdByFilter, 
+                startDateFilter, 
+                endDateFilter,
+                orderTypeFilter,
+                sortField,
+                sortOrder,
+                offset,
+                recordsPerPage
+        );
         
         List<Users> orderCreators = userDAO.getListUsers(); 
         request.setAttribute("allCreators", orderCreators);
@@ -61,10 +97,17 @@ public class OrderListServlet extends HttpServlet {
         request.setAttribute("startDateFilter", startDateFilter);
         request.setAttribute("endDateFilter", endDateFilter);
         request.setAttribute("orderTypeFilter", orderTypeFilter);
+        request.setAttribute("sort_field", sortField);
+        request.setAttribute("sort_order", sortOrder);
+        
+        request.setAttribute("currentPage", page);
+        request.setAttribute("totalPages", totalPages);
+        request.setAttribute("totalRecords", totalRecords);
+        request.setAttribute("recordsPerPage", recordsPerPage);
         
         request.getRequestDispatcher("order-list.jsp").forward(request, response);
     }
-
+    
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {

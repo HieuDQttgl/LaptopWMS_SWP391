@@ -237,6 +237,55 @@
             .btn-secondary:hover {
                 background-color: #7f8c8d;
             }
+            .pagination {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                gap: 8px;
+                margin: 25px 0;
+                flex-wrap: wrap;
+            }
+            .pagination a,
+            .pagination span {
+                padding: 8px 12px;
+                border: 1px solid #ddd;
+                border-radius: 4px;
+                text-decoration: none;
+                color: #2c3e50;
+                font-weight: 600;
+                transition: all 0.3s;
+            }
+            .pagination a:hover {
+                background-color: #3498db;
+                color: white;
+                border-color: #3498db;
+            }
+            .pagination .current-page {
+                background-color: #3498db;
+                color: white;
+                border-color: #3498db;
+            }
+            .pagination .disabled {
+                color: #bdc3c7;
+                cursor: not-allowed;
+                pointer-events: none;
+            }
+            .pagination-info {
+                display: inline-block;
+                padding: 8px 12px;
+                color: #7f8c8d;
+                font-weight: 600;
+                font-size: 14px;
+            }
+            th a {
+                color: inherit;
+                text-decoration: none;
+                display: block;
+                cursor: pointer;
+            }
+            th a:hover {
+                text-decoration: underline;
+            }
         </style>
     </head>
     <body>
@@ -271,15 +320,24 @@
             </div>
 
             <div class="filter-container">
-                <form action="order-list" method="get" class="filter-form">
+                <form action="order-list" method="get" class="filter-form" id="filterForm">
+                    <!-- Hidden fields for sorting and pagination -->
+                    <input type="hidden" name="sort_field" value="${sort_field}">
+                    <input type="hidden" name="sort_order" value="${sort_order}">
+                    <input type="hidden" name="page" value="1">
+
                     <div class="form-row">
                         <div class="form-group">
                             <label for="keyword">Search</label>
                             <input type="text" id="keyword" name="keyword" placeholder="Search by OrderCode,Customer,Supplier,.." value="${keyword}">
                         </div>
+
+                        <button type="submit" class="btn-secondary" style="padding: 6px 12px; background: #3498db; color: white; border: none; border-radius: 4px; cursor: pointer;">
+                            Search
+                        </button>
                         <div class="form-group">
                             <label for="statusFilter">Status</label>
-                            <select id="statusFilter" name="statusFilter">
+                            <select id="statusFilter" name="statusFilter" onchange="this.form.submit()">
                                 <option value="all" ${statusFilter == null || statusFilter == 'all' ? 'selected' : ''}>All Statuses</option>
                                 <option value="Pending" ${statusFilter == 'Pending' ? 'selected' : ''}>Pending</option>
                                 <option value="Approved" ${statusFilter == 'Approved' ? 'selected' : ''}>Approved</option>
@@ -290,7 +348,7 @@
                         </div>
                         <div class="form-group">
                             <label for="orderTypeFilter">Order Type</label>
-                            <select id="orderTypeFilter" name="orderTypeFilter">
+                            <select id="orderTypeFilter" name="orderTypeFilter" onchange="this.form.submit()">
                                 <option value="all" ${orderTypeFilter == null || orderTypeFilter == 'all' ? 'selected' : ''}>All Types</option>
                                 <option value="Export" ${orderTypeFilter == 'Export' ? 'selected' : ''}>Export</option>
                                 <option value="Import" ${orderTypeFilter == 'Import' ? 'selected' : ''}>Import</option>
@@ -298,7 +356,7 @@
                         </div>
                         <div class="form-group">
                             <label for="createdByFilter">Creator</label>
-                            <select id="createdByFilter" name="createdByFilter">
+                            <select id="createdByFilter" name="createdByFilter" onchange="this.form.submit()">
                                 <option value="" ${createdByFilter == null || createdByFilter == '' ? 'selected' : ''}>All Creators</option>
                                 <c:forEach var="creator" items="${allCreators}">
                                     <option value="${creator.userId}" ${createdByFilter == creator.userId ? 'selected' : ''}>
@@ -311,30 +369,82 @@
                     <div class="date-filter-row">
                         <div class="form-group">
                             <label for="startDateFilter">From (Created Date)</label>
-                            <input type="date" id="startDateFilter" name="startDateFilter" value="${startDateFilter}">
+                            <input type="date" id="startDateFilter" name="startDateFilter" value="${startDateFilter}" onchange="this.form.submit()">
                         </div>
                         <div class="form-group">
                             <label for="endDateFilter">To (Created Date)</label>
-                            <input type="date" id="endDateFilter" name="endDateFilter" value="${endDateFilter}">
+                            <input type="date" id="endDateFilter" name="endDateFilter" value="${endDateFilter}" onchange="this.form.submit()">
                         </div>
                         <div class="form-group btn-action-group" style="flex: 1 1 200px; align-self: flex-end;">
-                            <button type="submit" class="btn-primary"> Filter/ Search</button>
-                            <a href="order-list" class="btn-outline-secondary"> Reset</a>
+                            <a href="order-list" class="btn-outline-secondary">Reset</a>
                         </div>
                     </div>
                 </form>
             </div>
+            <%
+                String currentSortField = (String) request.getAttribute("sort_field");
+                String currentSortOrder = (String) request.getAttribute("sort_order");
+
+                if (currentSortField == null) {
+                    currentSortField = "order_id";
+                }
+                if (currentSortOrder == null)
+                    currentSortOrder = "DESC";
+            %>
+
             <table>
                 <thead>
                     <tr>
-                        <th>Order Code</th>
+                        <th>
+                            <a href="#" onclick="window.location.href = createSortUrl('order_code'); return false;">
+                                Order Code
+                                <% if ("order_code".equals(currentSortField)) {%>
+                                <%= "ASC".equals(currentSortOrder) ? " ▲" : " ▼"%>
+                                <% } %>
+                            </a>
+                        </th>
                         <th>Description</th>
-                        <th>Customer</th>
-                        <th>Supplier</th>
+                        <th>
+                            <a href="#" onclick="window.location.href = createSortUrl('customer_name'); return false;">
+                                Customer
+                                <% if ("customer_name".equals(currentSortField)) {%>
+                                <%= "ASC".equals(currentSortOrder) ? " ▲" : " ▼"%>
+                                <% } %>
+                            </a>
+                        </th>
+                        <th>
+                            <a href="#" onclick="window.location.href = createSortUrl('supplier_name'); return false;">
+                                Supplier
+                                <% if ("supplier_name".equals(currentSortField)) {%>
+                                <%= "ASC".equals(currentSortOrder) ? " ▲" : " ▼"%>
+                                <% } %>
+                            </a>
+                        </th>
                         <th>Order Type</th>
-                        <th>Created At</th>
-                        <th>Status</th>
-                        <th>Created By</th>
+                        <th>
+                            <a href="#" onclick="window.location.href = createSortUrl('created_at'); return false;">
+                                Created At
+                                <% if ("created_at".equals(currentSortField)) {%>
+                                <%= "ASC".equals(currentSortOrder) ? " ▲" : " ▼"%>
+                                <% } %>
+                            </a>
+                        </th>
+                        <th>
+                            <a href="#" onclick="window.location.href = createSortUrl('order_status'); return false;">
+                                Status
+                                <% if ("order_status".equals(currentSortField)) {%>
+                                <%= "ASC".equals(currentSortOrder) ? " ▲" : " ▼"%>
+                                <% } %>
+                            </a>
+                        </th>
+                        <th>
+                            <a href="#" onclick="window.location.href = createSortUrl('created_by_name'); return false;">
+                                Created By
+                                <% if ("created_by_name".equals(currentSortField)) {%>
+                                <%= "ASC".equals(currentSortOrder) ? " ▲" : " ▼"%>
+                                <% }%>
+                            </a>
+                        </th>
                         <th>Action</th> 
                     </tr>
                 </thead>
@@ -417,6 +527,90 @@
                     </c:choose>
                 </tbody>
             </table>
+            <%
+                Integer currentPage = (Integer) request.getAttribute("currentPage");
+                Integer totalPages = (Integer) request.getAttribute("totalPages");
+                Integer totalRecords = (Integer) request.getAttribute("totalRecords");
+                Integer recordsPerPage = (Integer) request.getAttribute("recordsPerPage");
+
+                if (currentPage == null) {
+                    currentPage = 1;
+                }
+                if (totalPages == null) {
+                    totalPages = 1;
+                }
+                if (totalRecords == null) {
+                    totalRecords = 0;
+                }
+                if (recordsPerPage == null)
+                    recordsPerPage = 10;
+            %>
+
+            <% if (totalRecords > 0) {%>
+            <div style="text-align: center; margin-top: 20px; color: #7f8c8d;">
+                <p style="margin-bottom: 15px; font-weight: 600;">
+                    Total Orders: <%= totalRecords%>
+                </p>
+
+                <% if (totalPages > 1) { %>
+                <div class="pagination">
+                    <!-- Previous Button -->
+                    <% if (currentPage > 1) {%>
+                    <a href="#" onclick="window.location.href = createPaginationUrl(<%= currentPage - 1%>); return false;">« Previous</a>
+                    <% } else { %>
+                    <span class="disabled">« Previous</span>
+                    <% } %>
+
+                    <!-- Page Numbers -->
+                    <%
+                        int startPage = Math.max(1, currentPage - 2);
+                        int endPage = Math.min(totalPages, currentPage + 2);
+
+                        if (startPage > 1) {
+                    %>
+                    <a href="#" onclick="window.location.href = createPaginationUrl(1); return false;">1</a>
+                    <% if (startPage > 2) { %>
+                    <span>...</span>
+                    <% } %>
+                    <% } %>
+
+                    <% for (int i = startPage; i <= endPage; i++) { %>
+                    <% if (i == currentPage) {%>
+                    <span class="current-page"><%= i%></span>
+                    <% } else {%>
+                    <a href="#" onclick="window.location.href = createPaginationUrl(<%= i%>); return false;"><%= i%></a>
+                    <% } %>
+                    <% } %>
+
+                    <% if (endPage < totalPages) { %>
+                    <% if (endPage < totalPages - 1) { %>
+                    <span>...</span>
+                    <% }%>
+                    <a href="#" onclick="window.location.href = createPaginationUrl(<%= totalPages%>); return false;"><%= totalPages%></a>
+                    <% } %>
+
+                    <!-- Next Button -->
+                    <% if (currentPage < totalPages) {%>
+                    <a href="#" onclick="window.location.href = createPaginationUrl(<%= currentPage + 1%>); return false;">Next »</a>
+                    <% } else { %>
+                    <span class="disabled">Next »</span>
+                    <% }%>
+
+                    <!-- Pagination Info -->
+                    <span class="pagination-info" style="margin-left: 15px;">
+                        Showing
+                        <%= Math.min((currentPage - 1) * recordsPerPage + 1, totalRecords)%>
+                        -
+                        <%= Math.min(currentPage * recordsPerPage, totalRecords)%>
+                        of
+                        <%= totalRecords%>
+                        orders
+                    </span>
+                </div>
+                <% } %>
+            </div>
+            <% }%>
+
             <a id="backLanding"
                href="<%= request.getContextPath()%>/landing"
                class="btn-secondary">Back to Landing Page</a>
@@ -435,6 +629,89 @@
                     }, 5000);
                 });
             });
+
+            function createPaginationUrl(page) {
+                var keyword = document.getElementById('keyword').value;
+                var statusFilter = document.getElementById('statusFilter').value;
+                var orderTypeFilter = document.getElementById('orderTypeFilter').value;
+                var createdByFilter = document.getElementById('createdByFilter').value;
+                var startDateFilter = document.getElementById('startDateFilter').value;
+                var endDateFilter = document.getElementById('endDateFilter').value;
+
+                var currentSortField = '<%= currentSortField%>';
+                var currentSortOrder = '<%= currentSortOrder%>';
+
+                var url = 'order-list?page=' + page;
+
+                if (keyword && keyword.trim() !== '') {
+                    url += '&keyword=' + encodeURIComponent(keyword.trim());
+                }
+                if (statusFilter && statusFilter !== 'all') {
+                    url += '&statusFilter=' + statusFilter;
+                }
+                if (orderTypeFilter && orderTypeFilter !== 'all') {
+                    url += '&orderTypeFilter=' + orderTypeFilter;
+                }
+                if (createdByFilter && createdByFilter !== '') {
+                    url += '&createdByFilter=' + createdByFilter;
+                }
+                if (startDateFilter && startDateFilter !== '') {
+                    url += '&startDateFilter=' + startDateFilter;
+                }
+                if (endDateFilter && endDateFilter !== '') {
+                    url += '&endDateFilter=' + endDateFilter;
+                }
+                if (currentSortField) {
+                    url += '&sort_field=' + currentSortField;
+                }
+                if (currentSortOrder) {
+                    url += '&sort_order=' + currentSortOrder;
+                }
+
+                return url;
+            }
+
+            function createSortUrl(field) {
+                var keyword = document.getElementById('keyword').value;
+                var statusFilter = document.getElementById('statusFilter').value;
+                var orderTypeFilter = document.getElementById('orderTypeFilter').value;
+                var createdByFilter = document.getElementById('createdByFilter').value;
+                var startDateFilter = document.getElementById('startDateFilter').value;
+                var endDateFilter = document.getElementById('endDateFilter').value;
+
+                var currentSortField = '<%= currentSortField%>';
+                var currentSortOrder = '<%= currentSortOrder%>';
+
+                var newSortOrder = 'ASC';
+                if (field === currentSortField) {
+                    newSortOrder = (currentSortOrder === 'ASC') ? 'DESC' : 'ASC';
+                } else {
+                    newSortOrder = 'ASC';
+                }
+
+                var url = 'order-list?sort_field=' + field + '&sort_order=' + newSortOrder;
+
+                if (keyword && keyword.trim() !== '') {
+                    url += '&keyword=' + encodeURIComponent(keyword.trim());
+                }
+                if (statusFilter && statusFilter !== 'all') {
+                    url += '&statusFilter=' + statusFilter;
+                }
+                if (orderTypeFilter && orderTypeFilter !== 'all') {
+                    url += '&orderTypeFilter=' + orderTypeFilter;
+                }
+                if (createdByFilter && createdByFilter !== '') {
+                    url += '&createdByFilter=' + createdByFilter;
+                }
+                if (startDateFilter && startDateFilter !== '') {
+                    url += '&startDateFilter=' + startDateFilter;
+                }
+                if (endDateFilter && endDateFilter !== '') {
+                    url += '&endDateFilter=' + endDateFilter;
+                }
+
+                return url;
+            }
         </script>
     </body>
 </html>
