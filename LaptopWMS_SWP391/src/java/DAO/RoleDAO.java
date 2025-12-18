@@ -28,6 +28,7 @@ public class RoleDAO extends DBContext {
             Role r = new Role(
                     rs.getInt("role_id"),
                     rs.getString("role_name"),
+                    rs.getString("role_description"),
                     rs.getString("status")
             );
             list.add(r);

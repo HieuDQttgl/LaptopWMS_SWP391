@@ -2,17 +2,13 @@
 <%@ page import="java.util.*" %>
 <%@ page import="Model.Users" %>
 <%@ page import="Model.Role" %>
-<%
-    List<Users> userList = (List<Users>) request.getAttribute("userList");
-    List<Role> roleList = (List<Role>) request.getAttribute("roleList");
-%>
 <!DOCTYPE html>
 <html>
     <head>
         <jsp:include page="header.jsp"/>
         <meta charset="UTF-8">
         <title>Laptop Warehouse Management System</title>
-        
+
         <style>
             body {
                 font-family: Arial, sans-serif;
@@ -118,34 +114,42 @@
                 <a href="role-permission" class="btn">Change Role Permission</a>
             </div>
 
-            <table>
+            <table class="table table-hover">
                 <thead>
                     <tr>
+                        <th>ID</th>
                         <th>Role Name</th>
-                        <th>Role Status</th>
+                        <th>Description</th> <th>Role Status</th>
+                        <th>Action</th>
                     </tr>
                 </thead>
 
                 <tbody>
                     <%
-                        if (userList != null && !userList.isEmpty()) {
-                            for (Users user : userList) {
-                                Role userRole = null;
-                                for (Role role : roleList) {
-                                    if (role.getRoleId() == user.getRoleId()) {
-                                        userRole = role;
-                                        break;
-                                    }
-                                }
+                        List<Role> roleList = (List<Role>) request.getAttribute("roleList");
+
+                        if (roleList != null && !roleList.isEmpty()) {
+                            for (Role role : roleList) {
                     %>
                     <tr>
-                        <td><%= user.getRoleName() != null ? user.getRoleName() : "No Role"%></td>
+                        <td><%= role.getRoleId()%></td>
+
+                        <td><strong><%= role.getRoleName()%></strong></td>
+
+                        <td style="color: #666; font-style: italic;">
+                            <%= (role.getRoleDescription() != null) ? role.getRoleDescription() : ""%>
+                        </td>
+
                         <td>
-                            <% if (userRole != null && "active".equals(userRole.getStatus())) { %>
-                            <span class="badge badge-active">Active</span>
+                            <% if ("active".equals(role.getStatus())) { %>
+                            <span class="badge badge-active" style="background: #28a745; color: white; padding: 5px 10px; border-radius: 4px;">Active</span>
                             <% } else { %>
-                            <span class="badge badge-inactive">Inactive</span>
-                            <% } %>
+                            <span class="badge badge-inactive" style="background: #dc3545; color: white; padding: 5px 10px; border-radius: 4px;">Inactive</span>
+                            <% }%>
+                        </td>
+
+                        <td>
+                            <a href="edit-role?id=<%= role.getRoleId()%>" style="color: blue; text-decoration: none;">Edit</a>
                         </td>
                     </tr>
                     <%
@@ -153,15 +157,15 @@
                     } else {
                     %>
                     <tr>
-                        <td colspan="6">No users found</td>
+                        <td colspan="5" style="text-align: center;">No roles found</td>
                     </tr>
                     <% }%>
                 </tbody>
             </table>
 
-            <p>Total Users: <%= userList != null ? userList.size() : 0%></p>
+            <p>Total Roles: <%= roleList != null ? roleList.size() : 0%></p>
             <a href="javascript:history.back()" class="btn-back"> Back</a>
         </div>
-            <jsp:include page="footer.jsp"/>
+        <jsp:include page="footer.jsp"/>
     </body>
 </html>
