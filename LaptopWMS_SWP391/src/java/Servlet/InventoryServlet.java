@@ -44,7 +44,7 @@ public class InventoryServlet extends HttpServlet {
             sortOrder = "ASC"; 
         }
         int page = 1;
-        int pageSize = 10;
+        int pageSize = 3;
         String pageStr = request.getParameter("page");
         if (pageStr != null && !pageStr.isEmpty()) {
             try {
