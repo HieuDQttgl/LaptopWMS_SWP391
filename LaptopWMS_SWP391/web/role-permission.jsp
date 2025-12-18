@@ -3,228 +3,340 @@
 <%@ page import="Model.Role" %>
 <%@ page import="Model.Permission" %>
 
-<title>Laptop Warehouse Management System</title>
-<%
-    List<Role> roles = (List<Role>) request.getAttribute("roles");
-    List<Permission> permissions = (List<Permission>) request.getAttribute("permissions");
-    Map<Integer, Set<Integer>> rolePermMap = (Map<Integer, Set<Integer>>) request.getAttribute("rolePermMap");
+<!DOCTYPE html>
+<html>
+    <head>
+        <jsp:include page="header.jsp"/>
+        <meta charset="UTF-8">
+        <title>Laptop Warehouse Management System</title>
 
-    if (roles == null) {
-        roles = new ArrayList<>();
-    }
-    if (permissions == null) {
-        permissions = new ArrayList<>();
-    }
-    if (rolePermMap == null) {
-        rolePermMap = new HashMap<>();
-    }
+        <style>
+            body {
+                font-family: 'Segoe UI', Roboto, Arial, sans-serif;
+                background-color: #f5f5f5;
+                margin: 0;
+                padding: 20px;
+            }
 
-    Set<String> modules = new HashSet<>();
-    for (Permission p : permissions)
-        modules.add(p.getModule());
-%>
-<style>
+            .container {
+                max-width: 1200px;
+                margin: 0 auto;
+                background-color: white;
+                padding: 30px;
+                border-radius: 10px;
+                box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            }
 
-    .container {
-        max-width: 980px;
-        margin: 18px auto;
-        padding: 12px;
-        font-family: "Segoe UI", Roboto, Arial, sans-serif;
-        background: #fafafa;
-        border: 1px solid #eee;
-        border-radius: 6px;
-    }
+            h1 {
+                color: #1f2937;
+                margin-bottom: 5px;
+                font-size: 24px;
+            }
 
+            .subtitle {
+                color: #6b7280;
+                margin-bottom: 25px;
+                font-size: 14px;
+            }
 
-    h2 {
-        margin: 0 0 12px 0;
-        font-size: 20px;
-        color: #222;
-    }
+            .filter-bar {
+                display: flex;
+                gap: 15px;
+                margin-bottom: 20px;
+                background: #f9fafb;
+                padding: 15px;
+                border-radius: 8px;
+                border: 1px solid #e5e7eb;
+            }
 
+            .search-input {
+                flex: 1;
+                padding: 10px 15px;
+                border: 1px solid #d1d5db;
+                border-radius: 6px;
+                font-size: 14px;
+                outline: none;
+                transition: border-color 0.2s;
+            }
 
-    #moduleSelect {
-        padding: 6px 10px;
-        border-radius: 4px;
-        border: 1px solid #ccc;
-        background: #fff;
-        margin-bottom: 12px;
-    }
+            .search-input:focus {
+                border-color: #10b981;
+                box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+            }
 
-
-    table {
-        width: 100%;
-        border-collapse: collapse;
-        background: #fff;
-        box-shadow: none;
-    }
-
-    table th, table td {
-        padding: 8px 10px;
-        border: 1px solid #e6e6e6;
-        text-align: left;
-        font-size: 14px;
-    }
-
-    table thead th {
-        background: #f3f4f6;
-        color: #333;
-        font-weight: 600;
-    }
-
-
-    table tbody tr:nth-child(odd) {
-        background: #ffffff;
-    }
-    table tbody tr:nth-child(even) {
-        background: #fbfbfb;
-    }
+            .module-select {
+                padding: 10px 15px;
+                border: 1px solid #d1d5db;
+                border-radius: 6px;
+                background-color: white;
+                font-size: 14px;
+                min-width: 200px;
+                cursor: pointer;
+            }
 
 
-    table td input[type="checkbox"] {
-        transform: scale(1.05);
-        margin: 0;
-        display: block;
-        margin-left: auto;
-        margin-right: auto;
-    }
+            .table-container {
+                max-height: 600px;
+                overflow-y: auto;
+                border: 1px solid #e5e7eb;
+                border-radius: 6px;
+            }
 
+            table {
+                width: 100%;
+                border-collapse: collapse;
+            }
 
-    .permission-meta {
-        color: #666;
-        font-size: 12px;
-    }
+            thead th {
+                position: sticky;
+                top: 0;
+                background-color: #f3f4f6;
+                z-index: 10;
+                padding: 15px;
+                text-align: left;
+                border-bottom: 2px solid #e5e5e5;
+                color: #374151;
+                font-size: 13px;
+                font-weight: 700;
+                text-transform: uppercase;
+                box-shadow: 0 2px 2px -1px rgba(0, 0, 0, 0.1);
+            }
 
+            thead th.role-header {
+                text-align: center;
+                min-width: 80px;
+            }
 
-    .btn {
-        display: inline-block;
-        padding: 7px 12px;
-        margin: 6px 6px 12px 0;
-        text-decoration: none;
-        border-radius: 5px;
-        border: 1px solid #d0d0d0;
-        background: #fff;
-        color: #333;
-        font-size: 13px;
-    }
+            tbody td {
+                padding: 12px 15px;
+                border-bottom: 1px solid #f0f0f0;
+                color: #374151;
+                vertical-align: middle;
+                font-size: 14px;
+            }
 
+            tbody tr:hover {
+                background-color: #f9fafb;
+            }
 
-    .btn.primary {
-        background: #e9f5ff;
-        border-color: #c7e3ff;
-    }
+            .desc-text {
+                font-weight: 600;
+                color: #111827;
+                display: block;
+                margin-bottom: 4px;
+            }
+            .url-text {
+                font-family: monospace;
+                color: #6b7280;
+                font-size: 12px;
+                background: #f3f4f6;
+                padding: 2px 6px;
+                border-radius: 4px;
+            }
 
+            .badge-module {
+                display: inline-block;
+                background: #e0e7ff;
+                color: #4338ca;
+                padding: 4px 8px;
+                border-radius: 4px;
+                font-size: 11px;
+                font-weight: 700;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+            }
 
-    .badge-active {
-        background: #dff0d8;
-        color: #2f6627;
-        padding: 3px 8px;
-        border-radius: 12px;
-        font-size: 12px;
-    }
-    .badge-inactive {
-        background: #f8d7da;
-        color: #7a2a2a;
-        padding: 3px 8px;
-        border-radius: 12px;
-        font-size: 12px;
-    }
+            input[type="checkbox"] {
+                width: 18px;
+                height: 18px;
+                cursor: pointer;
+                accent-color: #10b981;
+            }
 
+            .action-bar {
+                margin-top: 25px;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding-top: 20px;
+                border-top: 1px solid #e5e5e5;
+            }
 
-    @media (max-width: 640px) {
-        .container {
-            padding: 8px;
-        }
-        table th, table td {
-            font-size: 13px;
-            padding: 6px;
-        }
-        #moduleSelect {
-            width: 100%;
-        }
-    }
-</style>
+            .btn-save {
+                background-color: #10b981;
+                color: white;
+                padding: 12px 30px;
+                border: none;
+                border-radius: 6px;
+                font-size: 15px;
+                font-weight: 600;
+                cursor: pointer;
+                transition: all 0.3s;
+                box-shadow: 0 2px 4px rgba(16, 185, 129, 0.3);
+            }
 
-<body>
+            .btn-save:hover {
+                background-color: #059669;
+                transform: translateY(-1px);
+                box-shadow: 0 4px 6px rgba(16, 185, 129, 0.4);
+            }
 
-<div class="container">
-    <h2>Role Permission Management</h2>
-    <% if (request.getParameter("success") != null) { %>
-        <div class="success-msg">Permissions updated successfully!</div>
-    <% } %>
+            .btn-back {
+                color: #6b7280;
+                text-decoration: none;
+                font-weight: 500;
+                display: inline-flex;
+                align-items: center;
+                gap: 5px;
+            }
 
-    <div class="controls">
-        <select id="moduleSelect" onchange="filterTable()" style="padding: 8px; border-radius: 4px; border: 1px solid #ccc;">
-            <option value="all">-- All Modules --</option>
-            <% for (String m : modules) { %>
-                <option value="<%= m %>"><%= m %></option>
-            <% } %>
-        </select>
+            .btn-back:hover {
+                color: #1f2937;
+            }
 
-        <input type="text" id="searchInput" onkeyup="filterTable()" placeholder="Search permission description..." >
-    </div>
+        </style>
+    </head>
+    <body>
 
-    <form action="role-permission" method="POST">
-        <table>
-            <thead>
-                <tr>
-                    <th>Permission (URL)</th>
-                    <% for (Role r : roles) { %>
-                        <th style="text-align: center;"><%= r.getRoleName() %></th>
+        <div class="container">
+            <h1>Role Permissions</h1>
+            <div class="subtitle">Control access rights for each role. Check the box to grant permission.</div>
+
+            <%
+                List<Role> roles = (List<Role>) request.getAttribute("roles");
+                List<Permission> permissions = (List<Permission>) request.getAttribute("permissions");
+                Map<Integer, Set<Integer>> rolePermMap = (Map<Integer, Set<Integer>>) request.getAttribute("rolePermMap");
+
+                if (roles == null) {
+                    roles = new ArrayList<>();
+                }
+                if (permissions == null) {
+                    permissions = new ArrayList<>();
+                }
+                if (rolePermMap == null) {
+                    rolePermMap = new HashMap<>();
+                }
+
+                Set<String> modules = new HashSet<>();
+                for (Permission p : permissions) {
+                    if (p.getModule() != null) {
+                        modules.add(p.getModule());
+                    }
+                }
+            %>
+
+            <div class="filter-bar">
+                <input type="text" id="searchInput" class="search-input" 
+                       onkeyup="filterTable()" 
+                       placeholder="Type to search permission description or URL...">
+
+                <select id="moduleSelect" class="module-select" onchange="filterTable()">
+                    <option value="all">All Modules</option>
+                    <% for (String m : modules) {%>
+                    <option value="<%= m%>"><%= m%></option>
                     <% } %>
-                </tr>
-            </thead>
-            <tbody>
-                <% for (Permission p : permissions) { %>
-                <tr class="perm-row" data-module="<%= p.getModule() %>">
-                    <td>
-                        <span class="perm-name"><b><%= p.getPermissionDescription() %></b></span>
-                        <br>
-                        <small style="color: #888;"><%= p.getPermissionURL() %></small>
-                    </td>
+                </select>
+            </div>
 
-                    <% for (Role r : roles) { 
-                        Set<Integer> rolePerms = rolePermMap.get(r.getRoleId());
-                        boolean checked = rolePerms != null && rolePerms.contains(p.getPermissionId());
-                        boolean isAdmin = r.getRoleId() == 1;
-                    %>
-                    <td style="text-align: center;">
-                        <input type="checkbox" 
-                               name="perm_<%= r.getRoleId() %>_<%= p.getPermissionId() %>"
-                               value="true"
-                               <%= isAdmin ? "checked disabled" : (checked ? "checked" : "") %>>
-                        <% if (isAdmin) { %>
-                            <input type="hidden" name="perm_<%= r.getRoleId() %>_<%= p.getPermissionId() %>" value="true">
-                        <% } %>
-                    </td>
-                    <% } %>
-                </tr>
-                <% } %>
-            </tbody>
-        </table>
+            <form action="role-permission" method="post">
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th style="width: 50px;">ID</th>
+                                <th style="min-width: 300px;">Permission Details</th>
+                                <th style="width: 120px;">Module</th>
 
-        <button type="submit" class="update-btn">Save Changes</button>
-        <a href="javascript:history.back()" class="btn-back"> Back</a>
-        <div style="clear: both;"></div>
-    </form>
-</div>
+                                <%-- Cột Roles --%>
+                                <% for (Role r : roles) {%>
+                                <th class="role-header"><%= r.getRoleName()%></th>
+                                    <% } %>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <%
+                                if (!permissions.isEmpty()) {
+                                    for (Permission p : permissions) {
+                            %>
+                            <tr class="perm-row" data-module="<%= p.getModule()%>">
+                                <td style="color: #9ca3af;"><%= p.getPermissionId()%></td>
 
-<jsp:include page="footer.jsp"/>
+                                <td>
+                                    <span class="desc-text perm-search-target"><%= p.getPermissionDescription()%></span>
+                                    <span class="url-text perm-search-target"><%= p.getPermissionURL()%></span>
+                                </td>
 
-<script>
-    function filterTable() {
-        var input = document.getElementById("searchInput").value.toUpperCase();
-        var selectedModule = document.getElementById("moduleSelect").value;
-        var rows = document.querySelectorAll(".perm-row");
+                                <td>
+                                    <span class="badge-module"><%= p.getModule()%></span>
+                                </td>
 
-        rows.forEach(row => {
-            var text = row.querySelector(".perm-name").innerText.toUpperCase();
-            var module = row.getAttribute("data-module");
-            var matchKeyword = text.indexOf(input) > -1;
-            var matchModule = (selectedModule === "all" || selectedModule === module);
-            row.style.display = (matchKeyword && matchModule) ? "" : "none";
-        });
-    }
-</script>
-</body>
+                                <% for (Role r : roles) {
+                                        boolean isAdmin = (r.getRoleId() == 1);
+
+                                        Set<Integer> assignedPerms = rolePermMap.get(r.getRoleId());
+                                        boolean checked = (assignedPerms != null && assignedPerms.contains(p.getPermissionId()));
+                                %>
+                                <td style="text-align: center;">
+                                    <input type="checkbox" 
+                                           name="perm_<%= r.getRoleId()%>_<%= p.getPermissionId()%>" 
+                                           value="true"
+                                           <%= isAdmin ? "checked disabled" : (checked ? "checked" : "")%>
+                                           title="<%= r.getRoleName()%> - <%= p.getPermissionDescription()%>">
+
+                                    <% if (isAdmin) {%>
+                                    <input type="hidden" name="perm_<%= r.getRoleId()%>_<%= p.getPermissionId()%>" value="true">
+                                    <% } %>
+                                </td>
+                                <% } %>
+                            </tr>
+                            <%
+                                }
+                            } else {
+                            %>
+                            <tr>
+                                <td colspan="<%= 3 + roles.size()%>" style="text-align: center; padding: 40px; color: #6b7280;">
+                                    No permissions data found.
+                                </td>
+                            </tr>
+                            <% }%>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="action-bar">
+                    <a href="javascript:history.back()" class="btn-back">
+                        Back to Dashboard
+                    </a>
+                    <button type="submit" class="btn-save">Save Permission Changes</button>
+                </div>
+            </form>
+        </div>
+
+        <jsp:include page="footer.jsp"/>
+
+        <script>
+            function filterTable() {
+                var input = document.getElementById("searchInput").value.toUpperCase();
+                var selectedModule = document.getElementById("moduleSelect").value;
+                var rows = document.querySelectorAll(".perm-row");
+
+                rows.forEach(row => {
+                    var searchTargets = row.querySelectorAll(".perm-search-target");
+                    var textContent = "";
+                    searchTargets.forEach(span => textContent += span.innerText + " ");
+                    textContent = textContent.toUpperCase();
+                    var module = row.getAttribute("data-module");
+                    var matchKeyword = textContent.indexOf(input) > -1;
+                    var matchModule = (selectedModule === "all" || selectedModule === module);
+
+                    if (matchKeyword && matchModule) {
+                        row.style.display = "";
+                    } else {
+                        row.style.display = "none";
+                    }
+                });
+            }
+        </script>
+
+    </body>
 </html>

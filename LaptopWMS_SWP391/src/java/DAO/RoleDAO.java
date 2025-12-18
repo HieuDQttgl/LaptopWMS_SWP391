@@ -210,5 +210,6 @@ public class RoleDAO extends DBContext {
         }
         return list;
     }
+    
 
 }

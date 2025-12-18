@@ -204,7 +204,7 @@
 
             <div class="custom-pagination">
                 <%
-                    // Xử lý null an toàn
+                 
                     Integer cpObj = (Integer) request.getAttribute("currentPage");
                     Integer tpObj = (Integer) request.getAttribute("totalPages");
                     int currentPage = (cpObj != null) ? cpObj : 1;
