@@ -5,6 +5,7 @@ import java.sql.Timestamp;
 public class InventoryDTO {
     private int inventoryId;
     private int productId;
+     private int locationId; 
     private String productName;
     private String locationName;
     private int stockQuantity;
@@ -17,6 +18,14 @@ public class InventoryDTO {
         this.locationName = locationName;
         this.stockQuantity = stockQuantity;
         this.lastUpdated = lastUpdated;
+    }
+
+    public int getLocationId() {
+        return locationId;
+    }
+
+    public void setLocationId(int locationId) {
+        this.locationId = locationId;
     }
 
     public int getProductId() {

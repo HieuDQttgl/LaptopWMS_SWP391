@@ -34,7 +34,15 @@ public class InventoryServlet extends HttpServlet {
                 locationId = 0;
             }
         }
+         String sortBy = request.getParameter("sortBy");
+        if (sortBy == null || sortBy.isEmpty()) {
+            sortBy = "id"; 
+        }
         
+        String sortOrder = request.getParameter("sortOrder");
+        if (sortOrder == null || sortOrder.isEmpty()) {
+            sortOrder = "ASC"; 
+        }
         int page = 1;
         int pageSize = 10;
         String pageStr = request.getParameter("page");
@@ -46,7 +54,7 @@ public class InventoryServlet extends HttpServlet {
             }
         }
 
-        List<InventoryDTO> inventoryList = dao.getInventoryList(search, locationId, page, pageSize);
+        List<InventoryDTO> inventoryList = dao.getInventoryList(search, locationId, page, pageSize, sortBy, sortOrder);
         List<Location> locations = dao.getAllLocations();
         int totalRecords = dao.getTotalInventoryCount(search, locationId);
         int totalPages = (int) Math.ceil((double) totalRecords / pageSize);
@@ -57,6 +65,9 @@ public class InventoryServlet extends HttpServlet {
         request.setAttribute("totalPages", totalPages);
         request.setAttribute("search", search);
         request.setAttribute("selectedLocation", locationId);
+        request.setAttribute("sortBy", sortBy);
+        request.setAttribute("sortOrder", sortOrder);
+
         request.getRequestDispatcher("inventory.jsp").forward(request, response);
     }
 

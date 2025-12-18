@@ -32,10 +32,10 @@ public class InventoryDAO {
         return list;
     }
 
-    public List<InventoryDTO> getInventoryList(String search, int locationId, int page, int pageSize) {
+    public List<InventoryDTO> getInventoryList(String search, int locationId, int page, int pageSize, String sortBy, String sortOrder) {
         List<InventoryDTO> list = new ArrayList<>();
         StringBuilder sql = new StringBuilder(
-                "SELECT i.inventory_id, i.product_id, p.product_name, l.location_name, i.stock_quantity, i.last_updated "
+                "SELECT i.inventory_id, i.product_id, i.location_id, p.product_name, l.location_name, i.stock_quantity, i.last_updated "
                 + "FROM inventory i "
                 + "JOIN products p ON i.product_id = p.product_id "
                 + "JOIN locations l ON i.location_id = l.location_id "
@@ -45,8 +45,17 @@ public class InventoryDAO {
         if (locationId > 0) {
             sql.append("AND i.location_id = ? ");
         }
+        String orderColumn = "i.inventory_id";
+        if ("quantity".equals(sortBy)) {
+            orderColumn = "i.stock_quantity";
+        } else if ("product".equals(sortBy)) {
+            orderColumn = "p.product_name";
+        } else if ("location".equals(sortBy)) {
+            orderColumn = "l.location_name";
+        }
 
-        sql.append("ORDER BY i.inventory_id ASC LIMIT ? OFFSET ?");
+        String order = "DESC".equalsIgnoreCase(sortOrder) ? "DESC" : "ASC";
+        sql.append("ORDER BY ").append(orderColumn).append(" ").append(order).append(" LIMIT ? OFFSET ?");
 
         try (Connection conn = DBContext.getConnection(); PreparedStatement st = conn.prepareStatement(sql.toString())) {
 
@@ -62,14 +71,17 @@ public class InventoryDAO {
 
             ResultSet rs = st.executeQuery();
             while (rs.next()) {
-                list.add(new InventoryDTO(
+                InventoryDTO dto = new InventoryDTO(
                         rs.getInt("inventory_id"),
                         rs.getInt("product_id"),
                         rs.getString("product_name"),
                         rs.getString("location_name"),
                         rs.getInt("stock_quantity"),
                         rs.getTimestamp("last_updated")
-                ));
+                );
+                // Thêm locationId vào DTO
+                dto.setLocationId(rs.getInt("location_id"));
+                list.add(dto);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -295,25 +307,24 @@ public class InventoryDAO {
     }
 
     public List<Model.ProductDetail> getDetailsByProductId(int productId) {
-    List<Model.ProductDetail> list = new ArrayList<>();
-    String sql = "SELECT * FROM product_details WHERE product_id = ? AND status = 1";
-    try (Connection conn = DBContext.getConnection(); 
-         PreparedStatement ps = conn.prepareStatement(sql)) {
-        ps.setInt(1, productId);
-        ResultSet rs = ps.executeQuery();
-        while (rs.next()) {
-            Model.ProductDetail d = new Model.ProductDetail();
-            d.setProductDetailId(rs.getInt("product_detail_id"));
-            d.setCpu(rs.getString("cpu"));
-            d.setRam(rs.getString("ram"));
-            d.setStorage(rs.getString("storage"));
-            list.add(d);
+        List<Model.ProductDetail> list = new ArrayList<>();
+        String sql = "SELECT * FROM product_details WHERE product_id = ? AND status = 1";
+        try (Connection conn = DBContext.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, productId);
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                Model.ProductDetail d = new Model.ProductDetail();
+                d.setProductDetailId(rs.getInt("product_detail_id"));
+                d.setCpu(rs.getString("cpu"));
+                d.setRam(rs.getString("ram"));
+                d.setStorage(rs.getString("storage"));
+                list.add(d);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-    } catch (Exception e) {
-        e.printStackTrace();
+        return list;
     }
-    return list;
-}
 
     public boolean addProductItem(int detailId, String serial, String status) {
         String sql = "INSERT INTO product_items (product_detail_id, serial_number, status) VALUES (?, ?, ?)";
