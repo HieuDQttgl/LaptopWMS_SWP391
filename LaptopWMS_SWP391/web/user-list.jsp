@@ -12,7 +12,7 @@
     <head>
 
         <meta charset="UTF-8">
-        <title>User Management</title>
+        <title>Laptop Warehouse Management System</title>
 
         <style>
             body {

@@ -3,7 +3,7 @@
 <html>
 <head>
     <jsp:include page="header.jsp"/>
-    <title>Change Password</title>
+    <title>Laptop Warehouse Management System</title>
 
     <style>
         body {

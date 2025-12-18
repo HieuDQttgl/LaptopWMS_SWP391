@@ -10,7 +10,7 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>Edit Customer</title>
+        <title>Laptop Warehouse Management System</title>
         <style>
             body {
                 font-family: "Segoe UI", sans-serif;

@@ -9,7 +9,7 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>Update Order Status</title>
+        <title>Laptop Warehouse Management System</title>
         <style>
             body {
                 font-family: Arial, sans-serif;

@@ -6,7 +6,7 @@
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <title>Inventory Management</title>
+        <title>Laptop Warehouse Management System</title>
         <style>
             .inventory-container {
                 max-width: 1200px;

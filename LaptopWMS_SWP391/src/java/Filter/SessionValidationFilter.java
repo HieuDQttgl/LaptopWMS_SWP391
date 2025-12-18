@@ -77,7 +77,6 @@ public class SessionValidationFilter implements Filter {
             }
         }
 
-        // Continue with the request
         chain.doFilter(request, response);
     }
 

@@ -5,7 +5,7 @@
     <jsp:include page="header.jsp" />
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <title>JSP Page</title>
+        <title>Laptop Warehouse Management System</title>
         <style>
             body {
                 font-family: Arial, sans-serif;

@@ -6,7 +6,7 @@
 
     <head>
         <meta charset="UTF-8">
-        <title>WMS Landing Page</title>
+        <title>Laptop Warehouse Management System</title>
         <style>
             body {
                 margin: 0;
