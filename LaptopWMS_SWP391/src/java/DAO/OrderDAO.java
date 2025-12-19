@@ -90,11 +90,9 @@ public class OrderDAO extends DBContext {
             }
         }
 
-        // Add sorting
         String safeSortField = (sortField != null && !sortField.isEmpty()) ? sortField : "order_id";
         String safeSortOrder = (sortOrder != null && sortOrder.equalsIgnoreCase("DESC")) ? "DESC" : "ASC";
-
-        // Map sort fields to actual database columns
+        
         String finalSortField;
         switch (safeSortField) {
             case "customer_name":
@@ -113,7 +111,6 @@ public class OrderDAO extends DBContext {
 
         sql.append(String.format(" ORDER BY %s %s", finalSortField, safeSortOrder));
 
-        // Add pagination
         sql.append(" LIMIT ? OFFSET ?");
 
         try (Connection conn = getConnection(); PreparedStatement ps = conn.prepareStatement(sql.toString())) {
@@ -615,7 +612,6 @@ public class OrderDAO extends DBContext {
             sql.append(" AND o.created_at <= '").append(to).append("'");
         }
 
-        // Thêm LIMIT 5 vào cuối câu lệnh sau khi GROUP BY và ORDER BY
         sql.append(" GROUP BY p.product_name ORDER BY total_qty DESC LIMIT 5");
 
         try (Connection conn = DBContext.getConnection(); PreparedStatement ps = conn.prepareStatement(sql.toString()); ResultSet rs = ps.executeQuery()) {

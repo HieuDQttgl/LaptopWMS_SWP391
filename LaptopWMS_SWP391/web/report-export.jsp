@@ -3,7 +3,8 @@
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <html>
     <head>
-        <title>Export Report</title>
+        <title>Laptop Warehouse Management System</title>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
         <style>
             :root {
                 --primary: #2c3e50;
@@ -107,16 +108,39 @@
             }
 
             .badge {
-                padding: 5px 10px;
+                padding: 5px 12px;
                 border-radius: 20px;
                 font-size: 11px;
                 font-weight: bold;
                 text-transform: uppercase;
+                display: inline-block;
             }
-            .badge-done {
+
+            .badge-completed {
                 background: #e6fffa;
                 color: #234e52;
             }
+
+            .badge-pending {
+                background: #ebf8ff;
+                color: #2c5282;
+            }
+
+            .badge-approved {
+                background: #faf5ff;
+                color: #553c9a;
+            }
+
+            .badge-shipping {
+                background: #fffaf0;
+                color: #9c4221;
+            }
+
+            .badge-cancelled {
+                background: #fff5f5;
+                color: #c53030;
+            }
+
             .badge-other {
                 background: #f7fafc;
                 color: #4a5568;
@@ -165,6 +189,9 @@
         </style>
     </head>
     <body>
+
+        <jsp:include page="header.jsp" />
+
         <div class="container">
             <div class="report-card">
                 <h2>Export Report</h2>
@@ -181,12 +208,13 @@
 
                     <select name="status" onchange="this.form.submit()">
                         <option value="">Status: All</option>
-                        <option value="Done" ${param.status == 'Done' ? 'selected' : ''}>Done</option>
+                        <option value="Completed" ${param.status == 'Completed' ? 'selected' : ''}>Completed</option>
+                        <option value="Pending" ${param.status == 'Approved' ? 'selected' : ''}>Pending</option>
+                        <option value="Pending" ${param.status == 'Cancelled' ? 'selected' : ''}>Pending</option>
                         <option value="Pending" ${param.status == 'Pending' ? 'selected' : ''}>Pending</option>
                         <option value="Shipping" ${param.status == 'Shipping' ? 'selected' : ''}>Shipping</option>
                     </select>
 
-                    <button type="button" style="background:#6c757d; color:white; border:none; padding:8px 15px; border-radius:4px; cursor:pointer;">PDF</button>
                     <button type="button" style="background:#1d6f42; color:white; border:none; padding:8px 15px; border-radius:4px; cursor:pointer;">Excel</button>
                 </form>
             </div>
@@ -224,7 +252,6 @@
                             <th>Sale</th>
                             <th>Revenue</th>
                             <th>Status</th>
-                            <th>Action</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -236,11 +263,32 @@
                                 <td>${item.saleName}</td>
                                 <td><strong><fmt:formatNumber value="${item.revenue}" type="currency" currencySymbol="$"/></strong></td>
                                 <td>
-                                    <span class="badge ${item.status == 'Done' ? 'badge-done' : 'badge-other'}">
+                                    <c:set var="status" value="${item.status.toLowerCase()}" />
+                                    <c:choose>
+                                        <c:when test="${status == 'completed'}">
+                                            <c:set var="cls" value="badge-completed" />
+                                        </c:when>
+                                        <c:when test="${status == 'pending'}">
+                                            <c:set var="cls" value="badge-pending" />
+                                        </c:when>
+                                        <c:when test="${status == 'approved'}">
+                                            <c:set var="cls" value="badge-approved" />
+                                        </c:when>
+                                        <c:when test="${status == 'shipping'}">
+                                            <c:set var="cls" value="badge-shipping" />
+                                        </c:when>
+                                        <c:when test="${status == 'cancelled'}">
+                                            <c:set var="cls" value="badge-cancelled" />
+                                        </c:when>
+                                        <c:otherwise>
+                                            <c:set var="cls" value="badge-other" />
+                                        </c:otherwise>
+                                    </c:choose>
+
+                                    <span class="badge ${cls}">
                                         ${item.status}
                                     </span>
                                 </td>
-                                <td><a href="detail?code=${item.orderCode}" class="btn-action">VIEW</a></td>
                             </tr>
                         </c:forEach>
                     </tbody>
@@ -270,5 +318,18 @@
                 </div>
             </div>
         </div>
+
+        <jsp:include page="footer.jsp" />
+
+        <script>
+            function exportToExcel() {
+                var table = document.getElementById("reportTable");
+
+                var wb = XLSX.utils.table_to_book(table, {sheet: "Export Report"});
+
+                var today = new Date().toISOString().slice(0, 10);
+                XLSX.writeFile(wb, 'Export_Report_' + today + '.xlsx');
+            }
+        </script>
     </body>
 </html>

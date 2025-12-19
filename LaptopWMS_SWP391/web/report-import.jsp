@@ -3,7 +3,8 @@
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <html>
     <head>
-        <title>Import Report</title>
+        <title>Laptop Warehouse Management System</title>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
         <style>
             :root {
                 --primary: #2c3e50;
@@ -117,6 +118,7 @@
         
         <jsp:include page="header.jsp" />
         
+
         <div class="container">
             <div class="report-card">
                 <h2>Import Report</h2>
@@ -168,7 +170,7 @@
             </div>
 
             <div class="report-card" style="padding: 0;">
-                <table>
+                <table id="reportTable">
                     <thead>
                         <tr>
                             <th>Code</th>
@@ -177,7 +179,6 @@
                             <th>Items</th>
                             <th>Value</th>
                             <th>Status</th>
-                            <th>Action</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -193,13 +194,14 @@
                                         ${item.status == 'Completed' ? 'Completed' : 'Pending'}
                                     </span>
                                 </td>
-                                <td><a href="detail?code=${item.orderCode}" style="text-decoration:none; color:#3498db;"> View </a> </td>
                             </tr>
                         </c:forEach>
                     </tbody>
                 </table>
             </div>
         </div>
+                
+        <jsp:include page="header.jsp" />
 
         <script>
             document.getElementById('filterForm').onsubmit = function () {
@@ -207,9 +209,12 @@
             };
 
             function exportToExcel() {
-                const form = document.getElementById('filterForm');
-                const params = new URLSearchParams(new FormData(form)).toString();
-                window.location.href = 'report-import-export?' + params;
+                var table = document.getElementById("reportTable");
+
+                var wb = XLSX.utils.table_to_book(table, {sheet: "Import Report"});
+
+                var today = new Date().toISOString().slice(0, 10);
+                XLSX.writeFile(wb, 'Import_Report_' + today + '.xlsx');
             }
         </script>
         
