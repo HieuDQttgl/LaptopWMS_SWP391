@@ -21,7 +21,6 @@ public class OrderProduct {
         this.unitPrice = unitPrice;
     }
 
-    // --- Getters và Setters ---
     
     public Integer getOrderProductId() {
         return orderProductId;

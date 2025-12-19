@@ -389,7 +389,7 @@
                     currentSortField = "order_id";
                 }
                 if (currentSortOrder == null)
-                    currentSortOrder = "DESC";
+                    currentSortOrder = "ASC";
             %>
 
             <table>
@@ -554,14 +554,12 @@
 
                 <% if (totalPages > 1) { %>
                 <div class="pagination">
-                    <!-- Previous Button -->
                     <% if (currentPage > 1) {%>
                     <a href="#" onclick="window.location.href = createPaginationUrl(<%= currentPage - 1%>); return false;">« Previous</a>
                     <% } else { %>
                     <span class="disabled">« Previous</span>
                     <% } %>
 
-                    <!-- Page Numbers -->
                     <%
                         int startPage = Math.max(1, currentPage - 2);
                         int endPage = Math.min(totalPages, currentPage + 2);
@@ -589,14 +587,12 @@
                     <a href="#" onclick="window.location.href = createPaginationUrl(<%= totalPages%>); return false;"><%= totalPages%></a>
                     <% } %>
 
-                    <!-- Next Button -->
                     <% if (currentPage < totalPages) {%>
                     <a href="#" onclick="window.location.href = createPaginationUrl(<%= currentPage + 1%>); return false;">Next »</a>
                     <% } else { %>
                     <span class="disabled">Next »</span>
                     <% }%>
 
-                    <!-- Pagination Info -->
                     <span class="pagination-info" style="margin-left: 15px;">
                         Showing
                         <%= Math.min((currentPage - 1) * recordsPerPage + 1, totalRecords)%>
@@ -666,48 +662,6 @@
                 }
                 if (currentSortOrder) {
                     url += '&sort_order=' + currentSortOrder;
-                }
-
-                return url;
-            }
-
-            function createSortUrl(field) {
-                var keyword = document.getElementById('keyword').value;
-                var statusFilter = document.getElementById('statusFilter').value;
-                var orderTypeFilter = document.getElementById('orderTypeFilter').value;
-                var createdByFilter = document.getElementById('createdByFilter').value;
-                var startDateFilter = document.getElementById('startDateFilter').value;
-                var endDateFilter = document.getElementById('endDateFilter').value;
-
-                var currentSortField = '<%= currentSortField%>';
-                var currentSortOrder = '<%= currentSortOrder%>';
-
-                var newSortOrder = 'ASC';
-                if (field === currentSortField) {
-                    newSortOrder = (currentSortOrder === 'ASC') ? 'DESC' : 'ASC';
-                } else {
-                    newSortOrder = 'ASC';
-                }
-
-                var url = 'order-list?sort_field=' + field + '&sort_order=' + newSortOrder;
-
-                if (keyword && keyword.trim() !== '') {
-                    url += '&keyword=' + encodeURIComponent(keyword.trim());
-                }
-                if (statusFilter && statusFilter !== 'all') {
-                    url += '&statusFilter=' + statusFilter;
-                }
-                if (orderTypeFilter && orderTypeFilter !== 'all') {
-                    url += '&orderTypeFilter=' + orderTypeFilter;
-                }
-                if (createdByFilter && createdByFilter !== '') {
-                    url += '&createdByFilter=' + createdByFilter;
-                }
-                if (startDateFilter && startDateFilter !== '') {
-                    url += '&startDateFilter=' + startDateFilter;
-                }
-                if (endDateFilter && endDateFilter !== '') {
-                    url += '&endDateFilter=' + endDateFilter;
                 }
 
                 return url;

@@ -30,7 +30,6 @@ public class OrderDAO extends DBContext {
         return getListOrders(keyword, statusFilter, createdByFilter, startDateFilter, endDateFilter, orderTypeFilter, "order_id", "ASC", 0, Integer.MAX_VALUE);
     }
 
-// Main method with filters, sorting, and pagination
     public List<Order> getListOrders(
             String keyword,
             String statusFilter,
