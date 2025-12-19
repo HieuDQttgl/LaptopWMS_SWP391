@@ -13,7 +13,10 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
-@WebServlet(name = "NotificationServlet", urlPatterns = {"/notifications", "/notifications/*"})
+/**
+ * NotificationServlet - updated for laptop_wms_lite database
+ */
+@WebServlet(name = "NotificationServlet", urlPatterns = { "/notifications", "/notifications/*" })
 public class NotificationServlet extends HttpServlet {
 
     private final NotificationDAO notificationDAO = new NotificationDAO();
@@ -180,42 +183,23 @@ public class NotificationServlet extends HttpServlet {
 
     /**
      * Convert a single notification to JSON object string
+     * Updated for laptop_wms_lite - includes link field for redirects
      */
     private String notificationToJson(Notification n) {
         StringBuilder sb = new StringBuilder("{");
         sb.append("\"notificationId\":").append(n.getNotificationId()).append(",");
         sb.append("\"userId\":").append(n.getUserId()).append(",");
-        sb.append("\"type\":\"").append(escapeJson(n.getType())).append("\",");
         sb.append("\"title\":\"").append(escapeJson(n.getTitle())).append("\",");
         sb.append("\"message\":\"").append(escapeJson(n.getMessage())).append("\",");
-        sb.append("\"read\":").append(n.isRead()).append(",");
-
-        if (n.getRelatedUserId() != null) {
-            sb.append("\"relatedUserId\":").append(n.getRelatedUserId()).append(",");
-        }
+        sb.append("\"link\":\"").append(escapeJson(n.getLink())).append("\",");
+        sb.append("\"read\":").append(n.isRead());
 
         if (n.getCreatedAt() != null) {
-            sb.append("\"createdAt\":\"").append(n.getCreatedAt().toString()).append("\",");
+            sb.append(",\"createdAt\":\"").append(n.getCreatedAt().toString()).append("\"");
         }
 
-        if (n.getReadAt() != null) {
-            sb.append("\"readAt\":\"").append(n.getReadAt().toString()).append("\",");
-        }
-
-        if (n.getRelatedUserFullName() != null) {
-            sb.append("\"relatedUserFullName\":\"").append(escapeJson(n.getRelatedUserFullName())).append("\",");
-        }
-
-        if (n.getRelatedUserEmail() != null) {
-            sb.append("\"relatedUserEmail\":\"").append(escapeJson(n.getRelatedUserEmail())).append("\",");
-        }
-
-        // Remove trailing comma and close
-        String result = sb.toString();
-        if (result.endsWith(",")) {
-            result = result.substring(0, result.length() - 1);
-        }
-        return result + "}";
+        sb.append("}");
+        return sb.toString();
     }
 
     /**

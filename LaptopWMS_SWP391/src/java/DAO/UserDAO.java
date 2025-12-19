@@ -6,18 +6,20 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
-import java.sql.Timestamp;
 
+/**
+ * UserDAO - updated for laptop_wms_lite database
+ * Simplified schema: user_id, username, password, full_name, email, role_id,
+ * status
+ */
 public class UserDAO extends DBContext {
 
     public List<Users> getListUsers() {
-        return getListUsers(null, null, null, null, "user_id", "ASC", 0, Integer.MAX_VALUE);
+        return getListUsers(null, null, null, "user_id", "ASC", 0, Integer.MAX_VALUE);
     }
-
 
     public List<Users> getListUsers(
             String keyword,
-            String genderFilter,
             Integer roleIdFilter,
             String statusFilter,
             String sortField,
@@ -29,19 +31,15 @@ public class UserDAO extends DBContext {
         List<Object> params = new ArrayList<>();
         StringBuilder sql = new StringBuilder(
                 "SELECT u.*, r.role_name "
-                + "FROM users u JOIN roles r ON u.role_id = r.role_id "
-                + "WHERE 1=1 ");
+                        + "FROM users u JOIN roles r ON u.role_id = r.role_id "
+                        + "WHERE 1=1 ");
 
         if (keyword != null && !keyword.trim().isEmpty()) {
-            sql.append("AND (u.full_name LIKE ? OR u.email LIKE ? OR u.phone_number LIKE ?) ");
+            sql.append("AND (u.full_name LIKE ? OR u.email LIKE ? OR u.username LIKE ?) ");
             String wildcardKeyword = "%" + keyword.trim() + "%";
             params.add(wildcardKeyword);
             params.add(wildcardKeyword);
             params.add(wildcardKeyword);
-        }
-        if (genderFilter != null && !genderFilter.equalsIgnoreCase("all")) {
-            sql.append("AND u.gender = ? ");
-            params.add(genderFilter);
         }
         if (roleIdFilter != null && roleIdFilter > 0) {
             sql.append("AND u.role_id = ? ");
@@ -75,14 +73,8 @@ public class UserDAO extends DBContext {
                             rs.getString("password"),
                             rs.getString("full_name"),
                             rs.getString("email"),
-                            rs.getString("phone_number"),
-                            rs.getString("gender"),
                             rs.getInt("role_id"),
-                            rs.getString("status"),
-                            rs.getTimestamp("last_login_at"),
-                            rs.getTimestamp("created_at"),
-                            rs.getTimestamp("updated_at"),
-                            rs.getObject("created_by", Integer.class));
+                            rs.getString("status"));
                     user.setRoleName(rs.getString("role_name"));
                     users.add(user);
                 }
@@ -92,10 +84,9 @@ public class UserDAO extends DBContext {
         }
         return users;
     }
-    
+
     public int getTotalUsers(
             String keyword,
-            String genderFilter,
             Integer roleIdFilter,
             String statusFilter) {
 
@@ -103,19 +94,15 @@ public class UserDAO extends DBContext {
         List<Object> params = new ArrayList<>();
         StringBuilder sql = new StringBuilder(
                 "SELECT COUNT(*) "
-                + "FROM users u JOIN roles r ON u.role_id = r.role_id "
-                + "WHERE 1=1 ");
+                        + "FROM users u JOIN roles r ON u.role_id = r.role_id "
+                        + "WHERE 1=1 ");
 
         if (keyword != null && !keyword.trim().isEmpty()) {
-            sql.append("AND (u.full_name LIKE ? OR u.email LIKE ? OR u.phone_number LIKE ?) ");
+            sql.append("AND (u.full_name LIKE ? OR u.email LIKE ? OR u.username LIKE ?) ");
             String wildcardKeyword = "%" + keyword.trim() + "%";
             params.add(wildcardKeyword);
             params.add(wildcardKeyword);
             params.add(wildcardKeyword);
-        }
-        if (genderFilter != null && !genderFilter.equalsIgnoreCase("all")) {
-            sql.append("AND u.gender = ? ");
-            params.add(genderFilter);
         }
         if (roleIdFilter != null && roleIdFilter > 0) {
             sql.append("AND u.role_id = ? ");
@@ -142,18 +129,15 @@ public class UserDAO extends DBContext {
     }
 
     public boolean addNew(Users user) {
-        String sql = "INSERT INTO users (username, password, full_name, email, phone_number, gender, role_id, status, created_at, created_by) VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW(), ?)";
+        String sql = "INSERT INTO users (username, password, full_name, email, role_id, status) VALUES (?, ?, ?, ?, ?, ?)";
         try (Connection conn = getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setString(1, user.getUsername());
             ps.setString(2, user.getPassword());
             ps.setString(3, user.getFullName());
             ps.setString(4, user.getEmail());
-            ps.setString(5, user.getPhoneNumber());
-            ps.setString(6, user.getGender());
-            ps.setInt(7, user.getRoleId());
-            ps.setString(8, user.getStatus() != null ? user.getStatus() : "active");
-            ps.setObject(9, user.getCreatedBy());
+            ps.setInt(5, user.getRoleId());
+            ps.setString(6, user.getStatus() != null ? user.getStatus() : "active");
 
             int rowsAffected = ps.executeUpdate();
             return rowsAffected > 0;
@@ -178,15 +162,8 @@ public class UserDAO extends DBContext {
                     u.setPassword(rs.getString("password"));
                     u.setFullName(rs.getString("full_name"));
                     u.setEmail(rs.getString("email"));
-                    u.setPhoneNumber(rs.getString("phone_number"));
-                    u.setGender(rs.getString("gender"));
                     u.setRoleId(rs.getInt("role_id"));
                     u.setStatus(rs.getString("status"));
-                    u.setLastLoginAt(rs.getTimestamp("last_login_at"));
-                    u.setCreatedAt(rs.getTimestamp("created_at"));
-                    u.setUpdatedAt(rs.getTimestamp("updated_at"));
-                    Integer createdBy = (Integer) rs.getObject("created_by");
-                    u.setCreatedBy(createdBy);
                     return u;
                 }
             }
@@ -207,8 +184,12 @@ public class UserDAO extends DBContext {
             if (rs.next()) {
                 Users u = new Users();
                 u.setUserId(rs.getInt("user_id"));
+                u.setUsername(rs.getString("username"));
                 u.setEmail(rs.getString("email"));
                 u.setPassword(rs.getString("password"));
+                u.setFullName(rs.getString("full_name"));
+                u.setRoleId(rs.getInt("role_id"));
+                u.setStatus(rs.getString("status"));
                 return u;
             }
         } catch (Exception e) {
@@ -232,15 +213,8 @@ public class UserDAO extends DBContext {
                 u.setPassword(rs.getString("password"));
                 u.setFullName(rs.getString("full_name"));
                 u.setEmail(rs.getString("email"));
-                u.setPhoneNumber(rs.getString("phone_number"));
-                u.setGender(rs.getString("gender"));
                 u.setRoleId(rs.getInt("role_id"));
                 u.setStatus(rs.getString("status"));
-                u.setLastLoginAt(rs.getTimestamp("last_login_at"));
-                u.setCreatedAt(rs.getTimestamp("created_at"));
-                u.setUpdatedAt(rs.getTimestamp("updated_at"));
-                Integer createdBy = (Integer) rs.getObject("created_by");
-                u.setCreatedBy(createdBy);
                 return u;
             }
         } catch (Exception e) {
@@ -279,15 +253,13 @@ public class UserDAO extends DBContext {
         }
     }
 
-    public boolean updateProfile(int userId, String fullName, String email, String phoneNumber, String gender) {
-        String sql = "UPDATE users SET full_name = ?, email = ?, phone_number = ?, gender = ?, updated_at = CURRENT_TIMESTAMP WHERE user_id = ?";
+    public boolean updateProfile(int userId, String fullName, String email) {
+        String sql = "UPDATE users SET full_name = ?, email = ? WHERE user_id = ?";
 
         try (Connection conn = getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, fullName);
             ps.setString(2, email);
-            ps.setString(3, phoneNumber);
-            ps.setString(4, gender);
-            ps.setInt(5, userId);
+            ps.setInt(3, userId);
 
             return ps.executeUpdate() > 0;
         } catch (Exception e) {
@@ -296,30 +268,15 @@ public class UserDAO extends DBContext {
         }
     }
 
-    public boolean updateProfilebyAdmin(int userId, String username, String fullName, String email, String phoneNumber,
-            String gender) {
-        String sql = "UPDATE users SET username = ?, full_name = ?, email = ?, phone_number = ?, gender = ?, updated_at = CURRENT_TIMESTAMP WHERE user_id = ?";
+    public boolean updateProfilebyAdmin(int userId, String username, String fullName, String email) {
+        String sql = "UPDATE users SET username = ?, full_name = ?, email = ? WHERE user_id = ?";
 
         try (Connection conn = getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, username);
             ps.setString(2, fullName);
             ps.setString(3, email);
-            ps.setString(4, phoneNumber);
-            ps.setString(5, gender);
-            ps.setInt(6, userId);
+            ps.setInt(4, userId);
 
-            return ps.executeUpdate() > 0;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return false;
-        }
-    }
-
-    public boolean updateLastLogin(int userId) {
-        String sql = "UPDATE users SET last_login_at = CURRENT_TIMESTAMP WHERE user_id = ?";
-
-        try (Connection conn = getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setInt(1, userId);
             return ps.executeUpdate() > 0;
         } catch (Exception e) {
             e.printStackTrace();
@@ -360,7 +317,7 @@ public class UserDAO extends DBContext {
     }
 
     public boolean isUsernameExists(String username) {
-        String sql = "SELECT COUNT(*) FROM Users WHERE username = ?";
+        String sql = "SELECT COUNT(*) FROM users WHERE username = ?";
         try (Connection con = DBContext.getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
 
             ps.setString(1, username);
@@ -377,7 +334,7 @@ public class UserDAO extends DBContext {
     }
 
     public boolean isEmailExists(String email) {
-        String sql = "SELECT COUNT(*) FROM Users WHERE email = ?";
+        String sql = "SELECT COUNT(*) FROM users WHERE email = ?";
         try (Connection con = DBContext.getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
 
             ps.setString(1, email);
@@ -394,8 +351,24 @@ public class UserDAO extends DBContext {
     }
 
     /**
-     * Update password_changed_at timestamp when password changes Used to
-     * invalidate all active sessions
+     * Get email of first active Admin for notifications
+     */
+    public String getAdminEmail() {
+        String sql = "SELECT email FROM users WHERE role_id = 1 AND status = 'active' LIMIT 1";
+        try (Connection conn = getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                return rs.getString("email");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    /**
+     * Update password_changed_at timestamp when password changes
+     * Used to invalidate all active sessions
      */
     public boolean updatePasswordChangedAt(int userId) {
         String sql = "UPDATE users SET password_changed_at = CURRENT_TIMESTAMP WHERE user_id = ?";
@@ -411,29 +384,13 @@ public class UserDAO extends DBContext {
     /**
      * Get password_changed_at timestamp for session validation
      */
-    public Timestamp getPasswordChangedAt(int userId) {
+    public java.sql.Timestamp getPasswordChangedAt(int userId) {
         String sql = "SELECT password_changed_at FROM users WHERE user_id = ?";
         try (Connection conn = getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, userId);
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
                 return rs.getTimestamp("password_changed_at");
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-
-    /**
-     * Get email of first active Admin for notifications
-     */
-    public String getAdminEmail() {
-        String sql = "SELECT email FROM users WHERE role_id = 1 AND status = 'active' LIMIT 1";
-        try (Connection conn = getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
-            ResultSet rs = ps.executeQuery();
-            if (rs.next()) {
-                return rs.getString("email");
             }
         } catch (Exception e) {
             e.printStackTrace();

@@ -1,51 +1,32 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Servlet.java to edit this template
- */
 package Servlet;
 
-import DAO.RoleDAO;
-import Model.Users;
 import java.io.IOException;
-import java.io.PrintWriter;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
 
+/**
+ * RoleStatusServlet - Disabled for laptop_wms_lite database
+ * The roles table no longer has a status column in this schema.
+ * This servlet is kept for backward compatibility but does nothing.
+ */
 @WebServlet("/role-status")
 public class RoleStatusServlet extends HttpServlet {
+
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
-        throws ServletException, IOException {
+            throws ServletException, IOException {
+        // Role status toggle is not supported in laptop_wms_lite schema
+        // The roles table doesn't have a status column
+        // Just redirect back to role-list
+        response.sendRedirect("role-list");
+    }
 
-        int roleId = Integer.parseInt(request.getParameter("roleId"));
-        String currentStatus = request.getParameter("status");
-
-        String newStatus = currentStatus.equals("active") ? "inactive" : "active";
-
-        RoleDAO dao = new RoleDAO();
-
-        try {
-            dao.updateStatus(roleId, newStatus);
-
-            if (newStatus.equals("inactive")) {
-                HttpSession session = request.getSession(false);
-                if (session != null) {
-                    Users user = (Users) session.getAttribute("currentUser");
-                    if (user != null && user.getRoleId() == roleId) {
-                        session.invalidate();
-                    }
-                }
-            }
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
+    @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
         response.sendRedirect("role-list");
     }
 }
-

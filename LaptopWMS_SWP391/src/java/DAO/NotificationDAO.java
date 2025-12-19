@@ -8,24 +8,22 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * NotificationDAO - updated for laptop_wms_lite database
+ * DB Schema: notification_id, user_id, title, message, is_read, created_at
+ */
 public class NotificationDAO extends DBContext {
 
     public int createNotification(Notification notification) {
-        String sql = "INSERT INTO notifications (user_id, type, title, message, related_user_id) VALUES (?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO notifications (user_id, title, message, link) VALUES (?, ?, ?, ?)";
 
         try (Connection conn = getConnection();
                 PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
             ps.setInt(1, notification.getUserId());
-            ps.setString(2, notification.getType());
-            ps.setString(3, notification.getTitle());
-            ps.setString(4, notification.getMessage());
-
-            if (notification.getRelatedUserId() != null) {
-                ps.setInt(5, notification.getRelatedUserId());
-            } else {
-                ps.setNull(5, java.sql.Types.INTEGER);
-            }
+            ps.setString(2, notification.getTitle());
+            ps.setString(3, notification.getMessage());
+            ps.setString(4, notification.getLink());
 
             int rowsAffected = ps.executeUpdate();
 
@@ -44,12 +42,7 @@ public class NotificationDAO extends DBContext {
 
     public List<Notification> getNotificationsByUserId(int userId) {
         List<Notification> notifications = new ArrayList<>();
-        String sql = "SELECT n.*, u.full_name as related_user_full_name, u.email as related_user_email, u.username as related_user_username "
-                +
-                "FROM notifications n " +
-                "LEFT JOIN users u ON n.related_user_id = u.user_id " +
-                "WHERE n.user_id = ? " +
-                "ORDER BY n.created_at DESC";
+        String sql = "SELECT * FROM notifications WHERE user_id = ? ORDER BY created_at DESC";
 
         try (Connection conn = getConnection();
                 PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -66,16 +59,10 @@ public class NotificationDAO extends DBContext {
         }
         return notifications;
     }
-
 
     public List<Notification> getUnreadNotifications(int userId) {
         List<Notification> notifications = new ArrayList<>();
-        String sql = "SELECT n.*, u.full_name as related_user_full_name, u.email as related_user_email, u.username as related_user_username "
-                +
-                "FROM notifications n " +
-                "LEFT JOIN users u ON n.related_user_id = u.user_id " +
-                "WHERE n.user_id = ? AND n.is_read = 0 " +
-                "ORDER BY n.created_at DESC";
+        String sql = "SELECT * FROM notifications WHERE user_id = ? AND is_read = 0 ORDER BY created_at DESC";
 
         try (Connection conn = getConnection();
                 PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -92,7 +79,6 @@ public class NotificationDAO extends DBContext {
         }
         return notifications;
     }
-
 
     public int getUnreadCount(int userId) {
         String sql = "SELECT COUNT(*) FROM notifications WHERE user_id = ? AND is_read = 0";
@@ -113,9 +99,8 @@ public class NotificationDAO extends DBContext {
         return 0;
     }
 
-
     public boolean markAsRead(int notificationId) {
-        String sql = "UPDATE notifications SET is_read = 1, read_at = CURRENT_TIMESTAMP WHERE notification_id = ?";
+        String sql = "UPDATE notifications SET is_read = 1 WHERE notification_id = ?";
 
         try (Connection conn = getConnection();
                 PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -128,9 +113,8 @@ public class NotificationDAO extends DBContext {
         return false;
     }
 
-
     public int markAllAsRead(int userId) {
-        String sql = "UPDATE notifications SET is_read = 1, read_at = CURRENT_TIMESTAMP WHERE user_id = ? AND is_read = 0";
+        String sql = "UPDATE notifications SET is_read = 1 WHERE user_id = ? AND is_read = 0";
 
         try (Connection conn = getConnection();
                 PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -142,7 +126,6 @@ public class NotificationDAO extends DBContext {
         }
         return 0;
     }
-
 
     public boolean deleteNotification(int notificationId) {
         String sql = "DELETE FROM notifications WHERE notification_id = ?";
@@ -158,13 +141,8 @@ public class NotificationDAO extends DBContext {
         return false;
     }
 
-
     public Notification getNotificationById(int notificationId) {
-        String sql = "SELECT n.*, u.full_name as related_user_full_name, u.email as related_user_email, u.username as related_user_username "
-                +
-                "FROM notifications n " +
-                "LEFT JOIN users u ON n.related_user_id = u.user_id " +
-                "WHERE n.notification_id = ?";
+        String sql = "SELECT * FROM notifications WHERE notification_id = ?";
 
         try (Connection conn = getConnection();
                 PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -182,7 +160,6 @@ public class NotificationDAO extends DBContext {
         return null;
     }
 
-
     public int getFirstAdminUserId() {
         String sql = "SELECT user_id FROM users WHERE role_id = 1 AND status = 'active' LIMIT 1";
 
@@ -198,7 +175,6 @@ public class NotificationDAO extends DBContext {
         }
         return -1;
     }
-
 
     public boolean createPasswordResetNotification(Model.Users requestingUser) {
         int adminUserId = getFirstAdminUserId();
@@ -224,44 +200,23 @@ public class NotificationDAO extends DBContext {
                 requestingUser.getEmail(),
                 requestingUser.getUserId());
 
-        Notification notification = new Notification(
-                adminUserId,
-                "password_reset",
-                title,
-                message,
-                requestingUser.getUserId());
+        // Link to user detail page for easy access
+        String link = "/user-detail?id=" + requestingUser.getUserId();
+
+        Notification notification = new Notification(adminUserId, title, message, link);
 
         return createNotification(notification) > 0;
     }
-
 
     private Notification mapResultSetToNotification(ResultSet rs) throws java.sql.SQLException {
         Notification n = new Notification();
         n.setNotificationId(rs.getInt("notification_id"));
         n.setUserId(rs.getInt("user_id"));
-        n.setType(rs.getString("type"));
         n.setTitle(rs.getString("title"));
         n.setMessage(rs.getString("message"));
-
-        int relatedUserId = rs.getInt("related_user_id");
-        if (!rs.wasNull()) {
-            n.setRelatedUserId(relatedUserId);
-        }
-
+        n.setLink(rs.getString("link"));
         n.setRead(rs.getBoolean("is_read"));
         n.setCreatedAt(rs.getTimestamp("created_at"));
-        n.setReadAt(rs.getTimestamp("read_at"));
-
-        // Set related user details if available
-        try {
-            n.setRelatedUserFullName(rs.getString("related_user_full_name"));
-            n.setRelatedUserEmail(rs.getString("related_user_email"));
-            n.setRelatedUserUsername(rs.getString("related_user_username"));
-        } catch (java.sql.SQLException e) {
-            // These columns might not be in all queries
-        }
-
         return n;
     }
-
 }

@@ -1,31 +1,21 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package Model;
 
-import java.sql.Timestamp;
-
 /**
- *
- * @author Admin
+ * RolePermission model for laptop_wms_lite database
+ * DB Schema: role_permission_id, role_id, permission_id
  */
 public class RolePermission {
     private int rolePermissionId;
     private int roleId;
     private int permissionId;
-    private Timestamp grantedAt;
-    private int grantedBy;
 
     public RolePermission() {
     }
 
-    public RolePermission(int rolePermissionId, int roleId, int permissionId, Timestamp grantedAt, Integer grantedBy) {
+    public RolePermission(int rolePermissionId, int roleId, int permissionId) {
         this.rolePermissionId = rolePermissionId;
         this.roleId = roleId;
         this.permissionId = permissionId;
-        this.grantedAt = grantedAt;
-        this.grantedBy = grantedBy;
     }
 
     public int getRolePermissionId() {
@@ -51,21 +41,4 @@ public class RolePermission {
     public void setPermissionId(int permissionId) {
         this.permissionId = permissionId;
     }
-
-    public Timestamp getGrantedAt() {
-        return grantedAt;
-    }
-
-    public void setGrantedAt(Timestamp grantedAt) {
-        this.grantedAt = grantedAt;
-    }
-
-    public int getGrantedBy() {
-        return grantedBy;
-    }
-
-    public void setGrantedBy(int grantedBy) {
-        this.grantedBy = grantedBy;
-    }
-    
 }

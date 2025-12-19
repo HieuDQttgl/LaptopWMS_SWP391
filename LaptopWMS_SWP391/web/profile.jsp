@@ -122,22 +122,6 @@
                 box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
             }
 
-            .field-select {
-                width: 200px;
-                padding: 6px 10px;
-                border: 1px solid var(--border-color);
-                border-radius: 6px;
-                font-size: 14px;
-                font-family: inherit;
-                background: white;
-            }
-
-            .field-select:focus {
-                outline: none;
-                border-color: var(--primary-color);
-                box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
-            }
-
             .edit-mode {
                 display: none;
             }
@@ -268,11 +252,7 @@
                     String fullName = currentUser != null
                             ? (currentUser.getFullName() != null ? currentUser.getFullName() : "") : "";
                     String email = currentUser
-                            != null ? (currentUser.getEmail() != null ? currentUser.getEmail() : "") : "";
-                    String phoneNumber = currentUser != null ? (currentUser.getPhoneNumber() != null ? currentUser.getPhoneNumber()
-                            : "") : "";
-                    String gender = currentUser != null ? (currentUser.getGender() != null
-                            ? currentUser.getGender() : "") : ""; %>
+                            != null ? (currentUser.getEmail() != null ? currentUser.getEmail() : "") : ""; %>
 
                 <% if (successMsg != null) {%>
                 <div class="message success">
@@ -318,35 +298,6 @@
                             <input type="email" name="email" class="field-input" value="<%= email%>"
                                    required>
                         </div>
-
-                        <div class="field-group view-mode">
-                            <span class="field-label">Phone</span>
-                            <span class="field-value">
-                                <%= phoneNumber.isEmpty() ? "—" : phoneNumber%>
-                            </span>
-                        </div>
-                        <div class="field-group edit-mode">
-                            <span class="field-label">Phone</span>
-                            <input type="text" name="phoneNumber" class="field-input"
-                                   value="<%= phoneNumber%>" required>
-                        </div>
-
-                        <div class="field-group view-mode">
-                            <span class="field-label">Gender</span>
-                            <span class="field-value">
-                                <%= gender.isEmpty() ? "—" : gender%>
-                            </span>
-                        </div>
-                        <div class="field-group edit-mode">
-                            <span class="field-label">Gender</span>
-                            <select name="gender" class="field-select">
-                                <option value="" <%=gender.isEmpty() ? "selected" : ""%>>—</option>
-                                <option value="Male" <%="Male".equals(gender) ? "selected" : ""%>
-                                        >Male</option>
-                                        <option value="Female" <%="Female".equals(gender) ? "selected" : ""%>>Female</option>
-                                        <option value="Other" <%="Other".equals(gender) ? "selected" : ""%>>Other</option>
-                            </select>
-                        </div>
                     </div>
 
                     <div class="actions edit-mode" style="display: none;">
@@ -378,24 +329,13 @@
         <script>
             function validateProfileForm(event) {
                 const email = document.querySelector('input[name="email"]').value.trim();
-                const phone = document.querySelector('input[name="phoneNumber"]').value.trim();
 
                 // Email regex (RFC-compliant simplified)
                 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-                // Vietnamese phone format: 10 digits starting with 03,05,07,08,09
-                const phoneRegex = /^(03|05|07|08|09)\d{8}$/;
-
                 // Validate email
                 if (!emailRegex.test(email)) {
                     alert("❌ Invalid email format.");
-                    event.preventDefault();
-                    return false;
-                }
-
-                // Validate phone (optional field)
-                if (phone.length > 0 && !phoneRegex.test(phone)) {
-                    alert("❌ Phone number must be 10 digits and start with 03, 05, 07, 08 or 09.");
                     event.preventDefault();
                     return false;
                 }

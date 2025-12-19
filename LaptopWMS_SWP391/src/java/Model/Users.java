@@ -4,48 +4,36 @@
  */
 package Model;
 
-import java.sql.Timestamp;
-
 /**
- *
+ * Users model - updated for laptop_wms_lite database
+ * 
  * @author Admin
  */
 public class Users {
 
-    
     private int userId;
     private String username;
     private String password;
     private String fullName;
     private String email;
-    private String phoneNumber;
-    private String gender;
     private int roleId;
     private String status;
-    private Timestamp lastLoginAt;
-    private Timestamp createdAt;
-    private Timestamp updatedAt;
-    private Integer createdBy;   
-    
+
+    // For display purposes
     private String roleName;
 
-    public Users(int userId, String username, String password, String fullName, String email, String phoneNumber, String gender, int roleId, String status, Timestamp lastLoginAt, Timestamp createdAt, Timestamp updatedAt, Integer createdBy) {
+    public Users() {
+    }
+
+    public Users(int userId, String username, String password, String fullName, String email, int roleId,
+            String status) {
         this.userId = userId;
         this.username = username;
         this.password = password;
         this.fullName = fullName;
         this.email = email;
-        this.phoneNumber = phoneNumber;
-        this.gender = gender;
         this.roleId = roleId;
         this.status = status;
-        this.lastLoginAt = lastLoginAt;
-        this.createdAt = createdAt;
-        this.updatedAt = updatedAt;
-        this.createdBy = createdBy;
-    }
-
-    public Users() {
     }
 
     public int getUserId() {
@@ -88,22 +76,6 @@ public class Users {
         this.email = email;
     }
 
-    public String getPhoneNumber() {
-        return phoneNumber;
-    }
-
-    public void setPhoneNumber(String phoneNumber) {
-        this.phoneNumber = phoneNumber;
-    }
-
-    public String getGender() {
-        return gender;
-    }
-
-    public void setGender(String gender) {
-        this.gender = gender;
-    }
-
     public int getRoleId() {
         return roleId;
     }
@@ -120,38 +92,6 @@ public class Users {
         this.status = status;
     }
 
-    public Timestamp getLastLoginAt() {
-        return lastLoginAt;
-    }
-
-    public void setLastLoginAt(Timestamp lastLoginAt) {
-        this.lastLoginAt = lastLoginAt;
-    }
-
-    public Timestamp getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(Timestamp createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    public Timestamp getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public void setUpdatedAt(Timestamp updatedAt) {
-        this.updatedAt = updatedAt;
-    }
-
-    public Integer getCreatedBy() {
-        return createdBy;
-    }
-
-    public void setCreatedBy(Integer createdBy) {
-        this.createdBy = createdBy;
-    }
-
     public String getRoleName() {
         return roleName;
     }
@@ -160,11 +100,9 @@ public class Users {
         this.roleName = roleName;
     }
 
-    
-    
     @Override
     public String toString() {
-        return "Users{" + "userId=" + userId + ", username=" + username + ", password=" + password + ", fullName=" + fullName + ", email=" + email + ", phoneNumber=" + phoneNumber + ", gender=" + gender + ", roleId=" + roleId + ", status=" + status + ", lastLoginAt=" + lastLoginAt + ", createdAt=" + createdAt + ", updatedAt=" + updatedAt + ", createdBy=" + createdBy + '}';
+        return "Users{" + "userId=" + userId + ", username=" + username + ", password=" + password + ", fullName="
+                + fullName + ", email=" + email + ", roleId=" + roleId + ", status=" + status + '}';
     }
-    
 }

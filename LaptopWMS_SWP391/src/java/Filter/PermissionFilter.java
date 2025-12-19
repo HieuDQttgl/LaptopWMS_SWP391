@@ -17,6 +17,7 @@ public class PermissionFilter implements Filter {
     private static final List<String> PUBLIC_PAGES = Arrays.asList(
             "/landing",
             "/login",
+            "/logout",
             "/register",
             "/forgot",
             "/notifications");

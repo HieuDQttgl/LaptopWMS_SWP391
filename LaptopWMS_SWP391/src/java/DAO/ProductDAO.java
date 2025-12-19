@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package DAO;
 
 import static DAO.DBContext.getConnection;
@@ -14,8 +10,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- *
- * @author PC
+ * ProductDAO - updated for laptop_wms_lite database
+ * DB Schema for products: product_id, product_name, brand, category, status
+ * DB Schema for product_details: product_detail_id, product_id, cpu, ram,
+ * storage, gpu, unit, quantity
  */
 public class ProductDAO extends DBContext {
 
@@ -24,11 +22,9 @@ public class ProductDAO extends DBContext {
         List<Object> params = new ArrayList<>();
 
         StringBuilder sql = new StringBuilder(
-                "SELECT p.product_id, p.product_name, p.brand, p.category, p.unit, p.status, "
-                + "p.supplier_id, s.supplier_name "
-                + "FROM products p "
-                + "LEFT JOIN suppliers s ON p.supplier_id = s.supplier_id "
-                + "WHERE 1=1 ");
+                "SELECT p.product_id, p.product_name, p.brand, p.category, p.status "
+                        + "FROM products p "
+                        + "WHERE 1=1 ");
 
         if (keyword != null && !keyword.trim().isEmpty()) {
             sql.append("AND p.product_name LIKE ? ");
@@ -37,7 +33,7 @@ public class ProductDAO extends DBContext {
 
         if (status != null && !status.equals("all")) {
             sql.append("AND p.status = ? ");
-            params.add(status);
+            params.add(status.equals("active") ? 1 : 0);
         }
 
         if (category != null && !category.equals("all")) {
@@ -46,7 +42,7 @@ public class ProductDAO extends DBContext {
         }
 
         if (brand != null && !brand.equals("all")) {
-            sql.append("AND s.supplier_name LIKE ? ");
+            sql.append("AND p.brand LIKE ? ");
             params.add("%" + brand.trim() + "%");
         }
 
@@ -65,12 +61,9 @@ public class ProductDAO extends DBContext {
 
                     p.setProductId(rs.getInt("product_id"));
                     p.setProductName(rs.getString("product_name"));
-                    p.setCategory(rs.getString("category"));
-                    p.setUnit(rs.getString("unit"));
-                    p.setStatus(rs.getBoolean("status"));
-
-                    p.setSupplierName(rs.getString("supplier_name"));
                     p.setBrand(rs.getString("brand"));
+                    p.setCategory(rs.getString("category"));
+                    p.setStatus(rs.getBoolean("status"));
 
                     List<ProductDetail> details = getDetailsByProductId(p.getProductId());
                     p.setDetailsList(details);
@@ -87,8 +80,10 @@ public class ProductDAO extends DBContext {
     private List<ProductDetail> getDetailsByProductId(int productId) {
         List<ProductDetail> details = new ArrayList<>();
 
-        String sql = "SELECT product_detail_id, product_id, ram, storage, cpu, gpu, screen, status "
-                + "FROM product_details WHERE product_id = ?";
+        String sql = "SELECT pd.*, p.product_name "
+                + "FROM product_details pd "
+                + "JOIN products p ON pd.product_id = p.product_id "
+                + "WHERE pd.product_id = ?";
 
         try (PreparedStatement ps = getConnection().prepareStatement(sql)) {
             ps.setInt(1, productId);
@@ -98,12 +93,13 @@ public class ProductDAO extends DBContext {
 
                     d.setProductDetailId(rs.getInt("product_detail_id"));
                     d.setProductId(rs.getInt("product_id"));
+                    d.setCpu(rs.getString("cpu"));
                     d.setRam(rs.getString("ram"));
                     d.setStorage(rs.getString("storage"));
-                    d.setCpu(rs.getString("cpu"));
                     d.setGpu(rs.getString("gpu"));
-                    d.setScreen(rs.getDouble("screen"));
-                    d.setStatus(rs.getBoolean("status"));
+                    d.setUnit(rs.getString("unit"));
+                    d.setQuantity(rs.getInt("quantity"));
+                    d.setProductName(rs.getString("product_name"));
 
                     details.add(d);
                 }
@@ -115,33 +111,10 @@ public class ProductDAO extends DBContext {
     }
 
     public void toggleProductStatus(int productId) {
-        String flipParent = "UPDATE products SET status = NOT status WHERE product_id = ?";
-
-        String syncChildren = "UPDATE product_details SET status = "
-                + "(SELECT status FROM products WHERE product_id = ?) "
-                + "WHERE product_id = ?";
-
-        try {
-            try (PreparedStatement ps = getConnection().prepareStatement(flipParent)) {
-                ps.setInt(1, productId);
-                ps.executeUpdate();
-            }
-
-            try (PreparedStatement ps = getConnection().prepareStatement(syncChildren)) {
-                ps.setInt(1, productId);
-                ps.setInt(2, productId);
-                ps.executeUpdate();
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    public void toggleDetailStatus(int detailId) {
-        String sql = "UPDATE product_details SET status = NOT status WHERE product_detail_id = ?";
+        String sql = "UPDATE products SET status = NOT status WHERE product_id = ?";
 
         try (PreparedStatement ps = getConnection().prepareStatement(sql)) {
-            ps.setInt(1, detailId);
+            ps.setInt(1, productId);
             ps.executeUpdate();
         } catch (Exception e) {
             e.printStackTrace();
@@ -149,15 +122,13 @@ public class ProductDAO extends DBContext {
     }
 
     public void addProduct(Product p) {
-        String sql = "INSERT INTO products (product_name, brand, category, supplier_id, unit, status) VALUES (?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO products (product_name, brand, category, status) VALUES (?, ?, ?, ?)";
 
         try (PreparedStatement ps = getConnection().prepareStatement(sql)) {
             ps.setString(1, p.getProductName());
             ps.setString(2, p.getBrand());
             ps.setString(3, p.getCategory());
-            ps.setInt(4, p.getSupplierId());
-            ps.setString(5, p.getUnit());
-            ps.setBoolean(6, true);
+            ps.setBoolean(4, true);
 
             ps.executeUpdate();
 
@@ -167,16 +138,16 @@ public class ProductDAO extends DBContext {
     }
 
     public void addProductDetail(ProductDetail d) throws SQLException {
-        String sql = "INSERT INTO product_details (product_id, cpu, gpu, ram, storage, screen, status) VALUES (?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO product_details (product_id, cpu, ram, storage, gpu, unit, quantity) VALUES (?, ?, ?, ?, ?, ?, ?)";
 
         try (PreparedStatement ps = getConnection().prepareStatement(sql)) {
             ps.setInt(1, d.getProductId());
             ps.setString(2, d.getCpu());
-            ps.setString(3, d.getGpu());
-            ps.setString(4, d.getRam());
-            ps.setString(5, d.getStorage());
-            ps.setDouble(6, d.getScreen());
-            ps.setBoolean(7, true);
+            ps.setString(3, d.getRam());
+            ps.setString(4, d.getStorage());
+            ps.setString(5, d.getGpu());
+            ps.setString(6, d.getUnit() != null ? d.getUnit() : "piece");
+            ps.setInt(7, d.getQuantity());
 
             ps.executeUpdate();
         }
@@ -212,9 +183,7 @@ public class ProductDAO extends DBContext {
                     p.setProductName(rs.getString("product_name"));
                     p.setBrand(rs.getString("brand"));
                     p.setCategory(rs.getString("category"));
-                    p.setUnit(rs.getString("unit"));
                     p.setStatus(rs.getBoolean("status"));
-                    p.setSupplierId(rs.getInt("supplier_id"));
 
                     return p;
                 }
@@ -230,16 +199,13 @@ public class ProductDAO extends DBContext {
     }
 
     public void updateProduct(Product p) {
-        String sql = "UPDATE products SET product_name=?, brand=?, category=?, supplier_id=?, unit=? WHERE product_id=?";
+        String sql = "UPDATE products SET product_name=?, brand=?, category=? WHERE product_id=?";
 
         try (PreparedStatement ps = getConnection().prepareStatement(sql)) {
             ps.setString(1, p.getProductName());
             ps.setString(2, p.getBrand());
             ps.setString(3, p.getCategory());
-            ps.setInt(4, p.getSupplierId());
-            ps.setString(5, p.getUnit());
-
-            ps.setInt(6, p.getProductId());
+            ps.setInt(4, p.getProductId());
 
             ps.executeUpdate();
         } catch (Exception e) {
@@ -250,8 +216,10 @@ public class ProductDAO extends DBContext {
     public ProductDetail getProductDetailById(int productDetailId) {
         ProductDetail d = null;
 
-        String sql = "SELECT product_detail_id, product_id, ram, storage, cpu, gpu, screen, status "
-                + "FROM product_details WHERE product_detail_id = ?";
+        String sql = "SELECT pd.*, p.product_name "
+                + "FROM product_details pd "
+                + "JOIN products p ON pd.product_id = p.product_id "
+                + "WHERE pd.product_detail_id = ?";
 
         try (PreparedStatement ps = getConnection().prepareStatement(sql)) {
             ps.setInt(1, productDetailId);
@@ -262,12 +230,13 @@ public class ProductDAO extends DBContext {
 
                     d.setProductDetailId(rs.getInt("product_detail_id"));
                     d.setProductId(rs.getInt("product_id"));
+                    d.setCpu(rs.getString("cpu"));
                     d.setRam(rs.getString("ram"));
                     d.setStorage(rs.getString("storage"));
-                    d.setCpu(rs.getString("cpu"));
                     d.setGpu(rs.getString("gpu"));
-                    d.setScreen(rs.getDouble("screen"));
-                    d.setStatus(rs.getBoolean("status"));
+                    d.setUnit(rs.getString("unit"));
+                    d.setQuantity(rs.getInt("quantity"));
+                    d.setProductName(rs.getString("product_name"));
                 }
             }
         } catch (Exception e) {
@@ -277,16 +246,15 @@ public class ProductDAO extends DBContext {
     }
 
     public void updateProductDetail(ProductDetail d) {
-        String sql = "UPDATE product_details SET ram=?, storage=?, cpu=?, gpu=?, screen=?, status=? WHERE product_detail_id=?";
+        String sql = "UPDATE product_details SET cpu=?, ram=?, storage=?, gpu=?, unit=?, quantity=? WHERE product_detail_id=?";
 
         try (PreparedStatement ps = getConnection().prepareStatement(sql)) {
-            ps.setString(1, d.getRam());
-            ps.setString(2, d.getStorage());
-            ps.setString(3, d.getCpu());
+            ps.setString(1, d.getCpu());
+            ps.setString(2, d.getRam());
+            ps.setString(3, d.getStorage());
             ps.setString(4, d.getGpu());
-            ps.setDouble(5, d.getScreen());
-            ps.setBoolean(6, d.isStatus());
-
+            ps.setString(5, d.getUnit() != null ? d.getUnit() : "piece");
+            ps.setInt(6, d.getQuantity());
             ps.setInt(7, d.getProductDetailId());
 
             ps.executeUpdate();
@@ -297,41 +265,43 @@ public class ProductDAO extends DBContext {
 
     public List<ProductDetail> getAllProductDetails() {
         List<ProductDetail> list = new ArrayList<>();
-        // Truy vấn đầy đủ các cột cấu hình để hiển thị ở Cách 1
-        String sql = "SELECT product_detail_id, product_id, ram, storage, cpu, gpu, screen, status "
-                + "FROM product_details WHERE status = 1";
+        String sql = "SELECT pd.*, p.product_name "
+                + "FROM product_details pd "
+                + "JOIN products p ON pd.product_id = p.product_id "
+                + "WHERE p.status = 1";
 
-        
         try (PreparedStatement ps = getConnection().prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
 
             while (rs.next()) {
                 ProductDetail d = new ProductDetail();
                 d.setProductDetailId(rs.getInt("product_detail_id"));
                 d.setProductId(rs.getInt("product_id"));
+                d.setCpu(rs.getString("cpu"));
                 d.setRam(rs.getString("ram"));
                 d.setStorage(rs.getString("storage"));
-                d.setCpu(rs.getString("cpu"));
                 d.setGpu(rs.getString("gpu"));
-                d.setScreen(rs.getDouble("screen"));
-                d.setStatus(rs.getBoolean("status"));
+                d.setUnit(rs.getString("unit"));
+                d.setQuantity(rs.getInt("quantity"));
+                d.setProductName(rs.getString("product_name"));
 
                 list.add(d);
             }
         } catch (Exception e) {
-            System.err.println("Lỗi tại getAllProductDetails: " + e.getMessage());
+            System.err.println("Error in getAllProductDetails: " + e.getMessage());
             e.printStackTrace();
         }
         return list;
     }
-    
-    public static void main(String[] args) {
-        ProductDAO userDAO = new ProductDAO();
 
-        System.out.println("=== Testing ===");
-        List<ProductDetail> allUsers = userDAO.getAllProductDetails();
-        System.out.println("Found " + allUsers.size() + " Users:");
-        for (ProductDetail user : allUsers) {
-            System.out.println(user);
+    public void updateQuantity(int productDetailId, int quantityChange) {
+        String sql = "UPDATE product_details SET quantity = quantity + ? WHERE product_detail_id = ?";
+
+        try (PreparedStatement ps = getConnection().prepareStatement(sql)) {
+            ps.setInt(1, quantityChange);
+            ps.setInt(2, productDetailId);
+            ps.executeUpdate();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 }

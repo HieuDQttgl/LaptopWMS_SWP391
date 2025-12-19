@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.HashMap;
 
-@WebServlet(name = "UserListServlet", urlPatterns = {"/user-list"})
+@WebServlet(name = "UserListServlet", urlPatterns = { "/user-list" })
 public class UserListServlet extends HttpServlet {
 
     private static final int ADMIN_ROLE_ID = 1;
@@ -84,7 +84,6 @@ public class UserListServlet extends HttpServlet {
             throws ServletException, IOException {
 
         String keyword = request.getParameter("keyword");
-        String genderFilter = request.getParameter("gender_filter");
         String statusFilter = request.getParameter("status_filter");
 
         String roleIdFilterStr = request.getParameter("role_filter");
@@ -102,12 +101,13 @@ public class UserListServlet extends HttpServlet {
         if (sortField == null || sortField.isEmpty()) {
             sortField = "user_id";
         }
-        if (sortOrder == null || sortOrder.isEmpty() || (!"ASC".equalsIgnoreCase(sortOrder) && !"DESC".equalsIgnoreCase(sortOrder))) {
+        if (sortOrder == null || sortOrder.isEmpty()
+                || (!"ASC".equalsIgnoreCase(sortOrder) && !"DESC".equalsIgnoreCase(sortOrder))) {
             sortOrder = "ASC";
         }
 
         int page = 1;
-        int recordsPerPage = 2;
+        int recordsPerPage = 10;
 
         String pageStr = request.getParameter("page");
         if (pageStr != null && !pageStr.isEmpty()) {
@@ -123,19 +123,17 @@ public class UserListServlet extends HttpServlet {
 
         int offset = (page - 1) * recordsPerPage;
 
-        int totalRecords = userDAO.getTotalUsers(keyword, genderFilter, roleIdFilter, statusFilter);
+        int totalRecords = userDAO.getTotalUsers(keyword, roleIdFilter, statusFilter);
         int totalPages = (int) Math.ceil((double) totalRecords / recordsPerPage);
 
         List<Users> users = userDAO.getListUsers(
                 keyword,
-                genderFilter,
                 roleIdFilter,
                 statusFilter,
                 sortField,
                 sortOrder,
                 offset,
-                recordsPerPage
-        );
+                recordsPerPage);
 
         try {
             List<Role> allRoles = roleDAO.getAllRoles();
@@ -147,7 +145,6 @@ public class UserListServlet extends HttpServlet {
 
         request.setAttribute("users", users);
         request.setAttribute("keyword", keyword);
-        request.setAttribute("gender_filter", genderFilter);
         request.setAttribute("role_filter", roleIdFilterStr);
         request.setAttribute("status_filter", statusFilter);
         request.setAttribute("sort_field", sortField);
@@ -161,15 +158,14 @@ public class UserListServlet extends HttpServlet {
         request.getRequestDispatcher("/user-list.jsp").forward(request, response);
     }
 
-    private void handleAddUser(HttpServletRequest request, HttpServletResponse response, Users currentUser, HttpSession session)
+    private void handleAddUser(HttpServletRequest request, HttpServletResponse response, Users currentUser,
+            HttpSession session)
             throws ServletException, IOException {
 
         String username = request.getParameter("username");
         String email = request.getParameter("email");
         String password = request.getParameter("password");
         String fullName = request.getParameter("fullName");
-        String phoneNumber = request.getParameter("phoneNumber");
-        String gender = request.getParameter("gender");
         String roleIdStr = request.getParameter("roleId");
 
         Users tempUser = new Users();
@@ -177,8 +173,6 @@ public class UserListServlet extends HttpServlet {
         tempUser.setPassword(password);
         tempUser.setFullName(fullName);
         tempUser.setEmail(email);
-        tempUser.setPhoneNumber(phoneNumber);
-        tempUser.setGender(gender);
 
         int roleId = (roleIdStr != null && !roleIdStr.isEmpty()) ? Integer.parseInt(roleIdStr) : 0;
         tempUser.setRoleId(roleId);
@@ -201,7 +195,7 @@ public class UserListServlet extends HttpServlet {
         }
 
         try {
-            Users newUser = new Users(0, username, password, fullName, email, phoneNumber, gender, roleId, "active", null, null, null, currentUser.getUserId());
+            Users newUser = new Users(0, username, password, fullName, email, roleId, "active");
 
             if (userDAO.addNew(newUser)) {
                 session.setAttribute("message", "User " + username + " added successfully!");
@@ -216,7 +210,8 @@ public class UserListServlet extends HttpServlet {
         response.sendRedirect(request.getContextPath() + "/user-list");
     }
 
-    private void handleStatusChangeAndRedirect(HttpServletRequest request, HttpServletResponse response, HttpSession session)
+    private void handleStatusChangeAndRedirect(HttpServletRequest request, HttpServletResponse response,
+            HttpSession session)
             throws IOException {
 
         String userIdStr = request.getParameter("id");
@@ -235,7 +230,8 @@ public class UserListServlet extends HttpServlet {
                 String username = userDAO.updateStatus(userId, newStatus);
 
                 if (username != null) {
-                    session.setAttribute("message", "Status for user " + username + " successfully changed to '" + newStatus + "'.");
+                    session.setAttribute("message",
+                            "Status for user " + username + " successfully changed to '" + newStatus + "'.");
                 } else {
                     session.setAttribute("error", "Failed to update user status in the database.");
                 }

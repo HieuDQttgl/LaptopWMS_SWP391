@@ -1,19 +1,8 @@
-<%-- 
-    Document   : add-product
-    Created on : Dec 15, 2025, 10:23:08 AM
-    Author     : super
---%>
-
-<%-- 
-    Document   : add-product
-    Created on : Dec 15, 2025, 10:23:08 AM
-    Author     : super
---%>
-
-<%@page contentType="text/html" pageEncoding="UTF-8"%>
+<%@ page contentType="text/html" pageEncoding="UTF-8" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <!DOCTYPE html>
 <html>
+
     <head>
         <title>Laptop Warehouse Management System</title>
         <style>
@@ -23,35 +12,42 @@
                 margin: 0;
                 padding: 0;
             }
+
             .form-container {
                 max-width: 500px;
                 margin: 40px auto;
                 background: white;
                 padding: 30px;
                 border-radius: 8px;
-                box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+                box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
             }
+
             h2 {
                 text-align: center;
                 color: #2c3e50;
                 margin-top: 0;
             }
+
             .form-group {
                 margin-bottom: 15px;
             }
+
             label {
                 display: block;
                 margin-bottom: 5px;
                 font-weight: 600;
                 color: #333;
             }
-            input, select {
+
+            input,
+            select {
                 width: 100%;
                 padding: 10px;
                 border: 1px solid #ddd;
                 border-radius: 4px;
                 box-sizing: border-box;
             }
+
             .btn-save {
                 width: 100%;
                 padding: 12px;
@@ -63,9 +59,11 @@
                 font-size: 16px;
                 font-weight: bold;
             }
+
             .btn-save:hover {
                 background: #27ae60;
             }
+
             .link-back {
                 display: block;
                 text-align: center;
@@ -75,6 +73,7 @@
             }
         </style>
     </head>
+
     <body>
 
         <jsp:include page="header.jsp" />
@@ -83,7 +82,8 @@
             <h2>Create New Product</h2>
 
             <c:if test="${not empty error}">
-                <div style="color: #721c24; background-color: #f8d7da; border: 1px solid #f5c6cb; padding: 10px; margin-bottom: 15px; border-radius: 4px;">
+                <div
+                    style="color: #721c24; background-color: #f8d7da; border: 1px solid #f5c6cb; padding: 10px; margin-bottom: 15px; border-radius: 4px;">
                     <strong>Error:</strong> ${error}
                 </div>
             </c:if>
@@ -96,7 +96,7 @@
 
                 <div class="form-group">
                     <label>Brand</label>
-                    <select name="brand" id="brandSelect" required>
+                    <select name="brand" required>
                         <option value="">-- Select Brand --</option>
                         <option value="Dell">Dell</option>
                         <option value="HP">HP</option>
@@ -111,19 +111,10 @@
                 <div class="form-group">
                     <label>Category</label>
                     <select name="category">
+                        <option value="Laptop" selected>Laptop</option>
                         <option value="Office">Office</option>
                         <option value="Gaming">Gaming</option>
                         <option value="Workstation">Workstation</option>
-                    </select>
-                </div>
-
-                <div class="form-group">
-                    <label>Distributor (Auto-Selected)</label>
-                    <select name="supplierId" id="supplierSelect" required style="pointer-events: none; background-color: #e9ecef;">
-                        <option value="" disabled selected>-- Waiting for Brand --</option>
-                        <c:forEach items="${supplierList}" var="s">
-                            <option value="${s.supplierId}">${s.supplierName}</option>
-                        </c:forEach>
                     </select>
                 </div>
 
@@ -133,37 +124,6 @@
         </div>
 
         <jsp:include page="footer.jsp" />
-
-        <script>
-            document.addEventListener("DOMContentLoaded", function () {
-                const brandSelect = document.getElementById('brandSelect');
-                const supplierSelect = document.getElementById('supplierSelect');
-
-                const brandToSupplierMap = {
-                    "Dell": "1",
-                    "Apple": "2",
-                    "Lenovo": "3",
-                    "ASUS": "4",
-                    "Acer": "5",
-                    "MSI": "6",
-                    "HP": "7"
-                };
-
-                brandSelect.addEventListener('change', function () {
-                    const selectedBrand = this.value;
-                    const correctSupplierId = brandToSupplierMap[selectedBrand];
-
-                    if (correctSupplierId) {
-                        supplierSelect.value = correctSupplierId;
-                        supplierSelect.style.backgroundColor = "#d4edda";
-                        supplierSelect.style.color = "#155724";
-                    } else {
-                        supplierSelect.value = "";
-                        supplierSelect.style.backgroundColor = "#e9ecef";
-                        supplierSelect.style.color = "";
-                    }
-                });
-            });
-        </script>
     </body>
+
 </html>

@@ -138,6 +138,7 @@
                 padding: 18px 24px;
                 border-bottom: 1px solid var(--border-color);
                 transition: background 0.15s;
+                cursor: pointer;
             }
 
             .notification-item:last-child {
@@ -167,14 +168,6 @@
                 margin-right: 16px;
                 flex-shrink: 0;
                 font-size: 20px;
-            }
-
-            .notification-icon.password-reset {
-                background: #fef3c7;
-                color: #d97706;
-            }
-
-            .notification-icon.default {
                 background: #e0e7ff;
                 color: #4f46e5;
             }
@@ -195,7 +188,11 @@
                 font-size: 14px;
                 color: var(--text-muted);
                 line-height: 1.5;
-                white-space: pre-wrap;
+                display: -webkit-box;
+                -webkit-line-clamp: 2;
+                -webkit-box-orient: vertical;
+                overflow: hidden;
+                text-overflow: ellipsis;
             }
 
             .notification-meta {
@@ -285,6 +282,117 @@
                 color: #991b1b;
                 border: 1px solid #fecaca;
             }
+
+            /* Modal Styles */
+            .modal-overlay {
+                display: none;
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0, 0, 0, 0.5);
+                z-index: 1000;
+                justify-content: center;
+                align-items: center;
+            }
+
+            .modal-overlay.show {
+                display: flex;
+            }
+
+            .modal {
+                background: white;
+                border-radius: 16px;
+                width: 90%;
+                max-width: 600px;
+                max-height: 80vh;
+                box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+                overflow: hidden;
+                animation: modalSlideIn 0.2s ease-out;
+            }
+
+            @keyframes modalSlideIn {
+                from {
+                    opacity: 0;
+                    transform: translateY(-20px);
+                }
+
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+
+            .modal-header {
+                display: flex;
+                justify-content: space-between;
+                align-items: flex-start;
+                padding: 24px 24px 16px;
+                border-bottom: 1px solid var(--border-color);
+            }
+
+            .modal-header h2 {
+                margin: 0;
+                font-size: 20px;
+                font-weight: 600;
+                color: var(--text-main);
+                line-height: 1.4;
+            }
+
+            .modal-close {
+                background: none;
+                border: none;
+                font-size: 24px;
+                cursor: pointer;
+                color: var(--text-muted);
+                padding: 0;
+                line-height: 1;
+                transition: color 0.15s;
+            }
+
+            .modal-close:hover {
+                color: var(--text-main);
+            }
+
+            .modal-body {
+                padding: 24px;
+                max-height: 50vh;
+                overflow-y: auto;
+            }
+
+            .modal-message {
+                font-size: 15px;
+                line-height: 1.7;
+                color: var(--text-main);
+                white-space: pre-wrap;
+                word-wrap: break-word;
+            }
+
+            .modal-meta {
+                display: flex;
+                align-items: center;
+                gap: 16px;
+                padding: 16px 24px;
+                background: var(--bg-color);
+                border-top: 1px solid var(--border-color);
+                font-size: 13px;
+                color: var(--text-muted);
+            }
+
+            .modal-footer {
+                display: flex;
+                justify-content: flex-end;
+                gap: 12px;
+                padding: 16px 24px;
+                border-top: 1px solid var(--border-color);
+            }
+
+            .view-hint {
+                font-size: 11px;
+                color: var(--text-muted);
+                margin-top: 4px;
+            }
         </style>
     </head>
 
@@ -317,7 +425,8 @@
             <div class="page-header">
                 <h1>Notifications</h1>
                 <div class="header-actions">
-                    <% if (notifications != null && !notifications.isEmpty() && unreadCount > 0) { %>
+                    <% if (notifications != null && !notifications.isEmpty()
+                                                                    && unreadCount > 0) { %>
                     <button class="btn btn-primary" onclick="markAllAsRead()">
                         ✓ Mark All Read
                     </button>
@@ -350,14 +459,17 @@
                 </div>
                 <% } else { %>
                 <% for (Notification n : notifications) {
-                        String iconClass = "password_reset".equals(n.getType())
-                                ? "password-reset" : "default";
-                                                                    String icon = "password_reset".equals(n.getType()) ? "🔑" : "📢";
-                                                                    String unreadClass = !n.isRead() ? "unread" : "";%>
+                        String unreadClass = !n.isRead() ? "unread" : "";
+                        String createdAtStr = n.getCreatedAt() != null ? new java.text.SimpleDateFormat("MMM dd, yyyy HH:mm").format(n.getCreatedAt()) : "Unknown"; // Escape single quotes and newlines for JavaScript 
+                        String escapedTitle = n.getTitle().replace("'", "\\'").replace("\n", "\\n").replace("\r", "");
+                        String escapedMessage = n.getMessage().replace("'", "\\'"
+                                                                    ).replace("\n", "\\n").replace("\r", "");
+                                                                    String link = n.getLink() != null ? n.getLink() : "";%>
                 <div class="notification-item <%= unreadClass%>"
-                     id="notification-<%= n.getNotificationId()%>">
-                    <div class="notification-icon <%= iconClass%>">
-                        <%= icon%>
+                     id="notification-<%= n.getNotificationId()%>"
+                     onclick="openModal('<%= escapedTitle%>', '<%= escapedMessage%>', '<%= createdAtStr%>', <%= n.isRead()%>, <%= n.getNotificationId()%>, '<%= link%>')">
+                    <div class="notification-icon">
+                        📢
                     </div>
                     <div class="notification-body">
                         <div class="notification-title">
@@ -367,21 +479,16 @@
                             <%= n.getMessage()%>
                         </div>
                         <div class="notification-meta">
-                            <span>📅 <%= n.getCreatedAt() != null ? new java.text.SimpleDateFormat("MMM dd, yyyy HH:mm").format(n.getCreatedAt())
-                                    : "Unknown" %></span>
-                                <% if (n.getRelatedUserFullName() != null) {
-                                %>
-                            <span>👤 <%=n.getRelatedUserFullName()%>
-                            </span>
-                            <% } %>
-                            <% if (n.isRead() && n.getReadAt()
-                                                                                                != null) {%>
-                            <span>✓ Read at <%= new java.text.SimpleDateFormat("MMM dd, HH:mm").format(n.getReadAt())%>
-                            </span>
+                            <span>📅 <%= createdAtStr%></span>
+                            <% if (n.isRead()) { %>
+                            <span>✓ Read</span>
                             <% } %>
                         </div>
+                        <div class="view-hint">Click to view full
+                            message</div>
                     </div>
-                    <div class="notification-actions">
+                    <div class="notification-actions"
+                         onclick="event.stopPropagation()">
                         <% if (!n.isRead()) {%>
                         <button class="action-btn mark-read"
                                 onclick="markAsRead(<%= n.getNotificationId()%>)">
@@ -399,10 +506,85 @@
             </div>
         </div>
 
+        <!-- Notification Detail Modal -->
+        <div class="modal-overlay" id="notificationModal" onclick="closeModal(event)">
+            <div class="modal" onclick="event.stopPropagation()">
+                <div class="modal-header">
+                    <h2 id="modalTitle"></h2>
+                    <button class="modal-close" onclick="closeModal()">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="modal-message" id="modalMessage"></div>
+                </div>
+                <div class="modal-meta">
+                    <span id="modalDate"></span>
+                    <span id="modalStatus"></span>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-outline" onclick="closeModal()">Close</button>
+                    <a class="btn btn-primary" id="modalGoTo" style="display: none;" href="#">
+                        ➡️ Go to Details
+                    </a>
+                    <button class="btn btn-primary" id="modalMarkRead" style="display: none;"
+                            onclick="markAsReadFromModal()">
+                        Mark as Read
+                    </button>
+                </div>
+            </div>
+        </div>
+
         <jsp:include page="footer.jsp" />
 
         <script>
             // Note: contextPath is defined in header.jsp
+            var currentNotificationId = null;
+            var currentNotificationLink = null;
+
+            function openModal(title, message, date, isRead, notificationId, link) {
+                currentNotificationId = notificationId;
+                currentNotificationLink = link || null;
+
+                // Decode escaped characters
+                document.getElementById('modalTitle').textContent = title.replace(/\\n/g, '\n').replace(/\\'/g, "'");
+                document.getElementById('modalMessage').textContent = message.replace(/\\n/g, '\n').replace(/\\'/g, "'");
+                document.getElementById('modalDate').textContent = '📅 ' + date;
+                document.getElementById('modalStatus').textContent = isRead ? '✓ Read' : '○ Unread';
+
+                // Show/hide mark as read button
+                var markReadBtn = document.getElementById('modalMarkRead');
+                if (isRead) {
+                    markReadBtn.style.display = 'none';
+                } else {
+                    markReadBtn.style.display = 'inline-flex';
+                }
+
+                // Show/hide go to button based on link
+                var goToBtn = document.getElementById('modalGoTo');
+                if (link && link.length > 0) {
+                    goToBtn.style.display = 'inline-flex';
+                    goToBtn.href = contextPath + link;
+                } else {
+                    goToBtn.style.display = 'none';
+                }
+
+                document.getElementById('notificationModal').classList.add('show');
+                document.body.style.overflow = 'hidden';
+            }
+
+            function closeModal(event) {
+                if (event && event.target !== document.getElementById('notificationModal')) {
+                    return;
+                }
+                document.getElementById('notificationModal').classList.remove('show');
+                document.body.style.overflow = '';
+                currentNotificationId = null;
+            }
+
+            function markAsReadFromModal() {
+                if (currentNotificationId) {
+                    markAsRead(currentNotificationId);
+                }
+            }
 
             function markAsRead(notificationId) {
                 fetch(contextPath + '/notifications?action=markRead&id=' + notificationId, {
@@ -463,6 +645,13 @@
                             alert('Failed to delete notification');
                         });
             }
+
+            // Close modal on Escape key
+            document.addEventListener('keydown', function (e) {
+                if (e.key === 'Escape') {
+                    closeModal();
+                }
+            });
         </script>
     </body>
 

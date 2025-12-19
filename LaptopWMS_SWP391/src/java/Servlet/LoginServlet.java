@@ -49,7 +49,6 @@ public class LoginServlet extends HttpServlet {
                     request.getRequestDispatcher("login.jsp").forward(request, response);
                     return;
                 }
-                userDao.updateLastLogin(user.getUserId());
                 PermissionDAO permissionDAO = new PermissionDAO();
                 List<String> userPermissions = permissionDAO.getPermissionUrlsByRoleId(user.getRoleId());
 
@@ -57,7 +56,7 @@ public class LoginServlet extends HttpServlet {
                 session.setAttribute("username", user.getUsername());
                 session.setAttribute("fullName", user.getFullName());
                 session.setAttribute("currentUser", user);
-                session.setAttribute("sessionCreatedAt", System.currentTimeMillis()); 
+                session.setAttribute("sessionCreatedAt", System.currentTimeMillis());
                 session.setAttribute("userPermissions", userPermissions);
                 response.sendRedirect(request.getContextPath() + "/dashboard");
             } catch (Exception ex) {

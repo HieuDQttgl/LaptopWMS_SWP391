@@ -142,18 +142,12 @@ public class AdminResetPasswordServlet extends HttpServlet {
             Model.Role role = roleDAO.getRoleById(user.getRoleId());
             java.util.List<Model.Role> roles = roleDAO.getAllRoles();
 
-            Users creator = null;
-            if (user.getCreatedBy() != null) {
-                creator = userDAO.getUserById(user.getCreatedBy());
-            }
-
             Users currentUser = (Users) request.getSession().getAttribute("currentUser");
 
             request.setAttribute("currentUser", currentUser);
             request.setAttribute("user", user);
             request.setAttribute("role", role);
             request.setAttribute("roles", roles);
-            request.setAttribute("creator", creator);
 
             request.getRequestDispatcher("/user-detail.jsp").forward(request, response);
         } catch (Exception e) {

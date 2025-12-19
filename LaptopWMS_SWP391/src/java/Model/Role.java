@@ -1,24 +1,25 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package Model;
 
-import java.sql.Timestamp;
-
 /**
- *
- * @author Admin
+ * Role model for laptop_wms_lite database
+ * DB Schema: role_id, role_name, role_description
+ * Note: No status, created_at, updated_at columns in this database
  */
 public class Role {
     private int roleId;
     private String roleName;
     private String roleDescription;
-    private String status;
-    private Timestamp createdAt;
-    private Timestamp updatedAt;
+
+    // For backward compatibility with existing code
+    private String status = "active";
 
     public Role() {
+    }
+
+    public Role(int roleId, String roleName, String roleDescription) {
+        this.roleId = roleId;
+        this.roleName = roleName;
+        this.roleDescription = roleDescription;
     }
 
     public Role(int roleId, String roleName, String roleDescription, String status) {
@@ -26,24 +27,6 @@ public class Role {
         this.roleName = roleName;
         this.roleDescription = roleDescription;
         this.status = status;
-    }
-
-    public Role(int roleId, String roleName, String status) {
-        this.roleId = roleId;
-        this.roleName = roleName;
-        this.status = status;
-    }
-
-    
-    
-
-    public Role(int roleId, String roleName, String roleDescription, String status, Timestamp createdAt, Timestamp updatedAt) {
-        this.roleId = roleId;
-        this.roleName = roleName;
-        this.roleDescription = roleDescription;
-        this.status = status;
-        this.createdAt = createdAt;
-        this.updatedAt = updatedAt;
     }
 
     public int getRoleId() {
@@ -77,22 +60,4 @@ public class Role {
     public void setStatus(String status) {
         this.status = status;
     }
-
-    public Timestamp getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(Timestamp createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    public Timestamp getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public void setUpdatedAt(Timestamp updatedAt) {
-        this.updatedAt = updatedAt;
-    }
-    
-    
 }

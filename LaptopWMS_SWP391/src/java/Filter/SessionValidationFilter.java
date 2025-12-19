@@ -23,6 +23,7 @@ public class SessionValidationFilter implements Filter {
             "/login",
             "/logout",
             "/forgot",
+            "/landing",
             "/css",
             "/js",
             "/images",
@@ -46,6 +47,7 @@ public class SessionValidationFilter implements Filter {
 
         // Get request path
         String path = req.getRequestURI().substring(req.getContextPath().length());
+
         // Check if path is excluded from validation
         for (String excluded : EXCLUDED_PATHS) {
             if (path.startsWith(excluded) || path.equals("/") || path.isEmpty()) {
@@ -74,6 +76,13 @@ public class SessionValidationFilter implements Filter {
                             "/login?msg=Your password was changed. Please login again.");
                     return;
                 }
+            }
+
+            // Check if user account is still active
+            if (currentUser.getStatus() != null && "inactive".equalsIgnoreCase(currentUser.getStatus())) {
+                session.invalidate();
+                resp.sendRedirect(req.getContextPath() + "/login?msg=Your account has been deactivated.");
+                return;
             }
         }
 

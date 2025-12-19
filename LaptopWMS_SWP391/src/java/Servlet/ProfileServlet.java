@@ -10,7 +10,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
 
-@WebServlet(name = "ProfileServlet", urlPatterns = {"/profile"})
+@WebServlet(name = "ProfileServlet", urlPatterns = { "/profile" })
 public class ProfileServlet extends HttpServlet {
 
     @Override
@@ -43,14 +43,9 @@ public class ProfileServlet extends HttpServlet {
 
         String fullName = request.getParameter("fullName");
         String email = request.getParameter("email");
-        String phoneNumber = request.getParameter("phoneNumber");
-        String gender = request.getParameter("gender");
 
         // Email regex
         String emailRegex = "^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$";
-
-        // VN phone regex
-        String phoneRegex = "^(03|05|07|08|09)\\d{8}$";
 
         if (email == null || !email.matches(emailRegex)) {
             request.setAttribute("error", "Invalid email format.");
@@ -58,14 +53,8 @@ public class ProfileServlet extends HttpServlet {
             return;
         }
 
-        if (phoneNumber != null && !phoneNumber.isEmpty() && !phoneNumber.matches(phoneRegex)) {
-            request.setAttribute("error", "Phone number must be 10 digits and start with 03, 05, 07, 08, or 09.");
-            request.getRequestDispatcher("/profile.jsp").forward(request, response);
-            return;
-        }
-
         UserDAO userDAO = new UserDAO();
-        boolean success = userDAO.updateProfile(userId, fullName, email, phoneNumber, gender);
+        boolean success = userDAO.updateProfile(userId, fullName, email);
 
         if (success) {
             Users updatedUser = userDAO.getUserById(userId);

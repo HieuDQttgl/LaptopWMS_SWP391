@@ -2,7 +2,6 @@
 <%@ page import="Model.Users" %>
 <%@ page import="Model.Role" %>
 <%@ page import="java.util.List" %>
-<%@ page import="java.text.SimpleDateFormat" %>
 <!DOCTYPE html>
 <html>
     <jsp:include page="header.jsp" />
@@ -291,8 +290,8 @@
                         Users currentUser = (Users) request.getAttribute("currentUser");
                         boolean isAdmin = currentUser != null
                                 && currentUser.getRoleId() == 1;
-                        if (user != null && "active"
-                                .equalsIgnoreCase(user.getStatus())) { %>
+                                    if (user != null && "active"
+                                            .equalsIgnoreCase(user.getStatus())) { %>
                     <span class="badge active">Active</span>
                     <% } else if (user != null) { %>
                     <span class="badge inactive">Inactive</span>
@@ -300,8 +299,8 @@
                 </div>
 
                 <% String successMsg = (String) request.getAttribute("success");
-                    String errorMsg = (String) request.getAttribute("error");
-                    if (successMsg != null) {%>
+                                String errorMsg = (String) request.getAttribute("error");
+                                if (successMsg != null) {%>
                 <div class="message success">
                     <%= successMsg%>
                 </div>
@@ -313,22 +312,14 @@
                 <% } %>
 
                 <% if (user != null) {
-                        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
                         Role role = (Role) request.getAttribute("role");
-                        Users creator = (Users) request.getAttribute("creator");
-                        String username = user.getUsername()
-                                != null ? user.getUsername() : "";
+                        String username = user.getUsername() != null ? user.getUsername() : "";
                         String fullName = user.getFullName() != null ? user.getFullName() : "";
-                        String email = user.getEmail() != null ? user.getEmail() : "";
-                        String phoneNumber = user.getPhoneNumber() != null ? user.getPhoneNumber()
-                                : "";
-                        String gender = user.getGender() != null ? user.getGender() : "";%>
+                                                    String email = user.getEmail() != null ? user.getEmail() : "";%>
 
-                <form method="post"
-                      action="<%= request.getContextPath()%>/user-detail"
+                <form method="post" action="<%= request.getContextPath()%>/user-detail"
                       id="userForm">
-                    <input type="hidden" name="userId"
-                           value="<%= user.getUserId()%>">
+                    <input type="hidden" name="userId" value="<%= user.getUserId()%>">
 
                     <div class="detail-body">
                         <div class="field-group">
@@ -348,9 +339,8 @@
                         <% if (isAdmin) {%>
                         <div class="field-group edit-mode">
                             <span class="field-label">Username</span>
-                            <input type="text" name="username"
-                                   class="field-input" value="<%= username%>"
-                                   required>
+                            <input type="text" name="username" class="field-input"
+                                   value="<%= username%>" required>
                         </div>
                         <% }%>
 
@@ -365,8 +355,7 @@
                         <div class="field-group edit-mode">
                             <span class="field-label">Full Name</span>
                             <input type="text" name="fullName"
-                                   class="field-input"
-                                   value="<%= fullName%>">
+                                   class="field-input" value="<%= fullName%>">
                         </div>
                         <% }%>
 
@@ -379,121 +368,49 @@
                         </div>
                         <% if (isAdmin) {%>
                         <div class="field-group edit-mode">
-                            <span
-                                class="field-label">Email</span>
+                            <span class="field-label">Email</span>
                             <input type="email" name="email"
                                    class="field-input"
                                    value="<%= email%>">
                         </div>
                         <% }%>
 
-                        <!-- Phone Number -->
-                        <div class="field-group view-mode">
-                            <span class="field-label">Phone
-                                Number</span>
-                            <span class="field-value">
-                                <%= phoneNumber.isEmpty()
-                                        ? "—" : phoneNumber%>
-                            </span>
-                        </div>
-                        <% if (isAdmin) {%>
-                        <div
-                            class="field-group edit-mode">
-                            <span
-                                class="field-label">Phone
-                                Number</span>
-                            <input type="text"
-                                   name="phoneNumber"
-                                   class="field-input"
-                                   value="<%= phoneNumber%>">
-                        </div>
-                        <% }%>
-
-                        <!-- Gender -->
-                        <div
-                            class="field-group view-mode">
-                            <span
-                                class="field-label">Gender</span>
-                            <span
-                                class="field-value">
-                                <%= gender.isEmpty()
-                                        ? "—" : gender%>
-                            </span>
-                        </div>
-                        <% if (isAdmin) {%>
-                        <div
-                            class="field-group edit-mode">
-                            <span
-                                class="field-label">Gender</span>
-                            <select
-                                name="gender"
-                                class="field-select">
-                                <option value=""
-                                        <%=gender.isEmpty()
-                                                ? "selected"
-                                                : ""%>>—
-                                </option>
-                                <option
-                                    value="Male"
-                                    <%="Male"
-                                            .equals(gender)
-                                            ? "selected"
-                                            : ""%>>Male
-                                </option>
-                                <option
-                                    value="Female"
-                                    <%="Female"
-                                            .equals(gender)
-                                            ? "selected"
-                                            : ""%>
-                                    >Female
-                                </option>
-                                <option
-                                    value="Other"
-                                    <%="Other"
-                                            .equals(gender)
-                                            ? "selected"
-                                            : ""%>
-                                    >Other
-                                </option>
-                            </select>
-                        </div>
-                        <% }%>
-
                         <!-- Role -->
-                        <div
-                            class="field-group view-mode">
+                        <div class="field-group view-mode">
                             <span
                                 class="field-label">Role</span>
-                            <span
-                                class="field-value">
-                                <%= role != null ? role.getRoleName() : "—"%>
+                            <span class="field-value">
+                                <%= role != null
+                                                                                                ? role.getRoleName() : "—"%>
                             </span>
                         </div>
-                        <%
-                            List<Role> roles = (List<Role>) request.getAttribute("roles");
-                            boolean canEditRole = isAdmin && user.getRoleId() != 1 && currentUser.getUserId() != user.getUserId();
-                            if (canEditRole && roles != null) {
+                        <% List<Role> roles = (List<Role>) request.getAttribute("roles");
+                            boolean canEditRole = isAdmin
+                                    && user.getRoleId() != 1
+                                    && currentUser.getUserId()
+                                    != user.getUserId();
+                            if (canEditRole && roles
+                                    != null) {
                         %>
                         <div
                             class="field-group edit-mode">
                             <span
                                 class="field-label">Role</span>
-                            <select
-                                name="roleId"
-                                class="field-select">
+                            <select name="roleId"
+                                    class="field-select">
                                 <% for (Role r : roles) {
-                                        if (r.getRoleId() != 1) {
-                                %>
+                                                                                                        if (r.getRoleId()
+                                                                                                                != 1) {%>
                                 <option
                                     value="<%= r.getRoleId()%>"
-                                    <%=r.getRoleId() == user.getRoleId() ? "selected" : ""%>
+                                    <%=r.getRoleId() == user.getRoleId()
+                                                                                                                ? "selected"
+                                                                                                                : ""%>
                                     >
                                     <%=r.getRoleName()%>
                                 </option>
                                 <% }
-                                    }
-                                %>
+                                                                                                        } %>
                             </select>
                         </div>
                         <% } else if (isAdmin) {%>
@@ -504,22 +421,21 @@
                             <span
                                 class="field-value"
                                 style="color: #6b7280; font-style: italic;">
-                                <%= role != null ? role.getRoleName() : "—"%>
-                                <% if (user.getRoleId() == 1) {
-                                %>
+                                <%= role != null
+                                                                                                            ? role.getRoleName()
+                                                                                                            : "—"%>
+                                <% if (user.getRoleId() == 1) { %>
                                 (Cannot
                                 change
                                 admin
                                 role)
-                                <% } else if (currentUser.getUserId() == user.getUserId()) {
-                                %>
+                                <% } else if (currentUser.getUserId() == user.getUserId()) { %>
                                 (Cannot
                                 change
                                 your
                                 own
                                 role)
-                                <% }
-                                %>
+                                <% } %>
                             </span>
                         </div>
                         <% }%>
@@ -530,51 +446,10 @@
                                 class="field-label">Status</span>
                             <span
                                 class="field-value">
-                                <%= user.getStatus() != null ? user.getStatus() : "—"%>
-                            </span>
-                        </div>
-
-                        <div
-                            class="field-group">
-                            <span
-                                class="field-label">Last
-                                Login</span>
-                            <span
-                                class="field-value muted">
-                                <%= user.getLastLoginAt() != null ? sdf.format(user.getLastLoginAt()) : "Never logged in"%>
-                            </span>
-                        </div>
-
-                        <div
-                            class="field-group">
-                            <span
-                                class="field-label">Created
-                                At</span>
-                            <span
-                                class="field-value muted">
-                                <%= user.getCreatedAt() != null ? sdf.format(user.getCreatedAt()) : "—"%>
-                            </span>
-                        </div>
-
-                        <div
-                            class="field-group">
-                            <span
-                                class="field-label">Updated
-                                At</span>
-                            <span
-                                class="field-value muted">
-                                <%= user.getUpdatedAt() != null ? sdf.format(user.getUpdatedAt()) : "—"%>
-                            </span>
-                        </div>
-
-                        <div
-                            class="field-group">
-                            <span
-                                class="field-label">Created
-                                By</span>
-                            <span
-                                class="field-value muted">
-                                <%= creator != null ? creator.getUsername() : (user.getCreatedBy() != null ? "User ID: " + user.getCreatedBy() : "—")%>
+                                <%= user.getStatus()
+                                                                                                                != null
+                                                                                                                        ? user.getStatus()
+                                                                                                                        : "—"%>
                             </span>
                         </div>
                     </div>
@@ -596,7 +471,8 @@
                     <button type="button" onclick="enableEditMode()"
                             class="btn-primary">Edit User</button>
                     <% // Show reset password only for non-admin users with email 
-                        if (user.getRoleId() != 1 && user.getEmail() != null && !user.getEmail().isEmpty()) { %>
+                                                            if (user.getRoleId() != 1 && user.getEmail() != null
+                                                                    && !user.getEmail().isEmpty()) { %>
                     <button type="button" onclick="confirmResetPassword()"
                             class="btn-danger">Reset Password</button>
                     <% } %>

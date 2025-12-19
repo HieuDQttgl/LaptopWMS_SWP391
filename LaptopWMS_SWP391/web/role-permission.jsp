@@ -5,8 +5,9 @@
 
 <!DOCTYPE html>
 <html>
+
     <head>
-        <jsp:include page="header.jsp"/>
+        <jsp:include page="header.jsp" />
         <meta charset="UTF-8">
         <title>Laptop Warehouse Management System</title>
 
@@ -24,7 +25,7 @@
                 background-color: white;
                 padding: 30px;
                 border-radius: 10px;
-                box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+                box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
             }
 
             h1 {
@@ -63,17 +64,6 @@
                 border-color: #10b981;
                 box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
             }
-
-            .module-select {
-                padding: 10px 15px;
-                border: 1px solid #d1d5db;
-                border-radius: 6px;
-                background-color: white;
-                font-size: 14px;
-                min-width: 200px;
-                cursor: pointer;
-            }
-
 
             .table-container {
                 max-height: 600px;
@@ -125,6 +115,7 @@
                 display: block;
                 margin-bottom: 4px;
             }
+
             .url-text {
                 font-family: monospace;
                 color: #6b7280;
@@ -132,18 +123,6 @@
                 background: #f3f4f6;
                 padding: 2px 6px;
                 border-radius: 4px;
-            }
-
-            .badge-module {
-                display: inline-block;
-                background: #e0e7ff;
-                color: #4338ca;
-                padding: 4px 8px;
-                border-radius: 4px;
-                font-size: 11px;
-                font-weight: 700;
-                text-transform: uppercase;
-                letter-spacing: 0.5px;
             }
 
             input[type="checkbox"] {
@@ -193,17 +172,17 @@
             .btn-back:hover {
                 color: #1f2937;
             }
-
         </style>
     </head>
+
     <body>
 
         <div class="container">
             <h1>Role Permissions</h1>
-            <div class="subtitle">Control access rights for each role. Check the box to grant permission.</div>
+            <div class="subtitle">Control access rights for each role. Check the box to grant permission.
+            </div>
 
-            <%
-                List<Role> roles = (List<Role>) request.getAttribute("roles");
+            <% List<Role> roles = (List<Role>) request.getAttribute("roles");
                 List<Permission> permissions = (List<Permission>) request.getAttribute("permissions");
                 Map<Integer, Set<Integer>> rolePermMap = (Map<Integer, Set<Integer>>) request.getAttribute("rolePermMap");
 
@@ -216,26 +195,12 @@
                 if (rolePermMap == null) {
                     rolePermMap = new HashMap<>();
                 }
-
-                Set<String> modules = new HashSet<>();
-                for (Permission p : permissions) {
-                    if (p.getModule() != null) {
-                        modules.add(p.getModule());
-                    }
-                }
             %>
 
             <div class="filter-bar">
-                <input type="text" id="searchInput" class="search-input" 
-                       onkeyup="filterTable()" 
+                <input type="text" id="searchInput" class="search-input"
+                       onkeyup="filterTable()"
                        placeholder="Type to search permission description or URL...">
-
-                <select id="moduleSelect" class="module-select" onchange="filterTable()">
-                    <option value="all">All Modules</option>
-                    <% for (String m : modules) {%>
-                    <option value="<%= m%>"><%= m%></option>
-                    <% } %>
-                </select>
             </div>
 
             <form action="role-permission" method="post">
@@ -244,57 +209,69 @@
                         <thead>
                             <tr>
                                 <th style="width: 50px;">ID</th>
-                                <th style="min-width: 300px;">Permission Details</th>
-                                <th style="width: 120px;">Module</th>
+                                <th style="min-width: 300px;">Permission
+                                    Details</th>
 
-                                <%-- Cột Roles --%>
+                                <%-- Role Columns --%>
                                 <% for (Role r : roles) {%>
-                                <th class="role-header"><%= r.getRoleName()%></th>
-                                    <% } %>
+                                <th class="role-header">
+                                    <%= r.getRoleName()%>
+                                </th>
+                                <% } %>
                             </tr>
                         </thead>
                         <tbody>
-                            <%
-                                if (!permissions.isEmpty()) {
-                                    for (Permission p : permissions) {
-                            %>
-                            <tr class="perm-row" data-module="<%= p.getModule()%>">
-                                <td style="color: #9ca3af;"><%= p.getPermissionId()%></td>
-
-                                <td>
-                                    <span class="desc-text perm-search-target"><%= p.getPermissionDescription()%></span>
-                                    <span class="url-text perm-search-target"><%= p.getPermissionURL()%></span>
+                            <% if (!permissions.isEmpty()) {
+                                                                                    for (Permission p : permissions) {%>
+                            <tr class="perm-row">
+                                <td style="color: #9ca3af;">
+                                    <%= p.getPermissionId()%>
                                 </td>
 
                                 <td>
-                                    <span class="badge-module"><%= p.getModule()%></span>
+                                    <span
+                                        class="desc-text perm-search-target">
+                                        <%=p.getPermissionDescription()%>
+                                    </span>
+                                    <span
+                                        class="url-text perm-search-target">
+                                        <%= p.getPermissionURL()%>
+                                    </span>
                                 </td>
 
                                 <% for (Role r : roles) {
                                         boolean isAdmin = (r.getRoleId() == 1);
-
-                                        Set<Integer> assignedPerms = rolePermMap.get(r.getRoleId());
-                                        boolean checked = (assignedPerms != null && assignedPerms.contains(p.getPermissionId()));
+                                        Set<Integer> assignedPerms
+                                                = rolePermMap.get(r.getRoleId());
+                                        boolean checked = (assignedPerms
+                                                != null
+                                                && assignedPerms.contains(p.getPermissionId()));
                                 %>
                                 <td style="text-align: center;">
-                                    <input type="checkbox" 
-                                           name="perm_<%= r.getRoleId()%>_<%= p.getPermissionId()%>" 
-                                           value="true"
-                                           <%= isAdmin ? "checked disabled" : (checked ? "checked" : "")%>
-                                           title="<%= r.getRoleName()%> - <%= p.getPermissionDescription()%>">
+                                    <input type="checkbox"
+                                           name="perm_<%= r.getRoleId()%>_<%= p.getPermissionId()%>"
+                                           value="true" <%=isAdmin
+                                                                                                        ? "checked disabled"
+                                                                                                        : (checked ? "checked"
+                                                                                                                : "")%>
+                                           title="<%= r.getRoleName()%>
+                                           - <%=p.getPermissionDescription()%>
+                                           ">
 
                                     <% if (isAdmin) {%>
-                                    <input type="hidden" name="perm_<%= r.getRoleId()%>_<%= p.getPermissionId()%>" value="true">
+                                    <input
+                                        type="hidden"
+                                        name="perm_<%= r.getRoleId()%>_<%= p.getPermissionId()%>"
+                                        value="true">
                                     <% } %>
                                 </td>
                                 <% } %>
                             </tr>
-                            <%
-                                }
-                            } else {
-                            %>
+                            <% }
+                                                                                } else {%>
                             <tr>
-                                <td colspan="<%= 3 + roles.size()%>" style="text-align: center; padding: 40px; color: #6b7280;">
+                                <td colspan="<%= 2 + roles.size()%>"
+                                    style="text-align: center; padding: 40px; color: #6b7280;">
                                     No permissions data found.
                                 </td>
                             </tr>
@@ -304,20 +281,21 @@
                 </div>
 
                 <div class="action-bar">
-                    <a href="javascript:history.back()" class="btn-back">
+                    <a href="javascript:history.back()"
+                       class="btn-back">
                         Back to Dashboard
                     </a>
-                    <button type="submit" class="btn-save">Save Permission Changes</button>
+                    <button type="submit" class="btn-save">Save
+                        Permission Changes</button>
                 </div>
             </form>
         </div>
 
-        <jsp:include page="footer.jsp"/>
+        <jsp:include page="footer.jsp" />
 
         <script>
             function filterTable() {
                 var input = document.getElementById("searchInput").value.toUpperCase();
-                var selectedModule = document.getElementById("moduleSelect").value;
                 var rows = document.querySelectorAll(".perm-row");
 
                 rows.forEach(row => {
@@ -325,11 +303,8 @@
                     var textContent = "";
                     searchTargets.forEach(span => textContent += span.innerText + " ");
                     textContent = textContent.toUpperCase();
-                    var module = row.getAttribute("data-module");
-                    var matchKeyword = textContent.indexOf(input) > -1;
-                    var matchModule = (selectedModule === "all" || selectedModule === module);
 
-                    if (matchKeyword && matchModule) {
+                    if (textContent.indexOf(input) > -1) {
                         row.style.display = "";
                     } else {
                         row.style.display = "none";
@@ -339,4 +314,5 @@
         </script>
 
     </body>
+
 </html>

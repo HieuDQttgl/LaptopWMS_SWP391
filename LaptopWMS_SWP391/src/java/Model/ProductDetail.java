@@ -1,28 +1,23 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package Model;
 
 /**
- *
- * @author PC
+ * ProductDetail model for laptop_wms_lite database
+ * DB Schema: product_detail_id, product_id, cpu, ram, storage, gpu, unit,
+ * quantity
  */
 public class ProductDetail {
 
     private int productDetailId;
     private int productId;
-
+    private String cpu;
     private String ram;
     private String storage;
-    private String cpu;
     private String gpu;
-    private double screen;
-
-    private double price;
+    private String unit;
     private int quantity;
 
-    private boolean status;
+    // For display purposes
+    private String productName;
 
     public ProductDetail() {
     }
@@ -43,6 +38,14 @@ public class ProductDetail {
         this.productId = productId;
     }
 
+    public String getCpu() {
+        return cpu;
+    }
+
+    public void setCpu(String cpu) {
+        this.cpu = cpu;
+    }
+
     public String getRam() {
         return ram;
     }
@@ -59,14 +62,6 @@ public class ProductDetail {
         this.storage = storage;
     }
 
-    public String getCpu() {
-        return cpu;
-    }
-
-    public void setCpu(String cpu) {
-        this.cpu = cpu;
-    }
-
     public String getGpu() {
         return gpu;
     }
@@ -75,20 +70,12 @@ public class ProductDetail {
         this.gpu = gpu;
     }
 
-    public double getScreen() {
-        return screen;
+    public String getUnit() {
+        return unit;
     }
 
-    public void setScreen(double screen) {
-        this.screen = screen;
-    }
-
-    public double getPrice() {
-        return price;
-    }
-
-    public void setPrice(double price) {
-        this.price = price;
+    public void setUnit(String unit) {
+        this.unit = unit;
     }
 
     public int getQuantity() {
@@ -99,11 +86,29 @@ public class ProductDetail {
         this.quantity = quantity;
     }
 
-    public boolean isStatus() {
-        return status;
+    public String getProductName() {
+        return productName;
     }
 
-    public void setStatus(boolean status) {
-        this.status = status;
+    public void setProductName(String productName) {
+        this.productName = productName;
+    }
+
+    // Helper method to get config string
+    public String getConfig() {
+        StringBuilder config = new StringBuilder();
+        if (cpu != null && !cpu.isEmpty())
+            config.append(cpu);
+        if (ram != null && !ram.isEmpty()) {
+            if (config.length() > 0)
+                config.append(" / ");
+            config.append(ram);
+        }
+        if (storage != null && !storage.isEmpty()) {
+            if (config.length() > 0)
+                config.append(" / ");
+            config.append(storage);
+        }
+        return config.toString();
     }
 }

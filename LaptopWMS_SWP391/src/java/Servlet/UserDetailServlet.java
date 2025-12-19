@@ -54,15 +54,9 @@ public class UserDetailServlet extends HttpServlet {
             // user is not admin)
             List<Role> roles = roleDAO.getAllRoles();
 
-            Users creator = null;
-            if (user.getCreatedBy() != null) {
-                creator = userDAO.getUserById(user.getCreatedBy());
-            }
-
             request.setAttribute("user", user);
             request.setAttribute("role", role);
             request.setAttribute("roles", roles);
-            request.setAttribute("creator", creator);
             request.getRequestDispatcher("/user-detail.jsp").forward(request, response);
 
         } catch (Exception e) {
@@ -101,8 +95,6 @@ public class UserDetailServlet extends HttpServlet {
             String username = request.getParameter("username");
             String fullName = request.getParameter("fullName");
             String email = request.getParameter("email");
-            String phoneNumber = request.getParameter("phoneNumber");
-            String gender = request.getParameter("gender");
             String roleIdParam = request.getParameter("roleId");
 
             UserDAO userDAO = new UserDAO();
@@ -113,7 +105,7 @@ public class UserDetailServlet extends HttpServlet {
                 return;
             }
 
-            boolean success = userDAO.updateProfilebyAdmin(userId, username, fullName, email, phoneNumber, gender);
+            boolean success = userDAO.updateProfilebyAdmin(userId, username, fullName, email);
 
             // Handle role update - only if target user is not admin and not the current
             // user
@@ -148,16 +140,10 @@ public class UserDetailServlet extends HttpServlet {
             Role role = roleDAO.getRoleById(user.getRoleId());
             List<Role> roles = roleDAO.getAllRoles();
 
-            Users creator = null;
-            if (user.getCreatedBy() != null) {
-                creator = userDAO.getUserById(user.getCreatedBy());
-            }
-
             request.setAttribute("currentUser", currentUser);
             request.setAttribute("user", user);
             request.setAttribute("role", role);
             request.setAttribute("roles", roles);
-            request.setAttribute("creator", creator);
             request.getRequestDispatcher("/user-detail.jsp").forward(request, response);
 
         } catch (Exception e) {
