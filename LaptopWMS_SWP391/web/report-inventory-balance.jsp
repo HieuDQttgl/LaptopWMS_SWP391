@@ -45,7 +45,7 @@
                 border-radius: 4px;
                 cursor: pointer;
             }
-            
+
             .btn-excel {
                 padding: 9px 20px;
                 background: #009933;
@@ -118,35 +118,48 @@
             <table id="reportTable">
                 <thead>
                     <tr>
-                        <th rowspan="2">ID</th>
-                        <th rowspan="2">Product Name</th>
-                        <th rowspan="2">Unit</th>
+                        <th>ID</th>
+                        <th>Product Name</th>
+                        <th>Configuration</th>
+                        <th>Unit</th>
                         <th>Opening Stock</th>
-                        <th>Import Period</th>
-                        <th>Export Period</th>
+                        <th>Import</th>
+                        <th>Export</th>
                         <th>Closing Stock</th>
                     </tr>
                 </thead>
                 <tbody>
                     <c:forEach var="item" items="${reportList}">
                         <tr>
-                            <td>${item.productId}</td>
-                            <td class="left-align"><strong>${item.productName}</strong></td>
+                            <td>${item.productDetailId}</td>
+                            <td class="left-align">
+                                <span style="font-weight: bold; color: #2c3e50;">${item.productName}</span>
+                            </td>
+
+                            <td style="font-size: 13px; color: #555;">
+                                ${item.cpu} / ${item.ram}
+                            </td>
+
                             <td>${item.unit}</td>
-                            <td>${item.openingStock}</td>
+
+                            <td style="background-color: #f9f9f9;">${item.openingStock}</td>
+
                             <td style="color: ${item.importQuantity > 0 ? 'blue' : 'inherit'}">
                                 ${item.importQuantity > 0 ? item.importQuantity : '-'}
                             </td>
+
                             <td style="color: ${item.exportQuantity > 0 ? 'red' : 'inherit'}">
                                 ${item.exportQuantity > 0 ? item.exportQuantity : '-'}
                             </td>
+
                             <td style="font-weight: bold; background-color: #f0fdf4;">
                                 ${item.closingStock}
                             </td>
                         </tr>
                     </c:forEach>
+
                     <c:if test="${empty reportList}">
-                        <tr><td colspan="7">No data found.</td></tr>
+                        <tr><td colspan="8">No data found for this period.</td></tr>
                     </c:if>
                 </tbody>
             </table>

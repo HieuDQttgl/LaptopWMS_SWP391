@@ -10,8 +10,10 @@ package Model;
  */
 public class StockReportItem {
 
-    private int productId;
+    private int productDetailId;
     private String productName;
+    private String cpu;
+    private String ram;
     private String unit;
     private int openingStock;
     private int importQuantity;
@@ -21,12 +23,28 @@ public class StockReportItem {
     public StockReportItem() {
     }
 
-    public int getProductId() {
-        return productId;
+    public int getProductDetailId() {
+        return productDetailId;
     }
 
-    public void setProductId(int productId) {
-        this.productId = productId;
+    public void setProductDetailId(int productId) {
+        this.productDetailId = productId;
+    }
+
+    public String getCpu() {
+        return cpu;
+    }
+
+    public void setCpu(String cpu) {
+        this.cpu = cpu;
+    }
+
+    public String getRam() {
+        return ram;
+    }
+
+    public void setRam(String ram) {
+        this.ram = ram;
     }
 
     public String getProductName() {
