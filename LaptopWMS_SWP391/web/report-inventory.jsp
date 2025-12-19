@@ -62,6 +62,16 @@
                 color: white;
                 border: none;
             }
+            .btn-back {
+                display: inline-block;
+                margin-top: 20px;
+                color: #666;
+                text-decoration: none;
+            }
+            .btn-back:hover {
+                text-decoration: underline;
+                color: #333;
+            }
 
 
             .stats-row {
@@ -227,7 +237,8 @@
                 </table>
             </div>
         </div>
-<script>
+        <a href="javascript:history.back()" class="btn btn-back"> &larr; Back to Dashboard</a>
+        <script>
             function exportToExcel() {
                 var table = document.getElementById("table");
 
