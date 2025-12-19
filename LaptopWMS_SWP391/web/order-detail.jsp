@@ -221,9 +221,9 @@
                                         </div>
                                     </td>
                                     <td class="text-right">${item.quantity}</td>
-                                    <td class="text-right"><fmt:formatNumber value="${item.unitPrice}" pattern="#,##0₫" /></td>
+                                    <td class="text-right"><fmt:formatNumber value="${item.unitPrice}" pattern="$#,##0" /></td>
                                     <td class="text-right" style="font-weight: 600;">
-                                        <fmt:formatNumber value="${lineTotal}" pattern="#,##0₫" />
+                                        <fmt:formatNumber value="${lineTotal}" pattern="$#,##0" />
                                     </td>
                                 </tr>
                             </c:forEach>
@@ -232,7 +232,7 @@
                             <tr>
                                 <td colspan="4" class="text-right">GRAND TOTAL</td>
                                 <td class="text-right" style="font-size: 1.2em; color: #e74c3c;">
-                                    <fmt:formatNumber value="${grandTotal}" pattern="#,##0₫" />
+                                    <fmt:formatNumber value="${grandTotal}" pattern="$#,##0" />
                                 </td>
                             </tr>
                         </tfoot>

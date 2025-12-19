@@ -46,11 +46,11 @@ public class OrderListServlet extends HttpServlet {
         }
         if (sortOrder == null || sortOrder.isEmpty() || 
             (!"ASC".equalsIgnoreCase(sortOrder) && !"DESC".equalsIgnoreCase(sortOrder))) {
-            sortOrder = "DESC";
+            sortOrder = "ASC";
         }
         
         int page = 1;
-        int recordsPerPage = 3;
+        int recordsPerPage = 5;
         
         String pageStr = request.getParameter("page");
         if (pageStr != null && !pageStr.isEmpty()) {

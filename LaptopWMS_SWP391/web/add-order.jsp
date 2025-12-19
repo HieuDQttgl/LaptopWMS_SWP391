@@ -267,7 +267,7 @@
 
 
         <jsp:include page="footer.jsp" />
-        
+
         <script>
             function switchOrderType(type) {
                 const isExp = (type === 'export');
@@ -278,8 +278,57 @@
 
                 document.getElementById('customerIdHidden').value = '0';
                 document.getElementById('supplierIdHidden').value = '0';
+                document.getElementById('customerSearch').value = ''; 
+                document.getElementById('supplierSearch').value = '';
                 document.getElementById('err-customer').innerText = "";
                 document.getElementById('err-supplier').innerText = "";
+
+                clearAllProductRows();
+            }
+            function clearAllProductRows() {
+                const tbody = document.getElementById('detail-table-body');
+                const rows = tbody.querySelectorAll('.order-detail-row');
+
+                for (let i = rows.length - 1; i > 0; i--) {
+                    rows[i].remove();
+                }
+
+                const firstRow = tbody.querySelector('.order-detail-row');
+                if (firstRow) {
+                    firstRow.classList.remove('row-active', 'detail-selected');
+
+                    const pSearch = firstRow.querySelector('.product-search');
+                    if (pSearch)
+                        pSearch.value = "";
+
+                    const pHidden = firstRow.querySelector('.product-id-hidden');
+                    if (pHidden)
+                        pHidden.value = "";
+
+                    const dSelect = firstRow.querySelector('.detail-select');
+                    if (dSelect)
+                        dSelect.innerHTML = '<option value="">-- Select configuration --</option>';
+
+                    const qty = firstRow.querySelector('.qty-input');
+                    if (qty)
+                        qty.value = "1";
+
+                    const price = firstRow.querySelector('.price-input');
+                    if (price)
+                        price.value = "";
+
+                    firstRow.querySelectorAll('.error-text, .error-msg, .error-msg-detail, .input-error').forEach(el => {
+                        if (el.classList.contains('input-error')) {
+                            el.classList.remove('input-error');
+                        } else {
+                            el.innerText = "";
+                        }
+                    });
+                }
+
+                const globalError = document.getElementById('global-error');
+                if (globalError)
+                    globalError.innerText = "";
             }
 
             function initPartnerSearch(inputId, hiddenId, listId, errorId) {
@@ -338,7 +387,7 @@
                         row.classList.add('row-active');
                         loadDetailsToSelect(foundId, detailSelect);
                         e.target.classList.remove('input-error');
-                        row.querySelector('.error-msg').innerText = ""; // Xóa lỗi tên sp
+                        row.querySelector('.error-msg').innerText = "";
                     } else {
                         hiddenInput.value = '';
                         row.classList.remove('row-active', 'detail-selected');
@@ -361,7 +410,7 @@
                     });
 
                     if (isDuplicate) {
-                        errorSpan.innerText = "⚠️ Cấu hình này đã được chọn!";
+                        errorSpan.innerText = "This configuration has been chosen!";
                         currentSelect.value = "";
                         currentSelect.classList.add('input-error');
                         row.classList.remove('detail-selected');
@@ -460,7 +509,7 @@
                 });
 
                 if (!hasValidRow) {
-                    globalError.innerText = "❌ Lỗi: Order must have at least 1 product.";
+                    globalError.innerText = "Error: Order must have at least 1 product.";
                     isValid = false;
                 }
 
