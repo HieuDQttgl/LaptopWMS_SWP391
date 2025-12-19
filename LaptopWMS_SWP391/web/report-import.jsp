@@ -16,11 +16,11 @@
                 font-family: 'Segoe UI', sans-serif;
                 background: var(--bg);
                 margin: 0;
-                padding: 20px;
+                padding: 0;
             }
             .container {
                 max-width: 1100px;
-                margin: auto;
+                margin: 40px auto;
             }
             .report-card {
                 background: white;
@@ -114,6 +114,9 @@
         </style>
     </head>
     <body>
+        
+        <jsp:include page="header.jsp" />
+        
         <div class="container">
             <div class="report-card">
                 <h2>Import Report</h2>
@@ -209,6 +212,8 @@
                 window.location.href = 'report-import-export?' + params;
             }
         </script>
+        
+        <jsp:include page="footer.jsp" />
         
     </body>
 </html>

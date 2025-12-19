@@ -20,10 +20,14 @@ public class ReportDAO extends DBContext {
 
         String sql = """
             SELECT 
-                p.product_id,
+                pd.product_detail_id,
                 p.product_name,
+                pd.cpu,
+                pd.ram,
                 p.unit,
-                (COALESCE(SUM(CASE 
+
+                (
+                    COALESCE(SUM(CASE 
                         WHEN o.updated_at < ? AND o.supplier_id IS NOT NULL AND o.order_status = 'completed' THEN op.quantity 
                         ELSE 0 END), 0) 
                     - 
@@ -44,15 +48,17 @@ public class ReportDAO extends DBContext {
                     ELSE 0 END), 0) 
                 AS export_period
 
-            FROM products p
-            LEFT JOIN order_products op ON p.product_id = op.product_id
+            FROM product_details pd
+            JOIN products p ON pd.product_id = p.product_id
+            LEFT JOIN order_products op ON pd.product_detail_id = op.product_detail_id
             LEFT JOIN orders o ON op.order_id = o.order_id
-            GROUP BY p.product_id, p.product_name, p.unit
-            ORDER BY p.product_id ASC
+            GROUP BY pd.product_detail_id, p.product_name, pd.cpu, pd.ram, p.unit
+            ORDER BY pd.product_detail_id ASC
         """;
 
-        try (PreparedStatement ps = getConnection().prepareStatement(sql)) {
+        try (Connection conn = getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
 
+            // Set the Time Boundaries
             String startParams = startDate + " 00:00:00";
             String endParams = endDate + " 23:59:59";
 
@@ -68,10 +74,15 @@ public class ReportDAO extends DBContext {
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
                     StockReportItem item = new StockReportItem();
-                    item.setProductId(rs.getInt("product_id"));
+
+                    // NEW: Set the Variant Details
+                    item.setProductDetailId(rs.getInt("product_detail_id"));
                     item.setProductName(rs.getString("product_name"));
+                    item.setCpu(rs.getString("cpu"));
+                    item.setRam(rs.getString("ram"));
                     item.setUnit(rs.getString("unit"));
 
+                    // Set the Math
                     int opening = rs.getInt("opening_stock");
                     int imp = rs.getInt("import_period");
                     int exp = rs.getInt("export_period");
@@ -79,7 +90,6 @@ public class ReportDAO extends DBContext {
                     item.setOpeningStock(opening);
                     item.setImportQuantity(imp);
                     item.setExportQuantity(exp);
-
                     item.setClosingStock(opening + imp - exp);
 
                     list.add(item);
