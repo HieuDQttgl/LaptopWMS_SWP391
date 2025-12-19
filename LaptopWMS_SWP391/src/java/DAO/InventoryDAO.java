@@ -257,27 +257,27 @@ public class InventoryDAO {
         return list;
     }
 
-    public List<ProductDTO> getProductsNotInInventory() {
-        List<ProductDTO> list = new ArrayList<>();
-
-        String sql = "SELECT p.product_id, p.product_name, p.status "
-                + "FROM products p "
-                + "WHERE p.status = 1 "
-                + "ORDER BY p.product_name";
-        try (Connection conn = DBContext.getConnection(); PreparedStatement st = conn.prepareStatement(sql)) {
-            ResultSet rs = st.executeQuery();
-            while (rs.next()) {
-                list.add(new ProductDTO(
-                        rs.getInt("product_id"),
-                        rs.getString("product_name"),
-                        rs.getInt("status")
-                ));
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return list;
-    }
+//    public List<ProductDTO> getProductsNotInInventory() {
+//        List<ProductDTO> list = new ArrayList<>();
+//
+//        String sql = "SELECT p.product_id, p.product_name, p.status "
+//                + "FROM products p "
+//                + "WHERE p.status = 1 "
+//                + "ORDER BY p.product_name";
+//        try (Connection conn = DBContext.getConnection(); PreparedStatement st = conn.prepareStatement(sql)) {
+//            ResultSet rs = st.executeQuery();
+//            while (rs.next()) {
+//                list.add(new ProductDTO(
+//                        rs.getInt("product_id"),
+//                        rs.getString("product_name"),
+//                        rs.getInt("status")
+//                ));
+//            }
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+//        return list;
+//    }
 
     public boolean addProductToInventory(int productID, int locationId) throws Exception {
 

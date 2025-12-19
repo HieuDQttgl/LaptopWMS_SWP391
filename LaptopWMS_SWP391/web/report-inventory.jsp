@@ -2,6 +2,7 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <html>
     <head>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
         <title>Inventory Report</title>
         <style>
             :root {
@@ -168,6 +169,7 @@
                         </c:forEach>
                     </select>
                     <button type="submit" class="btn-filter">Filter</button>
+                    <button type="submit" onclick="exportToExcel()" class="btn">Export to Excel</button>
                 </form>
             </div>
 
@@ -187,7 +189,7 @@
             </div>
 
             <div class="report-card" style="padding: 0;">
-                <table>
+                <table id ="table">
                     <thead>
                         <tr>
                             <th>ID</th>
@@ -225,6 +227,15 @@
                 </table>
             </div>
         </div>
+<script>
+            function exportToExcel() {
+                var table = document.getElementById("table");
 
+                var wb = XLSX.utils.table_to_book(table, {sheet: "Inventory Report"});
+
+                var today = new Date().toISOString().slice(0, 10);
+                XLSX.writeFile(wb, 'Inventory_Report_' + today + '.xlsx');
+            }
+        </script>
     </body>
 </html>
