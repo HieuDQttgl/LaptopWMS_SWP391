@@ -79,10 +79,30 @@ public class CreateTicketServlet extends HttpServlet {
                 return;
             }
 
+            // Validate keeper is selected
+            if (keeperIdStr == null || keeperIdStr.trim().isEmpty()) {
+                request.setAttribute("error", "Please select a Keeper to assign");
+                doGet(request, response);
+                return;
+            }
+
             if (productIds == null || productIds.length == 0) {
                 request.setAttribute("error", "Please add at least one product");
                 doGet(request, response);
                 return;
+            }
+
+            // Check for duplicate products
+            java.util.Set<String> productIdSet = new java.util.HashSet<>();
+            for (String productId : productIds) {
+                if (productId != null && !productId.isEmpty()) {
+                    if (!productIdSet.add(productId)) {
+                        request.setAttribute("error",
+                                "Each product can only be selected once. Please remove duplicate products.");
+                        doGet(request, response);
+                        return;
+                    }
+                }
             }
 
             // Create ticket object

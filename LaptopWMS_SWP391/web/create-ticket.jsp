@@ -282,15 +282,16 @@
 
                     <!-- Assign Keeper -->
                     <div class="form-group">
-                        <label for="keeperId">Assign to Keeper</label>
-                        <select id="keeperId" name="keeperId">
+                        <label for="keeperId">Assign to Keeper *</label>
+                        <select id="keeperId" name="keeperId" required>
                             <option value="">-- Select Keeper --</option>
                             <% List<Users> keepers = (List<Users>) request.getAttribute("keepers");
                                 if (keepers != null) {
                                     for (Users keeper : keepers) {
                             %>
                             <option value="<%= keeper.getUserId()%>">
-                                <%= keeper.getFullName()%> (<%=keeper.getUsername()%>)
+                                <%= keeper.getFullName()%> (
+                                <%=keeper.getUsername()%>)
                             </option>
                             <% }
                                                                     } %>
@@ -302,7 +303,8 @@
                         <h3>📦 Products</h3>
                         <div id="productRows">
                             <div class="product-row">
-                                <select name="productDetailId" required>
+                                <select name="productDetailId" required
+                                        onchange="updateProductOptions()">
                                     <option value="">-- Select Product --</option>
                                     <% List<TicketItem> products = (List<TicketItem>) request.getAttribute("products");
                                         if (products != null) {
@@ -310,7 +312,9 @@
                                     %>
                                     <option value="<%= p.getProductDetailId()%>"
                                             data-stock="<%= p.getCurrentStock()%>">
-                                        <%= p.getProductName()%> - <%=p.getProductConfig()%> (Stock: <%=p.getCurrentStock()%>)
+                                        <%= p.getProductName()%> -
+                                        <%=p.getProductConfig()%> (Stock:
+                                        <%=p.getCurrentStock()%>)
                                     </option>
                                     <% }
                                                                             }%>
@@ -344,18 +348,23 @@
                 const firstRow = container.querySelector('.product-row');
                 const newRow = firstRow.cloneNode(true);
 
-                newRow.querySelector('select').value = '';
+                // Reset the new row
+                const newSelect = newRow.querySelector('select');
+                newSelect.value = '';
+                newSelect.onchange = updateProductOptions;
                 newRow.querySelector('input').value = '1';
                 newRow.querySelector('.btn-remove').style.visibility = 'visible';
 
                 container.appendChild(newRow);
                 updateRemoveButtons();
+                updateProductOptions();
             }
 
             function removeRow(btn) {
                 const row = btn.closest('.product-row');
                 row.remove();
                 updateRemoveButtons();
+                updateProductOptions();
             }
 
             function updateRemoveButtons() {
@@ -366,11 +375,83 @@
                 });
             }
 
+            // Update product options to disable already selected products
+            function updateProductOptions() {
+                const selects = document.querySelectorAll('select[name="productDetailId"]');
+
+                // Get all selected values
+                const selectedValues = [];
+                selects.forEach(select => {
+                    if (select.value) {
+                        selectedValues.push(select.value);
+                    }
+                });
+
+                // Update each select's options
+                selects.forEach(select => {
+                    const currentValue = select.value;
+                    const options = select.querySelectorAll('option');
+
+                    options.forEach(option => {
+                        if (option.value === '') {
+                            // Keep the placeholder enabled
+                            option.disabled = false;
+                        } else if (option.value === currentValue) {
+                            // Keep current selection enabled
+                            option.disabled = false;
+                        } else if (selectedValues.includes(option.value)) {
+                            // Disable if selected in another row
+                            option.disabled = true;
+                        } else {
+                            // Enable if not selected anywhere
+                            option.disabled = false;
+                        }
+                    });
+                });
+            }
+
+            // Check for duplicate products
+            function hasDuplicateProducts() {
+                const selects = document.querySelectorAll('select[name="productDetailId"]');
+                const values = [];
+
+                for (let select of selects) {
+                    if (select.value) {
+                        if (values.includes(select.value)) {
+                            return true;
+                        }
+                        values.push(select.value);
+                    }
+                }
+                return false;
+            }
+
             document.getElementById('ticketForm').addEventListener('submit', function (e) {
+                // Check ticket type
                 if (!document.getElementById('ticketType').value) {
                     e.preventDefault();
                     alert('Please select a ticket type');
+                    return;
                 }
+
+                // Check keeper selection
+                if (!document.getElementById('keeperId').value) {
+                    e.preventDefault();
+                    alert('Please select a Keeper to assign');
+                    return;
+                }
+
+                // Check for duplicate products
+                if (hasDuplicateProducts()) {
+                    e.preventDefault();
+                    alert('Each product can only be selected once. Please remove duplicate products.');
+                    return;
+                }
+            });
+
+            // Initialize product options on page load
+            document.addEventListener('DOMContentLoaded', function () {
+                updateProductOptions();
             });
         </script>
     </body>
