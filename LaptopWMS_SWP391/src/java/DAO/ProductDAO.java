@@ -10,10 +10,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * ProductDAO - updated for laptop_wms_lite database
- * DB Schema for products: product_id, product_name, brand, category, status
- * DB Schema for product_details: product_detail_id, product_id, cpu, ram,
- * storage, gpu, unit, quantity
+ * ProductDAO - updated for laptop_wms_lite database DB Schema for products:
+ * product_id, product_name, brand, category, status DB Schema for
+ * product_details: product_detail_id, product_id, cpu, ram, storage, gpu, unit,
+ * quantity
  */
 public class ProductDAO extends DBContext {
 
@@ -22,9 +22,11 @@ public class ProductDAO extends DBContext {
         List<Object> params = new ArrayList<>();
 
         StringBuilder sql = new StringBuilder(
-                "SELECT p.product_id, p.product_name, p.brand, p.category, p.status "
-                        + "FROM products p "
-                        + "WHERE 1=1 ");
+                "SELECT p.product_id, p.product_name, p.brand, p.category, p.status, "
+                + "COALESCE(SUM(pd.quantity), 0) AS total_quantity "
+                + "FROM products p "
+                + "LEFT JOIN product_details pd ON p.product_id = pd.product_id "
+                + "WHERE 1=1 ");
 
         if (keyword != null && !keyword.trim().isEmpty()) {
             sql.append("AND p.product_name LIKE ? ");
@@ -46,6 +48,8 @@ public class ProductDAO extends DBContext {
             params.add("%" + brand.trim() + "%");
         }
 
+        sql.append("GROUP BY p.product_id, p.product_name, p.brand, p.category, p.status ");
+
         String order = (sortOrder != null && sortOrder.equalsIgnoreCase("DESC")) ? "DESC" : "ASC";
         sql.append("ORDER BY p.product_id ").append(order);
 
@@ -64,6 +68,7 @@ public class ProductDAO extends DBContext {
                     p.setBrand(rs.getString("brand"));
                     p.setCategory(rs.getString("category"));
                     p.setStatus(rs.getBoolean("status"));
+                    p.setTotalQuantity(rs.getInt("total_quantity"));
 
                     List<ProductDetail> details = getDetailsByProductId(p.getProductId());
                     p.setDetailsList(details);
@@ -246,7 +251,7 @@ public class ProductDAO extends DBContext {
     }
 
     public void updateProductDetail(ProductDetail d) {
-        String sql = "UPDATE product_details SET cpu=?, ram=?, storage=?, gpu=?, unit=?, quantity=? WHERE product_detail_id=?";
+        String sql = "UPDATE product_details SET cpu=?, ram=?, storage=?, gpu=?, unit=? WHERE product_detail_id=?";
 
         try (PreparedStatement ps = getConnection().prepareStatement(sql)) {
             ps.setString(1, d.getCpu());
@@ -254,8 +259,7 @@ public class ProductDAO extends DBContext {
             ps.setString(3, d.getStorage());
             ps.setString(4, d.getGpu());
             ps.setString(5, d.getUnit() != null ? d.getUnit() : "piece");
-            ps.setInt(6, d.getQuantity());
-            ps.setInt(7, d.getProductDetailId());
+            ps.setInt(6, d.getProductDetailId());
 
             ps.executeUpdate();
         } catch (Exception e) {

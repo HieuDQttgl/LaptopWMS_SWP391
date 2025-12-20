@@ -111,7 +111,6 @@
                 <div class="form-group">
                     <label>Category</label>
                     <select name="category">
-                        <option value="Laptop" selected>Laptop</option>
                         <option value="Office">Office</option>
                         <option value="Gaming">Gaming</option>
                         <option value="Workstation">Workstation</option>

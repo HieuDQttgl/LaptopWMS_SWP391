@@ -275,21 +275,21 @@
         <a href="#hero">About</a>
         <% if (currentUser != null) {%>
         <a href="<%= request.getContextPath()%>/profile">Profile</a>
+        <a href="<%= request.getContextPath()%>/report-inventory">Reports</a>
 
         <% if (roleId == 1) {%>
         <a href="<%= request.getContextPath()%>/user-list">Users</a>
         <a href="<%= request.getContextPath()%>/role">Roles</a>
         <a href="<%= request.getContextPath()%>/ticket-list">Tickets</a>
-        <a href="<%= request.getContextPath()%>/report-inventory">Reports</a>
         <% } %>
 
         <% if (roleId == 2) {%>
         <a href="<%= request.getContextPath()%>/product-list">Products</a>
-        <a href="<%= request.getContextPath()%>/create-ticket">Create Ticket</a>
         <a href="<%= request.getContextPath()%>/ticket-list">Tickets</a>
         <% }%>
 
         <% if (roleId == 3) {%>
+        <a href="<%= request.getContextPath()%>/product-list">Products</a>
         <a href="<%= request.getContextPath()%>/ticket-list">My Tickets</a>
         <% }%>
 

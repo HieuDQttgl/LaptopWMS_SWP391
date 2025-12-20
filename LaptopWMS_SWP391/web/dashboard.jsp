@@ -134,9 +134,9 @@
             <p style="color: #7f8c8d; margin: 5px 0 0;">
                 Role: 
                 <c:choose>
-                    <c:when test="${currentUser.roleId == 3}">Sales Staff</c:when>
-                    <c:when test="${currentUser.roleId == 2}">Warehouse Keeper</c:when>
                     <c:when test="${currentUser.roleId == 1}">Administrator</c:when>
+                    <c:when test="${currentUser.roleId == 2}">Sales Staff</c:when>
+                    <c:when test="${currentUser.roleId == 3}">Warehouse Keeper</c:when>
                     <c:otherwise>User</c:otherwise>
                 </c:choose>
             </p>
@@ -144,7 +144,7 @@
 
         <div class="dash-container">
 
-            <c:if test="${currentUser.roleId == 3}">
+            <c:if test="${currentUser.roleId == 2}">
 
                 <div class="widget">
                     <h3>High Availability <span style="font-size:12px; color:#27ae60">Ready to Sell</span></h3>
@@ -212,7 +212,7 @@
                 </div>
             </c:if>
 
-            <c:if test="${currentUser.roleId == 2}">
+            <c:if test="${currentUser.roleId == 3}">
 
                 <div class="widget">
                     <h3>Work Queue <span class="badge badge-orange">${pendingOrders.size()} Active</span></h3>

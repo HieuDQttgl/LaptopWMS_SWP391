@@ -67,7 +67,7 @@ public class AddProductDetailServlet extends HttpServlet {
             d.setRam(ram);
             d.setStorage(storage);
             d.setUnit(unit != null ? unit : "piece");
-            d.setQuantity(quantity);
+            d.setQuantity(0);
 
             ProductDAO dao = new ProductDAO();
             dao.addProductDetail(d);
