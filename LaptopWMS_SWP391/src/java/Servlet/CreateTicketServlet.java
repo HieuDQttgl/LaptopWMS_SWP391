@@ -1,8 +1,10 @@
 package Servlet;
 
 import DAO.NotificationDAO;
+import DAO.PartnerDAO;
 import DAO.TicketDAO;
 import Model.Notification;
+import Model.Partners;
 import Model.Ticket;
 import Model.TicketItem;
 import Model.Users;
@@ -25,6 +27,7 @@ public class CreateTicketServlet extends HttpServlet {
 
     private TicketDAO ticketDAO = new TicketDAO();
     private NotificationDAO notificationDAO = new NotificationDAO();
+    private PartnerDAO partnerDAO = new PartnerDAO();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -41,9 +44,13 @@ public class CreateTicketServlet extends HttpServlet {
         // Load data for the form
         List<TicketItem> products = ticketDAO.getAvailableProducts();
         List<Users> keepers = ticketDAO.getKeeperList();
+        List<Partners> suppliers = partnerDAO.getSuppliers();
+        List<Partners> customers = partnerDAO.getCustomers();
 
         request.setAttribute("products", products);
         request.setAttribute("keepers", keepers);
+        request.setAttribute("suppliers", suppliers);
+        request.setAttribute("customers", customers);
 
         request.getRequestDispatcher("/create-ticket.jsp").forward(request, response);
     }
@@ -67,6 +74,7 @@ public class CreateTicketServlet extends HttpServlet {
             String title = request.getParameter("title");
             String description = request.getParameter("description");
             String keeperIdStr = request.getParameter("keeperId");
+            String partnerIdStr = request.getParameter("partnerId");
 
             // Get product items
             String[] productIds = request.getParameterValues("productDetailId");
@@ -118,13 +126,40 @@ public class CreateTicketServlet extends HttpServlet {
                 ticket.setAssignedKeeper(assignedKeeperId);
             }
 
+            if (partnerIdStr != null && !partnerIdStr.isEmpty()) {
+                int partnerId = Integer.parseInt(partnerIdStr);
+                // Validate partner type matches ticket type
+                Partners partner = partnerDAO.getPartnerById(partnerId);
+                if (partner != null) {
+                    // type=1 is Supplier (for IMPORT), type=2 is Customer (for EXPORT)
+                    if ("IMPORT".equals(type) && partner.getType() != 1) {
+                        request.setAttribute("error", "Invalid partner: Please select a Supplier for IMPORT tickets");
+                        doGet(request, response);
+                        return;
+                    }
+                    if ("EXPORT".equals(type) && partner.getType() != 2) {
+                        request.setAttribute("error", "Invalid partner: Please select a Customer for EXPORT tickets");
+                        doGet(request, response);
+                        return;
+                    }
+                }
+                ticket.setPartnerId(partnerId);
+            }
+
             // Add items
             List<TicketItem> items = new ArrayList<>();
             for (int i = 0; i < productIds.length; i++) {
                 if (productIds[i] != null && !productIds[i].isEmpty()) {
+                    int quantity = Integer.parseInt(quantities[i]);
+                    // Validate quantity > 0
+                    if (quantity <= 0) {
+                        request.setAttribute("error", "Quantity must be greater than 0");
+                        doGet(request, response);
+                        return;
+                    }
                     TicketItem item = new TicketItem();
                     item.setProductDetailId(Integer.parseInt(productIds[i]));
-                    item.setQuantity(Integer.parseInt(quantities[i]));
+                    item.setQuantity(quantity);
                     items.add(item);
                 }
             }

@@ -1,4 +1,5 @@
-CREATE DATABASE  IF NOT EXISTS `laptop_wms_lite` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci */ /*!80016 DEFAULT ENCRYPTION='N' */;
+CREATE DATABASE  IF NOT EXISTS `laptop_wms_lite`;
+
 USE `laptop_wms_lite`;
 -- MySQL dump 10.13  Distrib 8.0.43, for Win64 (x86_64)
 --
@@ -18,34 +19,6 @@ USE `laptop_wms_lite`;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
 --
--- Table structure for table `announcements`
---
-
-DROP TABLE IF EXISTS `announcements`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `announcements` (
-  `announcement_id` int NOT NULL AUTO_INCREMENT,
-  `user_id` int NOT NULL,
-  `content` text NOT NULL,
-  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY (`announcement_id`),
-  KEY `user_id` (`user_id`),
-  CONSTRAINT `announcements_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `announcements`
---
-
-LOCK TABLES `announcements` WRITE;
-/*!40000 ALTER TABLE `announcements` DISABLE KEYS */;
-INSERT INTO `announcements` VALUES (1,2,'System Update: Please finalize all Export tickets by 5 PM.','2025-12-20 18:18:50'),(2,3,'Testing Team Board','2025-12-20 18:29:06'),(4,2,'aaabbbbbbbbbbb','2025-12-20 18:54:08'),(6,3,'u sure bout dis','2025-12-20 19:04:21');
-/*!40000 ALTER TABLE `announcements` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
 -- Table structure for table `notifications`
 --
 
@@ -57,13 +30,12 @@ CREATE TABLE `notifications` (
   `user_id` int NOT NULL,
   `title` varchar(255) NOT NULL,
   `message` text NOT NULL,
-  `link` varchar(255) DEFAULT NULL,
   `is_read` tinyint(1) DEFAULT '0',
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`notification_id`),
   KEY `user_id` (`user_id`),
   CONSTRAINT `notifications_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -72,40 +44,8 @@ CREATE TABLE `notifications` (
 
 LOCK TABLES `notifications` WRITE;
 /*!40000 ALTER TABLE `notifications` DISABLE KEYS */;
-INSERT INTO `notifications` VALUES (1,3,'New Assignment','You have been assigned to Ticket #IMP-NOV-001',NULL,1,'2025-12-19 10:06:57'),(2,3,'New Ticket Assignment','You have been assigned to a new IMPORT ticket.\n\nTicket Details:\n- Title: Start Import\n- Type: IMPORT\n- Created by: Sarah Sales\n\nPlease review and process this ticket.','/ticket-detail?id=1',1,'2025-12-20 10:24:51'),(3,4,'New Ticket Assignment','You have been assigned to a new EXPORT ticket.\n\nTicket Details:\n- Title: Test Export\n- Type: EXPORT\n- Created by: Sarah Sales\n\nPlease review and process this ticket.','/ticket-detail?id=2',1,'2025-12-20 10:31:07'),(4,2,'Ticket Status Updated','Your ticket has been updated to APPROVED.\n\nTicket Details:\n- Title: Start Import\n- Type: IMPORT\n- Status: APPROVED\n- Processed by: Kevin Keeper\n','/ticket-detail?id=1',1,'2025-12-20 10:31:52'),(5,2,'Ticket Status Updated','Your ticket has been updated to APPROVED.\n\nTicket Details:\n- Title: Test Export\n- Type: EXPORT\n- Status: APPROVED\n- Processed by: LamNguyen\n','/ticket-detail?id=2',1,'2025-12-20 10:32:18'),(6,3,'New Ticket Assignment','You have been assigned to a new IMPORT ticket.\n\nTicket Details:\n- Title: New import\n- Type: IMPORT\n- Created by: Sarah Sales\n\nPlease review and process this ticket.','/ticket-detail?id=3',1,'2025-12-20 10:50:10'),(7,2,'Ticket Status Updated','Your ticket has been updated to APPROVED.\n\nTicket Details:\n- Title: New import\n- Type: IMPORT\n- Status: APPROVED\n- Processed by: Kevin Keeper\n','/ticket-detail?id=3',1,'2025-12-20 10:50:51');
+INSERT INTO `notifications` VALUES (1,3,'New Assignment','You have been assigned to Ticket #IMP-NOV-001',0,'2025-12-19 10:06:57');
 /*!40000 ALTER TABLE `notifications` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
--- Table structure for table `partners`
---
-
-DROP TABLE IF EXISTS `partners`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `partners` (
-  `partner_id` int NOT NULL AUTO_INCREMENT,
-  `type` tinyint NOT NULL COMMENT '1=Supplier, 2=Customer',
-  `partner_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `partner_email` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `partner_phone` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `status` enum('active','inactive') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT 'active',
-  PRIMARY KEY (`partner_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `partners`
---
-
-LOCK TABLES `partners` WRITE;
-/*!40000 ALTER TABLE `partners` DISABLE KEYS */;
-INSERT INTO partners (type, partner_name, partner_email, partner_phone, status) VALUES
-(1, 'Dell Supplier', 'supplier@dell.com', '0123456789', 'active'),
-(1, 'Apple Supplier', 'supplier@apple.com', '0987654321', 'active'),
-(2, 'TechStore Customer', 'order@techstore.vn', '0111222333', 'active'),
-(2, 'Laptop Retail', 'buy@laptopretail.vn', '0444555666', 'active');
-/*!40000 ALTER TABLE `partners` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -121,7 +61,7 @@ CREATE TABLE `permissions` (
   `permission_description` text,
   PRIMARY KEY (`permission_id`),
   UNIQUE KEY `permission_url` (`permission_url`)
-) ENGINE=InnoDB AUTO_INCREMENT=28 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -130,7 +70,7 @@ CREATE TABLE `permissions` (
 
 LOCK TABLES `permissions` WRITE;
 /*!40000 ALTER TABLE `permissions` DISABLE KEYS */;
-INSERT INTO `permissions` VALUES (1,'/dashboard','View Dashboard'),(2,'/ticket-list','View Tickets'),(3,'/create-ticket','Create New Ticket'),(4,'/approve-ticket','Approve/Reject Tickets'),(5,'/report-inventory','View Balance Report'),(6,'/user-list','View User List'),(7,'/user-detail','View/Edit User Details'),(8,'/admin-reset-password','Admin Reset User Password'),(9,'/product-list','View Product List'),(10,'/add-product','Add New Product'),(11,'/edit-product','Edit Product'),(12,'/toggleProduct','Toggle Product Status'),(13,'/add-product-detail','Add Product Configuration'),(14,'/edit-product-detail','Edit Product Configuration'),(15,'/role','View Roles'),(16,'/role-list','View Role List'),(17,'/add-role','Add New Role'),(18,'/edit-role','Edit Role'),(19,'/role-permission','Manage Role Permissions'),(20,'/ticket-detail','View Ticket Details'),(21,'/process-ticket','Process/Approve Tickets'),(22,'/profile','View/Edit Own Profile'),(23,'/change-password','Change Own Password'),(24,'/notifications','View Notifications'),(25,'/add-announcement','Post Team Announcements'),(26,'/team-board','View Team Board'),(27,'/manage-announcement','Edit/Delete Announcements');
+INSERT INTO `permissions` VALUES (1,'/dashboard','View Dashboard'),(2,'/ticket-list','View Tickets'),(3,'/create-ticket','Create New Ticket'),(4,'/approve-ticket','Approve/Reject Tickets'),(5,'/report-inventory','View Balance Report');
 /*!40000 ALTER TABLE `permissions` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -153,7 +93,7 @@ CREATE TABLE `product_details` (
   PRIMARY KEY (`product_detail_id`),
   KEY `product_id` (`product_id`),
   CONSTRAINT `product_details_ibfk_1` FOREIGN KEY (`product_id`) REFERENCES `products` (`product_id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=52 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -162,7 +102,7 @@ CREATE TABLE `product_details` (
 
 LOCK TABLES `product_details` WRITE;
 /*!40000 ALTER TABLE `product_details` DISABLE KEYS */;
-INSERT INTO `product_details` VALUES (1,1,'Core i7','16GB','512GB',NULL,'piece',110),(2,2,'M3 Pro','16GB','512GB','NVIDIA RTX 2050 4GB ','piece',20),(3,1,'AMD Ryzen 5 5600','16GB','1TB','NVIDIA RTX 3050 4GB','piece',15),(50,50,'Ryzen 9 6900HS','32GB','1TB SSD','RTX 3080','piece',4),(51,51,'Core i7-1260P','16GB','512GB SSD','Intel Iris Xe','piece',9);
+INSERT INTO `product_details` VALUES (1,1,'Core i7','16GB','512GB',NULL,'piece',50),(2,2,'M3 Pro','18GB','512GB',NULL,'piece',0);
 /*!40000 ALTER TABLE `product_details` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -180,7 +120,7 @@ CREATE TABLE `products` (
   `category` varchar(50) DEFAULT 'Laptop',
   `status` tinyint(1) DEFAULT '1',
   PRIMARY KEY (`product_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=52 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -189,7 +129,7 @@ CREATE TABLE `products` (
 
 LOCK TABLES `products` WRITE;
 /*!40000 ALTER TABLE `products` DISABLE KEYS */;
-INSERT INTO `products` VALUES (1,'Dell XPS 13','Dell','Office',1),(2,'MacBook Pro 16','Apple','Office',1),(3,'aaaaaaaa','Dell','Gaming',1),(50,'ASUS ROG Zephyrus','ASUS','Gaming',1),(51,'Lenovo ThinkPad X1','Lenovo','Office',1);
+INSERT INTO `products` VALUES (1,'Dell XPS 13','Dell','Laptop',1),(2,'MacBook Pro 16','Apple','Laptop',1);
 /*!40000 ALTER TABLE `products` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -209,7 +149,7 @@ CREATE TABLE `role_permissions` (
   KEY `permission_id` (`permission_id`),
   CONSTRAINT `role_permissions_ibfk_1` FOREIGN KEY (`role_id`) REFERENCES `roles` (`role_id`) ON DELETE CASCADE,
   CONSTRAINT `role_permissions_ibfk_2` FOREIGN KEY (`permission_id`) REFERENCES `permissions` (`permission_id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=63 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -218,7 +158,7 @@ CREATE TABLE `role_permissions` (
 
 LOCK TABLES `role_permissions` WRITE;
 /*!40000 ALTER TABLE `role_permissions` DISABLE KEYS */;
-INSERT INTO `role_permissions` VALUES (1,1,4),(2,1,3),(3,1,1),(4,1,5),(5,1,2),(8,2,1),(9,2,2),(10,2,3),(11,3,1),(12,3,2),(13,3,4),(14,1,6),(15,1,7),(16,1,8),(17,1,9),(18,1,10),(19,1,11),(20,1,12),(21,1,13),(22,1,14),(23,1,15),(24,1,16),(25,1,17),(26,1,18),(27,1,19),(28,1,20),(29,1,21),(30,1,22),(31,1,23),(32,1,24),(33,2,9),(34,2,10),(35,2,11),(36,2,13),(37,2,14),(38,2,20),(39,2,22),(40,2,23),(41,2,24),(42,3,9),(43,3,20),(44,3,21),(45,3,22),(46,3,23),(47,3,24),(48,1,5),(49,2,5),(50,3,5),(51,1,14),(52,3,14),(53,1,25),(54,2,25),(55,3,25),(56,1,26),(57,1,27),(58,2,26),(59,2,27),(60,3,26),(61,3,27);
+INSERT INTO `role_permissions` VALUES (1,1,4),(2,1,3),(3,1,1),(4,1,5),(5,1,2),(8,2,1),(9,2,2),(10,2,3),(11,3,1),(12,3,2),(13,3,4);
 /*!40000 ALTER TABLE `role_permissions` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -268,7 +208,7 @@ CREATE TABLE `stock_ledger` (
   KEY `ticket_id` (`ticket_id`),
   CONSTRAINT `stock_ledger_ibfk_1` FOREIGN KEY (`product_detail_id`) REFERENCES `product_details` (`product_detail_id`),
   CONSTRAINT `stock_ledger_ibfk_2` FOREIGN KEY (`ticket_id`) REFERENCES `tickets` (`ticket_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -277,7 +217,7 @@ CREATE TABLE `stock_ledger` (
 
 LOCK TABLES `stock_ledger` WRITE;
 /*!40000 ALTER TABLE `stock_ledger` DISABLE KEYS */;
-INSERT INTO `stock_ledger` VALUES (1,1,1,50,50,'IMPORT','2025-11-01 03:00:00'),(2,1,1,20,70,'IMPORT','2025-12-20 10:31:52'),(3,1,1,50,120,'IMPORT','2025-12-20 10:31:52'),(4,2,1,20,20,'IMPORT','2025-12-20 10:31:52'),(5,1,2,10,110,'EXPORT','2025-12-20 10:32:18'),(6,3,3,10,15,'IMPORT','2025-12-20 10:50:51'),(7,50,50,100,100,'IMPORT','2025-12-15 18:00:19'),(8,50,51,96,4,'EXPORT','2025-12-17 18:00:19'),(9,51,52,20,20,'IMPORT','2025-12-18 18:00:19'),(10,51,53,11,9,'EXPORT','2025-12-19 18:00:19');
+INSERT INTO `stock_ledger` VALUES (1,1,1,50,50,'IMPORT','2025-11-01 03:00:00');
 /*!40000 ALTER TABLE `stock_ledger` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -298,7 +238,7 @@ CREATE TABLE `ticket_items` (
   KEY `product_detail_id` (`product_detail_id`),
   CONSTRAINT `ticket_items_ibfk_1` FOREIGN KEY (`ticket_id`) REFERENCES `tickets` (`ticket_id`) ON DELETE CASCADE,
   CONSTRAINT `ticket_items_ibfk_2` FOREIGN KEY (`product_detail_id`) REFERENCES `product_details` (`product_detail_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -307,7 +247,7 @@ CREATE TABLE `ticket_items` (
 
 LOCK TABLES `ticket_items` WRITE;
 /*!40000 ALTER TABLE `ticket_items` DISABLE KEYS */;
-INSERT INTO `ticket_items` VALUES (1,1,1,50),(2,1,1,20),(3,1,2,20),(4,2,1,10),(5,3,3,10),(6,50,50,100),(7,51,50,96),(8,52,51,20),(9,53,51,11),(10,54,50,50);
+INSERT INTO `ticket_items` VALUES (1,1,1,50);
 /*!40000 ALTER TABLE `ticket_items` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -330,16 +270,13 @@ CREATE TABLE `tickets` (
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   `processed_at` timestamp NULL DEFAULT NULL,
   `keeper_note` text,
-  `partner_id` int DEFAULT NULL,
   PRIMARY KEY (`ticket_id`),
   UNIQUE KEY `ticket_code` (`ticket_code`),
   KEY `created_by` (`created_by`),
   KEY `assigned_keeper` (`assigned_keeper`),
-  KEY `fk_tickets_partners` (`partner_id`),
-  CONSTRAINT `fk_tickets_partners` FOREIGN KEY (`partner_id`) REFERENCES `partners` (`partner_id`) ON DELETE SET NULL,
   CONSTRAINT `tickets_ibfk_1` FOREIGN KEY (`created_by`) REFERENCES `users` (`user_id`),
   CONSTRAINT `tickets_ibfk_2` FOREIGN KEY (`assigned_keeper`) REFERENCES `users` (`user_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=55 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -348,7 +285,6 @@ CREATE TABLE `tickets` (
 
 LOCK TABLES `tickets` WRITE;
 /*!40000 ALTER TABLE `tickets` DISABLE KEYS */;
-INSERT INTO `tickets` VALUES (1,'IMP-DEC-001','IMPORT','Start Import','aaaa','APPROVED',2,3,'2025-12-20 10:24:51','2025-12-20 10:31:52','',NULL),(2,'EXP-DEC-001','EXPORT','Test Export','','APPROVED',2,4,'2025-12-20 10:31:07','2025-12-20 10:32:18','',NULL),(3,'IMP-DEC-002','IMPORT','New import','','APPROVED',2,3,'2025-12-20 10:50:10','2025-12-20 10:50:51','',NULL),(50,'IMP-HIST-001','IMPORT','Bulk Import ASUS',NULL,'APPROVED',2,3,'2025-12-15 18:00:19','2025-12-15 18:00:19',NULL,NULL),(51,'EXP-HIST-001','EXPORT','Wholesale ASUS Order',NULL,'APPROVED',2,3,'2025-12-17 18:00:19','2025-12-17 18:00:19',NULL,NULL),(52,'IMP-HIST-002','IMPORT','Restock Lenovo',NULL,'APPROVED',2,3,'2025-12-18 18:00:19','2025-12-18 18:00:19',NULL,NULL),(53,'EXP-HIST-002','EXPORT','Retail Lenovo Sales',NULL,'APPROVED',2,3,'2025-12-19 18:00:19','2025-12-19 18:00:19',NULL,NULL),(54,'IMP-NEW-001','IMPORT','Urgent Restock Request',NULL,'PENDING',2,3,'2025-12-20 18:00:19',NULL,NULL,NULL);
 /*!40000 ALTER TABLE `tickets` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -367,13 +303,12 @@ CREATE TABLE `users` (
   `email` varchar(255) NOT NULL,
   `role_id` int NOT NULL,
   `status` enum('active','inactive') DEFAULT 'active',
-  `password_changed_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`user_id`),
   UNIQUE KEY `username` (`username`),
   UNIQUE KEY `email` (`email`),
   KEY `role_id` (`role_id`),
   CONSTRAINT `users_ibfk_1` FOREIGN KEY (`role_id`) REFERENCES `roles` (`role_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -382,17 +317,9 @@ CREATE TABLE `users` (
 
 LOCK TABLES `users` WRITE;
 /*!40000 ALTER TABLE `users` DISABLE KEYS */;
-INSERT INTO `users` VALUES (1,'admin','123','System Admin','admin@wms.com',1,'active','2025-12-20 09:27:53'),(2,'sale1','123','Sarah Sales','sale1@wms.com',2,'active','2025-12-20 09:27:53'),(3,'keeper1','123','Kevin Keeper','keeper1@wms.com',3,'active','2025-12-20 09:27:53'),(4,'keeper2','123456','LamNguyen','abc@def.com',3,'active',NULL);
+INSERT INTO `users` VALUES (1,'admin','123','System Admin','admin@wms.com',1,'active'),(2,'sale1','123','Sarah Sales','sale1@wms.com',2,'active'),(3,'keeper1','123','Kevin Keeper','keeper1@wms.com',3,'active');
 /*!40000 ALTER TABLE `users` ENABLE KEYS */;
 UNLOCK TABLES;
-
---
--- Dumping events for database 'laptop_wms_lite'
---
-
---
--- Dumping routines for database 'laptop_wms_lite'
---
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
@@ -403,4 +330,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-12-21  2:15:38
+-- Dump completed on 2025-12-19 23:54:11

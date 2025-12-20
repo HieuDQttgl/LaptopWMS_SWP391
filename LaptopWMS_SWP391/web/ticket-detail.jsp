@@ -320,7 +320,8 @@
             <% } %>
 
             <% Ticket ticket = (Ticket) request.getAttribute("ticket");
-                SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm");
+                SimpleDateFormat sdf = new SimpleDateFormat(
+                        "dd/MM/yyyy HH:mm");
                 if (ticket != null) {%>
 
             <div class="card">
@@ -376,6 +377,18 @@
                                     : "-"%>
                         </div>
                     </div>
+                    <% if (ticket.getPartnerName() != null
+                                && !ticket.getPartnerName().isEmpty()) {%>
+                    <div class="info-item">
+                        <div class="info-label">
+                            <%= ticket.getType().equals("IMPORT")
+                                    ? "Supplier" : "Customer"%>
+                        </div>
+                        <div class="info-value">
+                            <%= ticket.getPartnerName()%>
+                        </div>
+                    </div>
+                    <% } %>
                 </div>
 
                 <% if (ticket.getDescription() != null

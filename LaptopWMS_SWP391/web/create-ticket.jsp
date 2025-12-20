@@ -1,5 +1,6 @@
 <%@page import="Model.TicketItem" %>
 <%@page import="Model.Users" %>
+<%@page import="Model.Partners" %>
 <%@page import="java.util.List" %>
 <%@page contentType="text/html" pageEncoding="UTF-8" %>
 <!DOCTYPE html>
@@ -231,7 +232,8 @@
         <%@include file="header.jsp" %>
 
         <div class="container">
-            <a href="<%= request.getContextPath()%>/ticket-list" class="btn-back">← Back to Tickets</a>
+            <a href="<%= request.getContextPath()%>/ticket-list" class="btn-back">← Back to
+                Tickets</a>
 
             <div class="card">
                 <h1>📝 Create New Ticket</h1>
@@ -252,14 +254,16 @@
                                  id="type-import">
                                 <div class="type-icon">📥</div>
                                 <div class="type-label">IMPORT</div>
-                                <div style="font-size: 13px; color: #6b7280;">Nhập hàng vào
+                                <div style="font-size: 13px; color: #6b7280;">Nhập hàng
+                                    vào
                                     kho</div>
                             </div>
                             <div class="type-option" onclick="selectType('EXPORT')"
                                  id="type-export">
                                 <div class="type-icon">📤</div>
                                 <div class="type-label">EXPORT</div>
-                                <div style="font-size: 13px; color: #6b7280;">Xuất hàng ra
+                                <div style="font-size: 13px; color: #6b7280;">Xuất hàng
+                                    ra
                                     kho</div>
                             </div>
                         </div>
@@ -294,8 +298,40 @@
                                 <%=keeper.getUsername()%>)
                             </option>
                             <% }
-                                                                    } %>
+                                                                        } %>
                         </select>
+                    </div>
+
+                    <!-- Partner Selection -->
+                    <div class="form-group" id="partnerSection" style="display: none;">
+                        <label for="partnerId" id="partnerLabel">Partner</label>
+                        <select id="partnerId" name="partnerId">
+                            <option value="">-- Select Partner --</option>
+                        </select>
+                        <div id="supplierOptions" style="display: none;">
+                            <% List<Partners> suppliers = (List<Partners>) request.getAttribute("suppliers");
+                                if (suppliers != null) {
+                                    for (Partners supplier : suppliers) {
+                            %>
+                            <option value="<%= supplier.getPartnerId()%>"
+                                    data-type="supplier">
+                                <%= supplier.getPartnerName()%>
+                            </option>
+                            <% }
+                                                                        } %>
+                        </div>
+                        <div id="customerOptions" style="display: none;">
+                            <% List<Partners> customers = (List<Partners>) request.getAttribute("customers");
+                                if (customers != null) {
+                                    for (Partners customer : customers) {
+                            %>
+                            <option value="<%= customer.getPartnerId()%>"
+                                    data-type="customer">
+                                <%= customer.getPartnerName()%>
+                            </option>
+                            <% }
+                                                                        } %>
+                        </div>
                     </div>
 
                     <!-- Products -->
@@ -317,7 +353,7 @@
                                         <%=p.getCurrentStock()%>)
                                     </option>
                                     <% }
-                                                                            }%>
+                                                                                }%>
                                 </select>
                                 <input type="number" name="quantity" placeholder="Qty"
                                        min="1" value="1" required>
@@ -326,7 +362,8 @@
                                         style="visibility: hidden;">×</button>
                             </div>
                         </div>
-                        <button type="button" class="btn-add" onclick="addProductRow()">+
+                        <button type="button" class="btn-add"
+                                onclick="addProductRow()">+
                             Add Product</button>
                     </div>
 
@@ -341,6 +378,41 @@
                 document.getElementById('ticketType').value = type;
                 document.querySelectorAll('.type-option').forEach(el => el.classList.remove('selected'));
                 document.getElementById('type-' + type.toLowerCase()).classList.add('selected');
+
+                // Update partner dropdown based on type
+                updatePartnerOptions(type);
+            }
+
+            function updatePartnerOptions(type) {
+                const partnerSection = document.getElementById('partnerSection');
+                const partnerLabel = document.getElementById('partnerLabel');
+                const partnerSelect = document.getElementById('partnerId');
+
+                if (!type) {
+                    partnerSection.style.display = 'none';
+                    return;
+                }
+
+                partnerSection.style.display = 'block';
+
+                // Clear current options
+                partnerSelect.innerHTML = '<option value="">-- Select Partner --</option>';
+
+                if (type === 'IMPORT') {
+                    partnerLabel.textContent = 'Supplier';
+                    // Add supplier options
+                    const supplierOptions = document.querySelectorAll('#supplierOptions option');
+                    supplierOptions.forEach(opt => {
+                        partnerSelect.appendChild(opt.cloneNode(true));
+                    });
+                } else if (type === 'EXPORT') {
+                    partnerLabel.textContent = 'Customer';
+                    // Add customer options
+                    const customerOptions = document.querySelectorAll('#customerOptions option');
+                    customerOptions.forEach(opt => {
+                        partnerSelect.appendChild(opt.cloneNode(true));
+                    });
+                }
             }
 
             function addProductRow() {
