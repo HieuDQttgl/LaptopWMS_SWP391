@@ -10,7 +10,8 @@
         <style>
             body {
                 margin: 0;
-                font-family: Arial, sans-serif;
+                font-family: "Segoe UI", sans-serif;
+                min-height: 100vh;
             }
 
             .hero {

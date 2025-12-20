@@ -11,7 +11,7 @@ import java.util.List;
 
 /**
  * DashboardDAO - updated for laptop_wms_lite database
- * 
+ *
  * @author super
  */
 public class DashboardDAO extends DBContext {
@@ -140,7 +140,6 @@ public class DashboardDAO extends DBContext {
                 Role r = new Role();
                 r.setRoleId(rs.getInt("role_id"));
                 r.setRoleName(rs.getString("role_name"));
-                r.setStatus(rs.getString("status"));
                 list.add(r);
             }
         } catch (Exception e) {
@@ -184,4 +183,30 @@ public class DashboardDAO extends DBContext {
         }
         return 0;
     }
+
+    public List<Ticket> getKeeperHistory(int keeperId) {
+        List<Ticket> list = new ArrayList<>();
+        String sql = "SELECT * FROM tickets "
+                + "WHERE assigned_keeper = ? AND status != 'PENDING' "
+                + "ORDER BY processed_at DESC LIMIT 5";
+
+        try (PreparedStatement ps = getConnection().prepareStatement(sql)) {
+            ps.setInt(1, keeperId);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    Ticket t = new Ticket();
+                    t.setTicketId(rs.getInt("ticket_id"));
+                    t.setTicketCode(rs.getString("ticket_code"));
+                    t.setType(rs.getString("type"));
+                    t.setTitle(rs.getString("title"));
+                    t.setStatus(rs.getString("status"));
+                    list.add(t);
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
+
 }

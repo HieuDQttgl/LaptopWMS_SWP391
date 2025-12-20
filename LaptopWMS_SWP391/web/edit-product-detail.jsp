@@ -12,6 +12,7 @@
                 background: #f5f6fa;
                 margin: 0;
                 padding: 0;
+                min-height: 100vh;
             }
 
             .form-container {

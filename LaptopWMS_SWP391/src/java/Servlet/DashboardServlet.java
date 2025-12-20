@@ -1,5 +1,6 @@
 package Servlet;
 
+import DAO.AnnouncementDAO;
 import DAO.DashboardDAO;
 import Model.*;
 import java.io.IOException;
@@ -31,10 +32,12 @@ public class DashboardServlet extends HttpServlet {
         }
 
         DashboardDAO dao = new DashboardDAO();
+        AnnouncementDAO aDao = new AnnouncementDAO();
+        
+        request.setAttribute("announcementList", aDao.getAnnouncements(4));
 
         int roleId = currentUser.getRoleId();
 
-        // Common stats for all roles
         request.setAttribute("totalProducts", dao.getTotalProducts());
         request.setAttribute("totalUsers", dao.getTotalUsers());
         request.setAttribute("pendingTicketCount", dao.getPendingTicketCount());
@@ -49,12 +52,12 @@ public class DashboardServlet extends HttpServlet {
             case 2: // Sale
                 request.setAttribute("topProducts", dao.getTopAvailableProducts());
                 request.setAttribute("myTickets", dao.getMyRecentTickets(currentUser.getUserId()));
-                request.setAttribute("lowStock", dao.getLowStockAlerts(5));
+                request.setAttribute("lowStock", dao.getLowStockAlerts(10));
                 break;
             case 3: // Keeper
-                request.setAttribute("topProducts", dao.getTopAvailableProducts());
                 request.setAttribute("pendingTickets", dao.getPendingTickets());
                 request.setAttribute("lowStock", dao.getLowStockAlerts(5));
+                request.setAttribute("keeperHistory", dao.getKeeperHistory(currentUser.getUserId()));
                 break;
             default:
                 break;

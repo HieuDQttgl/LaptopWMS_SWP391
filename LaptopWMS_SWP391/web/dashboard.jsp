@@ -16,7 +16,8 @@
                 font-family: "Segoe UI", sans-serif;
                 background: #f5f6fa;
                 padding: 0;
-                marginL: 0;
+                margin: 0;
+                min-height: 100vh;
             }
 
             .welcome-banner {
@@ -140,10 +141,39 @@
                     <c:otherwise>User</c:otherwise>
                 </c:choose>
             </p>
+
+            <h3 style="margin-top: 40px;">
+                Team Updates 
+                <a href="team-board" style="font-size:16px; float:right; text-decoration: none; color: black;">View Board &rarr;</a>
+            </h3>
+
+            <div style="min-height: 100px;">
+                <c:forEach var="a" items="${announcementList}">
+                    <div style="margin-bottom: 10px; border-bottom: 1px solid #f0f0f0; padding-bottom: 5px;">
+                        <div style="font-size: 11px; color: #999;">
+                            <strong>${a.senderName}</strong> • ${a.formattedDate}
+                        </div>
+                        <div style="font-size: 13px; color: #444; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;">
+                            ${a.content}
+                        </div>
+                    </div>
+                </c:forEach>
+                <c:if test="${empty announcementList}">
+                    <p style="color:#ccc; text-align:center;">No updates.</p>
+                </c:if>
+            </div>
+
+            <div style="text-align: center; margin-top: 10px;">
+                <form action="add-announcement" method="POST" style="display:flex; gap:5px;">
+                    <input type="text" name="content" placeholder="Quick post..." style="flex:1; padding:5px; font-size:12px;">
+                    <button type="submit" class="btn-action">Post</button>
+                </form>
+            </div>
         </div>
 
         <div class="dash-container">
 
+            <%-- ================== ROLE: SALES STAFF (ID 2) ================== --%>
             <c:if test="${currentUser.roleId == 2}">
 
                 <div class="widget">
@@ -160,92 +190,33 @@
                 </div>
 
                 <div class="widget">
-                    <h3>My Recent Orders <a href="order-list" style="font-size:12px; text-decoration: none;">View All</a></h3>
-                    <c:forEach var="o" items="${myOrders}">
+                    <h3>My Recent Tickets <a href="ticket-list" style="font-size:12px; text-decoration: none;">View All</a></h3>
+                    <%-- FIXED: Iterate 'myTickets', use Ticket properties --%>
+                    <c:forEach var="t" items="${myTickets}">
                         <div class="list-item">
                             <div>
-                                <span class="item-main">${o.orderCode}</span>
-                                <span class="item-sub">${o.supplierId > 0 ? 'Import' : 'Export'} - ID: ${o.orderId}</span>
+                                <span class="item-main">${t.ticketCode}</span>
+                                <span class="item-sub">${t.title}</span>
                             </div>
-
                             <c:choose>
-                                <c:when test="${o.supplierId > 0}">
-                                    <c:choose>
-                                        <c:when test="${o.orderStatus == 'pending' || o.orderStatus == 'approved'}">
-                                            <a href="order-status?orderId=${o.orderId}" class="btn-action">Manage Import</a>
-                                        </c:when>
-                                        <c:otherwise>
-                                            <span class="badge badge-orange">${o.orderStatus}</span>
-                                        </c:otherwise>
-                                    </c:choose>
+                                <c:when test="${t.status == 'APPROVED'}">
+                                    <span class="badge badge-green">APPROVED</span>
                                 </c:when>
-
+                                <c:when test="${t.status == 'REJECTED'}">
+                                    <span class="badge badge-red">REJECTED</span>
+                                </c:when>
                                 <c:otherwise>
-                                    <c:choose>
-                                        <c:when test="${o.orderStatus == 'pending' || o.orderStatus == 'approved'}">
-                                            <span class="badge badge-orange" style="background:#fff3e0; color:#e67e22; border:1px solid #e67e22">Waiting for Warehouse</span>
-                                        </c:when>
-                                        <c:when test="${o.orderStatus == 'shipping'}">
-                                            <a href="order-status?orderId=${o.orderId}" class="btn-action">Confirm Delivery</a>
-                                        </c:when>
-                                        <c:otherwise>
-                                            <span class="badge badge-green">${o.orderStatus}</span>
-                                        </c:otherwise>
-                                    </c:choose>
+                                    <span class="badge badge-orange" style="background:#fff3e0; color:#e67e22;">PENDING</span>
                                 </c:otherwise>
                             </c:choose>
                         </div>
                     </c:forEach>
-                </div>
-
-                <div class="widget">
-                    <h3>New Arrivals</h3>
-                    <c:forEach var="i" items="${newArrivals}">
-                        <div class="list-item">
-                            <div>
-                                <span class="item-main">${i.itemNote}</span> 
-                                <span class="item-sub">SN: ${i.serialNumber}</span>
-                            </div>
-                            <span class="badge badge-blue">New</span>
+                    <c:if test="${empty myTickets}">
+                        <div style="text-align: center; padding: 30px 10px; color: #95a5a6;">
+                            <strong>No history yet.</strong><br>
+                            You haven't created any tickets recently.
                         </div>
-                    </c:forEach>
-                </div>
-            </c:if>
-
-            <c:if test="${currentUser.roleId == 3}">
-
-                <div class="widget">
-                    <h3>Work Queue <span class="badge badge-orange">${pendingOrders.size()} Active</span></h3>
-                    <c:forEach var="o" items="${pendingOrders}">
-                        <div class="list-item">
-                            <div>
-                                <span class="item-main">${o.orderCode}</span>
-                                <span class="item-sub">
-                                    ${o.supplierId > 0 ? 'Import Request' : 'Export Request'}
-                                </span>
-                            </div>
-
-                            <c:choose>
-                                <c:when test="${o.supplierId > 0}">
-                                    <c:if test="${o.orderStatus == 'pending' || o.orderStatus == 'approved'}">
-                                        <span class="badge badge-orange" style="background:#fff3e0; color:#e67e22; border:1px solid #e67e22">Waiting for Sales</span>
-                                    </c:if>
-                                    <c:if test="${o.orderStatus == 'shipping'}">
-                                        <a href="order-status?orderId=${o.orderId}" class="btn-action btn-purple">Receive Goods</a>
-                                    </c:if>
-                                </c:when>
-
-                                <c:otherwise>
-                                    <c:if test="${o.orderStatus == 'pending' || o.orderStatus == 'approved'}">
-                                        <a href="order-status?orderId=${o.orderId}" class="btn-action">Check & Ship</a>
-                                    </c:if>
-                                    <c:if test="${o.orderStatus == 'shipping'}">
-                                        <span class="badge badge-blue">Shipped</span>
-                                    </c:if>
-                                </c:otherwise>
-                            </c:choose>
-                        </div>
-                    </c:forEach>
+                    </c:if>
                 </div>
 
                 <div class="widget">
@@ -260,26 +231,86 @@
                         </div>
                     </c:forEach>
                 </div>
+            </c:if>
+
+            <%-- ================== ROLE: KEEPER (ID 3) ================== --%>
+            <c:if test="${currentUser.roleId == 3}">
 
                 <div class="widget">
-                    <h3>Problem / Damaged</h3>
-                    <c:forEach var="i" items="${problemItems}">
+                    <h3>Work Queue <span class="badge badge-orange">Pending Action</span></h3>
+                    <%-- FIXED: Iterate 'pendingTickets' --%>
+                    <c:forEach var="t" items="${pendingTickets}">
                         <div class="list-item">
                             <div>
-                                <span class="item-main">${i.serialNumber}</span>
-                                <span class="item-sub">${i.itemNote}</span>
+                                <span class="item-main">${t.ticketCode}</span>
+                                <span class="item-sub">
+                                    ${t.type} Request
+                                </span>
                             </div>
-                            <span class="badge badge-red">${i.status}</span>
+                            <a href="ticket-detail?id=${t.ticketId}" class="btn-action">Process</a>
                         </div>
                     </c:forEach>
+                    <c:if test="${empty pendingTickets}">
+                        <p style="color:#999; text-align:center; padding:10px;">No pending tickets.</p>
+                    </c:if>
+                </div>
+
+                <div class="widget">
+                    <h3>Low Stock Alert</h3>
+                    <c:forEach var="p" items="${lowStock}">
+                        <div class="list-item">
+                            <div>
+                                <span class="item-main">${p.cpu}</span>
+                                <span class="item-sub">Restock needed</span>
+                            </div>
+                            <span class="badge badge-red">${p.quantity} Left</span>
+                        </div>
+                    </c:forEach>
+                    <c:if test="${empty lowStock}">
+                        <div style="text-align: center; padding: 30px 10px; color: #95a5a6;">
+                            <div style="font-size: 24px; margin-bottom: 5px;">✅</div>
+                            <strong>Healthy Inventory</strong><br>
+                            All products have sufficient stock.
+                        </div>
+                    </c:if>
+                </div>
+
+                <div class="widget">
+                    <h3>My History <span style="font-size:12px; color:#7f8c8d">Recently Completed</span></h3>
+
+                    <c:forEach var="t" items="${keeperHistory}">
+                        <div class="list-item">
+                            <div>
+                                <span class="item-main" style="color: #7f8c8d; text-decoration: line-through;">
+                                    ${t.ticketCode}
+                                </span>
+                                <span class="item-sub">${t.title}</span>
+                            </div>
+                            <c:choose>
+                                <c:when test="${t.status == 'APPROVED'}">
+                                    <span class="badge badge-green">Done</span>
+                                </c:when>
+                                <c:otherwise>
+                                    <span class="badge badge-red">Rejected</span>
+                                </c:otherwise>
+                            </c:choose>
+                        </div>
+                    </c:forEach>
+
+                    <%-- Empty State --%>
+                    <c:if test="${empty keeperHistory}">
+                        <div style="text-align: center; padding: 20px; color: #ccc;">
+                            No recent history.
+                        </div>
+                    </c:if>
                 </div>
             </c:if>
 
+            <%-- ================== ROLE: ADMIN (ID 1) ================== --%>
             <c:if test="${currentUser.roleId == 1}">
 
                 <div class="widget" style="flex: 2;"> 
                     <h3>Newest Users <a href="user-list" style="font-size:12px; text-decoration: none;">Manage Users</a></h3>
-
                     <table style="width: 100%; border-collapse: collapse; font-size: 13px;">
                         <thead>
                             <tr style="text-align: left; color: #7f8c8d; border-bottom: 1px solid #eee;">
@@ -295,42 +326,10 @@
                                         <strong style="color:#333;">${u.username}</strong><br>
                                         <span style="color: #999; font-size: 11px;">${u.email}</span>
                                     </td>
+                                    <td style="padding: 8px;"><span class="badge badge-blue">${u.roleName}</span></td>
                                     <td style="padding: 8px;">
-                                        <span class="badge badge-blue">${u.roleName}</span>
-                                    </td>
-                                    <td style="padding: 8px;">
-                                        <c:choose>
-                                            <c:when test="${u.status == 'active'}">
-                                                <span style="color: #27ae60; font-weight: bold;">Active</span>
-                                            </c:when>
-                                            <c:otherwise>
-                                                <span style="color: #c0392b; font-weight: bold;">Inactive</span>
-                                            </c:otherwise>
-                                        </c:choose>
-                                    </td>
-                                </tr>
-                            </c:forEach>
-                        </tbody>
-                    </table>
-                </div>
-
-                <div class="widget" style="flex: 1;">
-                    <h3>System Roles <a href="role-list" style="font-size:12px; text-decoration: none;">View All</a></h3>
-
-                    <table style="width: 100%; border-collapse: collapse; font-size: 13px;">
-                        <thead>
-                            <tr style="text-align: left; color: #7f8c8d; border-bottom: 1px solid #eee;">
-                                <th style="padding: 8px;">Role Name</th>
-                                <th style="padding: 8px;">Status</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <c:forEach var="r" items="${roleList}">
-                                <tr style="border-bottom: 1px solid #f9f9f9;">
-                                    <td style="padding: 10px 8px;">${r.roleName}</td>
-                                    <td style="padding: 10px 8px;">
-                                        <span class="badge ${r.status == 'active' ? 'badge-green' : 'badge-red'}">
-                                            ${r.status}
+                                        <span style="color: ${u.status == 'active' ? '#27ae60' : '#c0392b'}; font-weight: bold;">
+                                            ${u.status}
                                         </span>
                                     </td>
                                 </tr>
@@ -339,6 +338,23 @@
                     </table>
                 </div>
 
+                <div class="widget" style="flex: 1;">
+                    <h3>System Roles</h3>
+                    <table style="width: 100%; border-collapse: collapse; font-size: 13px;">
+                        <thead>
+                            <tr style="text-align: left; color: #7f8c8d; border-bottom: 1px solid #eee;">
+                                <th style="padding: 8px;">Role Name</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <c:forEach var="r" items="${roleList}">
+                                <tr style="border-bottom: 1px solid #f9f9f9;">
+                                    <td style="padding: 10px 8px;">${r.roleName}</td>
+                                </tr>
+                            </c:forEach>
+                        </tbody>
+                    </table>
+                </div>
             </c:if>
 
         </div>

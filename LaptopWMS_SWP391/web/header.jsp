@@ -274,6 +274,7 @@
         <a href="#features">Features</a>
         <a href="#hero">About</a>
         <% if (currentUser != null) {%>
+        <a href="<%= request.getContextPath()%>/team-board">Team Board</a>
         <a href="<%= request.getContextPath()%>/profile">Profile</a>
         <a href="<%= request.getContextPath()%>/report-inventory">Reports</a>
 
