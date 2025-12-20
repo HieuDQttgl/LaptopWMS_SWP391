@@ -239,8 +239,6 @@
                                 style="padding: 6px; border: 1px solid #ccc; border-radius: 4px;">
                             <option value="all" ${currentCategory=='all' ? 'selected' : '' }>All Categories
                             </option>
-                            <option value="Laptop" ${currentCategory=='Laptop' ? 'selected' : '' }>Laptop
-                            </option>
                             <option value="Office" ${currentCategory=='Office' ? 'selected' : '' }>Office
                             </option>
                             <option value="Gaming" ${currentCategory=='Gaming' ? 'selected' : '' }>Gaming
@@ -285,6 +283,7 @@
                         <th>Model Name</th>
                         <th>Brand</th>
                         <th>Category</th>
+                        <th>Quantity</th>
                         <th>Status</th>
                         <th>Actions</th>
                     </tr>
@@ -302,6 +301,7 @@
                                     <td><strong>${p.productName}</strong></td>
                                     <td>${p.brand}</td>
                                     <td>${p.category}</td>
+                                    <td>${p.totalQuantity}</td>
                                     <td>
                                         <c:choose>
                                             <c:when test="${p.status}">
@@ -323,14 +323,16 @@
                                 </tr>
 
                                 <tr id="row-${p.productId}" class="details-row">
-                                    <td colspan="7" style="padding: 0;">
+                                    <td colspan="8" style="padding: 0;">
                                         <div class="details-container">
                                             <h4 style="margin: 0 0 10px 0; color: #555;">Available
                                                 Configurations for ${p.productName}</h4>
 
-                                            <a href="add-product-detail?id=${p.productId}" class="btn-add">
-                                                + Add Detail
-                                            </a>
+                                            <c:if test="${sessionScope.currentUser.getRoleId() == 1 or sessionScope.currentUser.getRoleId() == 2}">
+                                                <a href="add-product-detail?id=${p.productId}" class="btn-add">
+                                                    + Add Detail
+                                                </a>
+                                            </c:if>
 
                                             <table class="inner-table">
                                                 <thead>

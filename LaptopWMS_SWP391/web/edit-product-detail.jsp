@@ -121,11 +121,6 @@
                     </select>
                 </div>
 
-                <div class="form-group">
-                    <label>Quantity</label>
-                    <input type="number" name="quantity" min="0" value="${detail.quantity}">
-                </div>
-
                 <button type="submit" class="btn-save">Update Configuration</button>
 
                 <a href="product-list" class="link-back">Cancel</a>

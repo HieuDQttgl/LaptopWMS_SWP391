@@ -14,6 +14,7 @@ public class Product {
     private String brand;
     private String category;
     private boolean status;
+    private int totalQuantity;
 
     private List<ProductDetail> detailsList = new ArrayList<>();
 
@@ -70,5 +71,13 @@ public class Product {
 
     public void setDetailsList(List<ProductDetail> detailsList) {
         this.detailsList = detailsList;
+    }
+
+    public int getTotalQuantity() {
+        return totalQuantity;
+    }
+
+    public void setTotalQuantity(int totalQuantity) {
+        this.totalQuantity = totalQuantity;
     }
 }

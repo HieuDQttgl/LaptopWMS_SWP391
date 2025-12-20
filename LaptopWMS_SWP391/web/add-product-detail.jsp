@@ -114,11 +114,6 @@
                     </select>
                 </div>
 
-                <div class="form-group">
-                    <label>Initial Quantity</label>
-                    <input type="number" name="quantity" min="0" value="0" placeholder="e.g. 10">
-                </div>
-
                 <button type="submit" class="btn-save">Save Configuration</button>
                 <a href="product-list" class="link-back">Cancel</a>
             </form>

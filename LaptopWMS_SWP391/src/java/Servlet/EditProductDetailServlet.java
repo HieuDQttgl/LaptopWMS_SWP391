@@ -10,7 +10,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 /**
- * EditProductDetailServlet - updated for laptop_wms_lite database
+ * EditProductDetailServlet - Logic updated to IGNORE Quantity changes
  */
 @WebServlet(name = "EditProductDetailServlet", urlPatterns = { "/edit-product-detail" })
 public class EditProductDetailServlet extends HttpServlet {
@@ -48,20 +48,14 @@ public class EditProductDetailServlet extends HttpServlet {
             throws ServletException, IOException {
 
         try {
-            int id = Integer.parseInt(request.getParameter("id"));
-            int productId = Integer.parseInt(request.getParameter("productId"));
+            int id = Integer.parseInt(request.getParameter("id"));     
+            int productId = Integer.parseInt(request.getParameter("productId")); 
 
             String cpu = request.getParameter("cpu");
             String gpu = request.getParameter("gpu");
             String ram = request.getParameter("ram");
             String storage = request.getParameter("storage");
             String unit = request.getParameter("unit");
-
-            int quantity = 0;
-            String quantityRaw = request.getParameter("quantity");
-            if (quantityRaw != null && !quantityRaw.isEmpty()) {
-                quantity = Integer.parseInt(quantityRaw);
-            }
 
             ProductDetail d = new ProductDetail();
             d.setProductDetailId(id);
@@ -70,22 +64,21 @@ public class EditProductDetailServlet extends HttpServlet {
             d.setGpu(gpu);
             d.setRam(ram);
             d.setStorage(storage);
-            d.setUnit(unit != null ? unit : "piece");
-            d.setQuantity(quantity);
+            d.setUnit(unit);
 
             ProductDAO dao = new ProductDAO();
-            dao.updateProductDetail(d);
+            dao.updateProductDetail(d); 
 
-            response.sendRedirect("product-list?id=" + productId);
+            response.sendRedirect("product-list");
 
         } catch (Exception e) {
             e.printStackTrace();
-            response.sendRedirect("product-list");
+            response.sendRedirect("product-list?error=EditFailed");
         }
     }
 
     @Override
     public String getServletInfo() {
-        return "Edit Product Detail Servlet for laptop_wms_lite";
+        return "Edit Product Detail Servlet (Specs Only, No Stock Edit)";
     }
 }
