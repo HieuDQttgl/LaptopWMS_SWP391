@@ -200,7 +200,6 @@ public class ReportDAO extends DBContext {
         return summary;
     }
 
-    // Inner classes for report data
     public static class ReportItem {
         public String productName;
         public String config;
