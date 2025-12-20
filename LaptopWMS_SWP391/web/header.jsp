@@ -285,7 +285,9 @@
         <% } %>
 
         <% if (roleId == 2) {%>
+        
         <a href="<%= request.getContextPath()%>/product-list">Products</a>
+        <a href="<%= request.getContextPath()%>/customer-list">Customer</a>
         <a href="<%= request.getContextPath()%>/ticket-list">Tickets</a>
         <% }%>
 

@@ -62,8 +62,8 @@ public class TicketDAO extends DBContext {
             String ticketCode = generateTicketCode(ticket.getType());
 
             // Insert ticket
-            String sqlTicket = "INSERT INTO tickets (ticket_code, type, title, description, status, created_by, assigned_keeper) "
-                    + "VALUES (?, ?, ?, ?, 'PENDING', ?, ?)";
+            String sqlTicket = "INSERT INTO tickets (ticket_code, type, title, description, status, created_by, assigned_keeper, partner_id) "
+                    + "VALUES (?, ?, ?, ?, 'PENDING', ?, ?, ?)";
 
             psTicket = conn.prepareStatement(sqlTicket, Statement.RETURN_GENERATED_KEYS);
             psTicket.setString(1, ticketCode);
@@ -75,6 +75,11 @@ public class TicketDAO extends DBContext {
                 psTicket.setInt(6, ticket.getAssignedKeeper());
             } else {
                 psTicket.setNull(6, java.sql.Types.INTEGER);
+            }
+            if (ticket.getPartnerId() != null) {
+                psTicket.setInt(7, ticket.getPartnerId());
+            } else {
+                psTicket.setNull(7, java.sql.Types.INTEGER);
             }
 
             psTicket.executeUpdate();
@@ -127,10 +132,12 @@ public class TicketDAO extends DBContext {
         StringBuilder sql = new StringBuilder(
                 "SELECT t.*, " +
                         "u1.full_name as creator_name, " +
-                        "u2.full_name as keeper_name " +
+                        "u2.full_name as keeper_name, " +
+                        "p.partner_name " +
                         "FROM tickets t " +
                         "LEFT JOIN users u1 ON t.created_by = u1.user_id " +
                         "LEFT JOIN users u2 ON t.assigned_keeper = u2.user_id " +
+                        "LEFT JOIN partners p ON t.partner_id = p.partner_id " +
                         "WHERE 1=1 ");
 
         List<Object> params = new ArrayList<>();
@@ -170,10 +177,12 @@ public class TicketDAO extends DBContext {
         List<Ticket> tickets = new ArrayList<>();
         String sql = "SELECT t.*, " +
                 "u1.full_name as creator_name, " +
-                "u2.full_name as keeper_name " +
+                "u2.full_name as keeper_name, " +
+                "p.partner_name " +
                 "FROM tickets t " +
                 "LEFT JOIN users u1 ON t.created_by = u1.user_id " +
                 "LEFT JOIN users u2 ON t.assigned_keeper = u2.user_id " +
+                "LEFT JOIN partners p ON t.partner_id = p.partner_id " +
                 "WHERE t.assigned_keeper = ? " +
                 "ORDER BY t.created_at DESC";
 
@@ -197,10 +206,12 @@ public class TicketDAO extends DBContext {
         Ticket ticket = null;
         String sql = "SELECT t.*, " +
                 "u1.full_name as creator_name, " +
-                "u2.full_name as keeper_name " +
+                "u2.full_name as keeper_name, " +
+                "p.partner_name " +
                 "FROM tickets t " +
                 "LEFT JOIN users u1 ON t.created_by = u1.user_id " +
                 "LEFT JOIN users u2 ON t.assigned_keeper = u2.user_id " +
+                "LEFT JOIN partners p ON t.partner_id = p.partner_id " +
                 "WHERE t.ticket_id = ?";
 
         try (PreparedStatement ps = getConnection().prepareStatement(sql)) {
@@ -490,6 +501,12 @@ public class TicketDAO extends DBContext {
         ticket.setKeeperNote(rs.getString("keeper_note"));
         ticket.setCreatorName(rs.getString("creator_name"));
         ticket.setKeeperName(rs.getString("keeper_name"));
+
+        int partnerId = rs.getInt("partner_id");
+        if (!rs.wasNull()) {
+            ticket.setPartnerId(partnerId);
+        }
+        ticket.setPartnerName(rs.getString("partner_name"));
 
         return ticket;
     }

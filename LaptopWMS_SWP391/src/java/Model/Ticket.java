@@ -21,10 +21,12 @@ public class Ticket {
     private Timestamp createdAt;
     private Timestamp processedAt;
     private String keeperNote;
+    private Integer partnerId;
 
     // For display purposes
     private String creatorName;
     private String keeperName;
+    private String partnerName;
     private List<TicketItem> items = new ArrayList<>();
 
     public Ticket() {
@@ -133,6 +135,22 @@ public class Ticket {
 
     public void setKeeperName(String keeperName) {
         this.keeperName = keeperName;
+    }
+
+    public Integer getPartnerId() {
+        return partnerId;
+    }
+
+    public void setPartnerId(Integer partnerId) {
+        this.partnerId = partnerId;
+    }
+
+    public String getPartnerName() {
+        return partnerName;
+    }
+
+    public void setPartnerName(String partnerName) {
+        this.partnerName = partnerName;
     }
 
     public List<TicketItem> getItems() {
