@@ -303,7 +303,7 @@
                     </div>
 
                     <!-- Partner Selection -->
-                    <div class="form-group" id="partnerSection" style="display: none;">
+                    <div class="form-group" id="partnerSection">
                         <label for="partnerId" id="partnerLabel">Partner</label>
                         <select id="partnerId" name="partnerId">
                             <option value="">-- Select Partner --</option>
@@ -395,19 +395,16 @@
 
                 partnerSection.style.display = 'block';
 
-                // Clear current options
                 partnerSelect.innerHTML = '<option value="">-- Select Partner --</option>';
 
                 if (type === 'IMPORT') {
                     partnerLabel.textContent = 'Supplier';
-                    // Add supplier options
                     const supplierOptions = document.querySelectorAll('#supplierOptions option');
                     supplierOptions.forEach(opt => {
                         partnerSelect.appendChild(opt.cloneNode(true));
                     });
                 } else if (type === 'EXPORT') {
                     partnerLabel.textContent = 'Customer';
-                    // Add customer options
                     const customerOptions = document.querySelectorAll('#customerOptions option');
                     customerOptions.forEach(opt => {
                         partnerSelect.appendChild(opt.cloneNode(true));

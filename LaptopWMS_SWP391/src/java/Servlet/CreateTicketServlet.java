@@ -41,7 +41,6 @@ public class CreateTicketServlet extends HttpServlet {
             return;
         }
 
-        // Load data for the form
         List<TicketItem> products = ticketDAO.getAvailableProducts();
         List<Users> keepers = ticketDAO.getKeeperList();
         List<Partners> suppliers = partnerDAO.getSuppliers();
@@ -69,25 +68,21 @@ public class CreateTicketServlet extends HttpServlet {
         }
 
         try {
-            // Get ticket data
             String type = request.getParameter("type");
             String title = request.getParameter("title");
             String description = request.getParameter("description");
             String keeperIdStr = request.getParameter("keeperId");
             String partnerIdStr = request.getParameter("partnerId");
 
-            // Get product items
             String[] productIds = request.getParameterValues("productDetailId");
             String[] quantities = request.getParameterValues("quantity");
 
-            // Validate
             if (type == null || title == null || title.trim().isEmpty()) {
                 request.setAttribute("error", "Please fill in all required fields");
                 doGet(request, response);
                 return;
             }
 
-            // Validate keeper is selected
             if (keeperIdStr == null || keeperIdStr.trim().isEmpty()) {
                 request.setAttribute("error", "Please select a Keeper to assign");
                 doGet(request, response);
@@ -100,7 +95,6 @@ public class CreateTicketServlet extends HttpServlet {
                 return;
             }
 
-            // Check for duplicate products
             java.util.Set<String> productIdSet = new java.util.HashSet<>();
             for (String productId : productIds) {
                 if (productId != null && !productId.isEmpty()) {
@@ -113,7 +107,6 @@ public class CreateTicketServlet extends HttpServlet {
                 }
             }
 
-            // Create ticket object
             Ticket ticket = new Ticket();
             ticket.setType(type);
             ticket.setTitle(title.trim());
@@ -128,10 +121,8 @@ public class CreateTicketServlet extends HttpServlet {
 
             if (partnerIdStr != null && !partnerIdStr.isEmpty()) {
                 int partnerId = Integer.parseInt(partnerIdStr);
-                // Validate partner type matches ticket type
                 Partners partner = partnerDAO.getPartnerById(partnerId);
                 if (partner != null) {
-                    // type=1 is Supplier (for IMPORT), type=2 is Customer (for EXPORT)
                     if ("IMPORT".equals(type) && partner.getType() != 1) {
                         request.setAttribute("error", "Invalid partner: Please select a Supplier for IMPORT tickets");
                         doGet(request, response);
@@ -146,12 +137,10 @@ public class CreateTicketServlet extends HttpServlet {
                 ticket.setPartnerId(partnerId);
             }
 
-            // Add items
             List<TicketItem> items = new ArrayList<>();
             for (int i = 0; i < productIds.length; i++) {
                 if (productIds[i] != null && !productIds[i].isEmpty()) {
                     int quantity = Integer.parseInt(quantities[i]);
-                    // Validate quantity > 0
                     if (quantity <= 0) {
                         request.setAttribute("error", "Quantity must be greater than 0");
                         doGet(request, response);
@@ -165,7 +154,6 @@ public class CreateTicketServlet extends HttpServlet {
             }
             ticket.setItems(items);
 
-            // For EXPORT tickets, validate stock availability
             if ("EXPORT".equals(type)) {
                 String stockError = ticketDAO.validateExportStock(items);
                 if (stockError != null) {
@@ -175,11 +163,9 @@ public class CreateTicketServlet extends HttpServlet {
                 }
             }
 
-            // Save to database
             int ticketId = ticketDAO.createTicket(ticket);
 
             if (ticketId > 0) {
-                // Notify assigned keeper if one was selected
                 if (assignedKeeperId != null) {
                     notifyKeeperOfAssignment(assignedKeeperId, ticketId, title, type, currentUser.getFullName());
                 }
@@ -217,14 +203,12 @@ public class CreateTicketServlet extends HttpServlet {
                     ticketType,
                     creatorName != null ? creatorName : "Unknown");
 
-            // Link to ticket detail page
             String link = "/ticket-detail?id=" + ticketId;
 
             Notification notification = new Notification(keeperId, title, message, link);
             notificationDAO.createNotification(notification);
         } catch (Exception e) {
             e.printStackTrace();
-            // Don't fail the ticket creation if notification fails
         }
     }
 }

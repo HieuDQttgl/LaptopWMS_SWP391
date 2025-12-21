@@ -40,7 +40,7 @@ public class TicketListServlet extends HttpServlet {
 
         // If keeper, show only assigned tickets
         if (currentUser.getRoleId() == 3) {
-            tickets = ticketDAO.getTicketsForKeeper(currentUser.getUserId());
+            tickets = ticketDAO.getTicketsForKeeper(currentUser.getUserId(), status, type);
         } else {
             tickets = ticketDAO.getAllTickets(status, type);
         }

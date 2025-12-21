@@ -206,6 +206,27 @@
                 align-items: center;
                 gap: 10px;
             }
+
+            .btn-edit {
+                background: #f59e0b; /* Màu cam vàng */
+                color: white;
+                text-decoration: none;
+                padding: 8px 16px;
+                border-radius: 8px;
+                font-size: 13px;
+                font-weight: 500;
+                transition: all 0.3s;
+                margin-right: 5px;
+            }
+
+            .btn-edit:hover {
+                background: #d97706;
+            }
+
+            .action-buttons {
+                display: flex;
+                gap: 8px;
+            }
         </style>
     </head>
 
@@ -221,11 +242,17 @@
                     <% } %>
             </div>
 
-            <% String successMessage = (String) request.getAttribute("successMessage"); %>
-            <% if (successMessage != null) {%>
-            <div class="success-message">✓ <%= successMessage%>
+            <%
+                String successMessage = (String) session.getAttribute("successMessage");
+                if (successMessage != null) {
+            %>
+            <div class="success-message">
+                ✓ <%= successMessage%>
             </div>
-            <% } %>
+            <%
+                    session.removeAttribute("successMessage");
+                }
+            %>
 
             <form method="get" class="filters">
                 <div class="filter-group">
@@ -265,6 +292,7 @@
                             <th>Created By</th>
                             <th>Assigned Keeper</th>
                             <th>Created At</th>
+                            <th>Partner</th>
                             <th>Action</th>
                         </tr>
                     </thead>
@@ -308,8 +336,23 @@
                                         ? sdf.format(ticket.getCreatedAt()) : "-"%>
                             </td>
                             <td>
+                                <%= ticket.getPartnerName() != null
+                                        ? ticket.getPartnerName() : "-"%>
+                            </td>
+                            <td class="action-buttons">
                                 <a href="<%= request.getContextPath()%>/ticket-detail?id=<%= ticket.getTicketId()%>"
                                    class="btn-view">View</a>
+
+                                <%
+                                    if (currentUser != null && (currentUser.getRoleId() == 1 || currentUser.getRoleId() == 2)) {
+                                        if ("PENDING".equalsIgnoreCase(ticket.getStatus())) {
+                                %>
+                                <a href="<%= request.getContextPath()%>/edit-ticket?id=<%= ticket.getTicketId()%>"
+                                   class="btn-edit">Edit</a>
+                                <%
+                                        }
+                                    }
+                                %>
                             </td>
                         </tr>
                         <% }

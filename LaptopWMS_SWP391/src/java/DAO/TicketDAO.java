@@ -176,21 +176,35 @@ public class TicketDAO extends DBContext {
     /**
      * Get tickets for a specific keeper
      */
-    public List<Ticket> getTicketsForKeeper(int keeperId) {
+    public List<Ticket> getTicketsForKeeper(int keeperId, String status, String type) {
         List<Ticket> tickets = new ArrayList<>();
-        String sql = "SELECT t.*, "
-                + "u1.full_name as creator_name, "
-                + "u2.full_name as keeper_name, "
-                + "p.partner_name "
+        StringBuilder sql = new StringBuilder(
+                "SELECT t.*, u1.full_name as creator_name, u2.full_name as keeper_name, p.partner_name "
                 + "FROM tickets t "
                 + "LEFT JOIN users u1 ON t.created_by = u1.user_id "
                 + "LEFT JOIN users u2 ON t.assigned_keeper = u2.user_id "
                 + "LEFT JOIN partners p ON t.partner_id = p.partner_id "
-                + "WHERE t.assigned_keeper = ? "
-                + "ORDER BY t.created_at DESC";
+                + "WHERE t.assigned_keeper = ? ");
 
-        try (PreparedStatement ps = getConnection().prepareStatement(sql)) {
-            ps.setInt(1, keeperId);
+        List<Object> params = new ArrayList<>();
+        params.add(keeperId);
+
+        // Thêm các điều kiện lọc giống như getAllTickets
+        if (status != null && !status.isEmpty() && !status.equals("all")) {
+            sql.append("AND t.status = ? ");
+            params.add(status);
+        }
+        if (type != null && !type.isEmpty() && !type.equals("all")) {
+            sql.append("AND t.type = ? ");
+            params.add(type);
+        }
+
+        sql.append("ORDER BY t.created_at DESC");
+        try (PreparedStatement ps = getConnection().prepareStatement(sql.toString())) {
+            for (int i = 0; i < params.size(); i++) {
+                ps.setObject(i + 1, params.get(i));
+            }
+
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
                     tickets.add(mapTicketFromResultSet(rs));
@@ -562,8 +576,7 @@ public class TicketDAO extends DBContext {
         }
         return list;
     }
-    
-    
+
     public List<ImportReportDTO> getExportReport(String from, String to, String partnerId, String status) {
         List<ImportReportDTO> list = new ArrayList<>();
 
@@ -614,7 +627,89 @@ public class TicketDAO extends DBContext {
         }
         return list;
     }
-    
+
+    public boolean updateTicketWithItems(Ticket ticket) throws SQLException {
+        Connection conn = null;
+        PreparedStatement psTicket = null;
+        PreparedStatement psDelItems = null;
+        PreparedStatement psInsItem = null;
+
+        try {
+            conn = getConnection();
+            conn.setAutoCommit(false);
+
+            String sqlTicket = "UPDATE tickets SET title = ?, description = ?, type = ?, "
+                    + "assigned_keeper = ?, partner_id = ? "
+                    + "WHERE ticket_id = ? AND status = 'PENDING'";
+
+            psTicket = conn.prepareStatement(sqlTicket);
+            psTicket.setString(1, ticket.getTitle());
+            psTicket.setString(2, ticket.getDescription());
+            psTicket.setString(3, ticket.getType());
+
+            if (ticket.getAssignedKeeper() != null) {
+                psTicket.setInt(4, ticket.getAssignedKeeper());
+            } else {
+                psTicket.setNull(4, java.sql.Types.INTEGER);
+            }
+
+            if (ticket.getPartnerId() != null) {
+                psTicket.setInt(5, ticket.getPartnerId());
+            } else {
+                psTicket.setNull(5, java.sql.Types.INTEGER);
+            }
+
+            psTicket.setInt(6, ticket.getTicketId());
+
+            int rowsUpdated = psTicket.executeUpdate();
+
+            if (rowsUpdated == 0) {
+                conn.rollback();
+                return false;
+            }
+
+            String sqlDeleteItems = "DELETE FROM ticket_items WHERE ticket_id = ?";
+            psDelItems = conn.prepareStatement(sqlDeleteItems);
+            psDelItems.setInt(1, ticket.getTicketId());
+            psDelItems.executeUpdate();
+
+            if (ticket.getItems() != null && !ticket.getItems().isEmpty()) {
+                String sqlInsertItem = "INSERT INTO ticket_items (ticket_id, product_detail_id, quantity) VALUES (?, ?, ?)";
+                psInsItem = conn.prepareStatement(sqlInsertItem);
+                for (TicketItem item : ticket.getItems()) {
+                    psInsItem.setInt(1, ticket.getTicketId());
+                    psInsItem.setInt(2, item.getProductDetailId());
+                    psInsItem.setInt(3, item.getQuantity());
+                    psInsItem.addBatch();
+                }
+                psInsItem.executeBatch();
+            }
+
+            conn.commit();
+            return true;
+
+        } catch (SQLException e) {
+            if (conn != null) {
+                conn.rollback();
+            }
+            throw e;
+        } finally {
+            if (psTicket != null) {
+                psTicket.close();
+            }
+            if (psDelItems != null) {
+                psDelItems.close();
+            }
+            if (psInsItem != null) {
+                psInsItem.close();
+            }
+            if (conn != null) {
+                conn.setAutoCommit(true);
+                conn.close();
+            }
+        }
+    }
+
     public static void main(String[] args) {
         TicketDAO userDAO = new TicketDAO();
 
