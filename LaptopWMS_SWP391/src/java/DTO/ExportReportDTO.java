@@ -5,58 +5,62 @@
 package DTO;
 
 import java.sql.Date;
+import java.sql.Timestamp;
 
 /**
  *
  * @author ASUS
  */
 public class ExportReportDTO {
-    private String orderCode;
-    private java.sql.Date createdAt;
-    private String customerName;
-    private String saleName;
-    private double revenue;
-    private String status;
+     private String ticketCode;      
+    private Timestamp processedAt;  
+    private String creatorName;     
+    private String confirmedBy;     
+    private String partnerName;     
+    private String status;          
 
-
-    public String getOrderCode() {
-        return orderCode;
+    public ExportReportDTO() {
     }
 
-    public void setOrderCode(String orderCode) {
-        this.orderCode = orderCode;
+
+    public String getTicketCode() {
+        return ticketCode;
     }
 
-    public Date getCreatedAt() {
-        return createdAt;
+    public void setTicketCode(String ticketCode) {
+        this.ticketCode = ticketCode;
     }
 
-    public void setCreatedAt(Date createdAt) {
-        this.createdAt = createdAt;
+    public Timestamp getProcessedAt() {
+        return processedAt;
     }
 
-    public String getCustomerName() {
-        return customerName;
+    public void setProcessedAt(Timestamp processedAt) {
+        this.processedAt = processedAt;
     }
 
-    public void setCustomerName(String customerName) {
-        this.customerName = customerName;
+    public String getCreatorName() {
+        return creatorName;
     }
 
-    public String getSaleName() {
-        return saleName;
+    public void setCreatorName(String creatorName) {
+        this.creatorName = creatorName;
     }
 
-    public void setSaleName(String saleName) {
-        this.saleName = saleName;
+    public String getConfirmedBy() {
+        return confirmedBy;
     }
 
-    public double getRevenue() {
-        return revenue;
+    public void setConfirmedBy(String confirmedBy) {
+        this.confirmedBy = confirmedBy;
     }
 
-    public void setRevenue(double revenue) {
-        this.revenue = revenue;
+    public String getPartnerName() {
+        return partnerName;
+    }
+
+    public void setPartnerName(String partnerName) {
+        this.partnerName = partnerName;
     }
 
     public String getStatus() {
@@ -65,30 +69,6 @@ public class ExportReportDTO {
 
     public void setStatus(String status) {
         this.status = status;
-    }
-    
-    public static class TopProduct {
-        private String productName;
-        private int totalQuantity;
-
-        public TopProduct(String productName, int totalQuantity) {
-            this.productName = productName;
-            this.totalQuantity = totalQuantity;
-        }
-        public String getProductName() { return productName; }
-        public int getTotalQuantity() { return totalQuantity; }
-    }
-
-    public static class StaffRevenue {
-        private String staffName;
-        private double totalRevenue;
-
-        public StaffRevenue(String staffName, double totalRevenue) {
-            this.staffName = staffName;
-            this.totalRevenue = totalRevenue;
-        }
-        public String getStaffName() { return staffName; }
-        public double getTotalRevenue() { return totalRevenue; }
     }
     
 }

@@ -1,6 +1,7 @@
 package DAO;
 
 import static DAO.DBContext.getConnection;
+import DTO.ImportReportDTO;
 import Model.Ticket;
 import Model.TicketItem;
 import Model.Users;
@@ -16,14 +17,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * DAO class for Ticket operations
- * Handles CRUD operations and business logic for tickets
+ * DAO class for Ticket operations Handles CRUD operations and business logic
+ * for tickets
  */
 public class TicketDAO extends DBContext {
 
     /**
-     * Generate ticket code based on type and current date
-     * Format: IMP-DEC-001 or EXP-DEC-001
+     * Generate ticket code based on type and current date Format: IMP-DEC-001
+     * or EXP-DEC-001
      */
     private String generateTicketCode(String type) {
         String prefix = type.equals("IMPORT") ? "IMP" : "EXP";
@@ -113,10 +114,12 @@ public class TicketDAO extends DBContext {
             }
             throw e;
         } finally {
-            if (psItem != null)
+            if (psItem != null) {
                 psItem.close();
-            if (psTicket != null)
+            }
+            if (psTicket != null) {
                 psTicket.close();
+            }
             if (conn != null) {
                 conn.setAutoCommit(true);
                 conn.close();
@@ -130,15 +133,15 @@ public class TicketDAO extends DBContext {
     public List<Ticket> getAllTickets(String status, String type) {
         List<Ticket> tickets = new ArrayList<>();
         StringBuilder sql = new StringBuilder(
-                "SELECT t.*, " +
-                        "u1.full_name as creator_name, " +
-                        "u2.full_name as keeper_name, " +
-                        "p.partner_name " +
-                        "FROM tickets t " +
-                        "LEFT JOIN users u1 ON t.created_by = u1.user_id " +
-                        "LEFT JOIN users u2 ON t.assigned_keeper = u2.user_id " +
-                        "LEFT JOIN partners p ON t.partner_id = p.partner_id " +
-                        "WHERE 1=1 ");
+                "SELECT t.*, "
+                + "u1.full_name as creator_name, "
+                + "u2.full_name as keeper_name, "
+                + "p.partner_name "
+                + "FROM tickets t "
+                + "LEFT JOIN users u1 ON t.created_by = u1.user_id "
+                + "LEFT JOIN users u2 ON t.assigned_keeper = u2.user_id "
+                + "LEFT JOIN partners p ON t.partner_id = p.partner_id "
+                + "WHERE 1=1 ");
 
         List<Object> params = new ArrayList<>();
 
@@ -175,16 +178,16 @@ public class TicketDAO extends DBContext {
      */
     public List<Ticket> getTicketsForKeeper(int keeperId) {
         List<Ticket> tickets = new ArrayList<>();
-        String sql = "SELECT t.*, " +
-                "u1.full_name as creator_name, " +
-                "u2.full_name as keeper_name, " +
-                "p.partner_name " +
-                "FROM tickets t " +
-                "LEFT JOIN users u1 ON t.created_by = u1.user_id " +
-                "LEFT JOIN users u2 ON t.assigned_keeper = u2.user_id " +
-                "LEFT JOIN partners p ON t.partner_id = p.partner_id " +
-                "WHERE t.assigned_keeper = ? " +
-                "ORDER BY t.created_at DESC";
+        String sql = "SELECT t.*, "
+                + "u1.full_name as creator_name, "
+                + "u2.full_name as keeper_name, "
+                + "p.partner_name "
+                + "FROM tickets t "
+                + "LEFT JOIN users u1 ON t.created_by = u1.user_id "
+                + "LEFT JOIN users u2 ON t.assigned_keeper = u2.user_id "
+                + "LEFT JOIN partners p ON t.partner_id = p.partner_id "
+                + "WHERE t.assigned_keeper = ? "
+                + "ORDER BY t.created_at DESC";
 
         try (PreparedStatement ps = getConnection().prepareStatement(sql)) {
             ps.setInt(1, keeperId);
@@ -204,15 +207,15 @@ public class TicketDAO extends DBContext {
      */
     public Ticket getTicketById(int ticketId) {
         Ticket ticket = null;
-        String sql = "SELECT t.*, " +
-                "u1.full_name as creator_name, " +
-                "u2.full_name as keeper_name, " +
-                "p.partner_name " +
-                "FROM tickets t " +
-                "LEFT JOIN users u1 ON t.created_by = u1.user_id " +
-                "LEFT JOIN users u2 ON t.assigned_keeper = u2.user_id " +
-                "LEFT JOIN partners p ON t.partner_id = p.partner_id " +
-                "WHERE t.ticket_id = ?";
+        String sql = "SELECT t.*, "
+                + "u1.full_name as creator_name, "
+                + "u2.full_name as keeper_name, "
+                + "p.partner_name "
+                + "FROM tickets t "
+                + "LEFT JOIN users u1 ON t.created_by = u1.user_id "
+                + "LEFT JOIN users u2 ON t.assigned_keeper = u2.user_id "
+                + "LEFT JOIN partners p ON t.partner_id = p.partner_id "
+                + "WHERE t.ticket_id = ?";
 
         try (PreparedStatement ps = getConnection().prepareStatement(sql)) {
             ps.setInt(1, ticketId);
@@ -233,13 +236,13 @@ public class TicketDAO extends DBContext {
      */
     private List<TicketItem> getTicketItems(int ticketId) {
         List<TicketItem> items = new ArrayList<>();
-        String sql = "SELECT ti.*, p.product_name, " +
-                "CONCAT(pd.cpu, ' / ', pd.ram, ' / ', pd.storage) as product_config, " +
-                "pd.quantity as current_stock " +
-                "FROM ticket_items ti " +
-                "JOIN product_details pd ON ti.product_detail_id = pd.product_detail_id " +
-                "JOIN products p ON pd.product_id = p.product_id " +
-                "WHERE ti.ticket_id = ?";
+        String sql = "SELECT ti.*, p.product_name, "
+                + "CONCAT(pd.cpu, ' / ', pd.ram, ' / ', pd.storage) as product_config, "
+                + "pd.quantity as current_stock "
+                + "FROM ticket_items ti "
+                + "JOIN product_details pd ON ti.product_detail_id = pd.product_detail_id "
+                + "JOIN products p ON pd.product_id = p.product_id "
+                + "WHERE ti.ticket_id = ?";
 
         try (PreparedStatement ps = getConnection().prepareStatement(sql)) {
             ps.setInt(1, ticketId);
@@ -263,8 +266,8 @@ public class TicketDAO extends DBContext {
     }
 
     /**
-     * Complete a ticket - update stock quantities and log to stock_ledger
-     * For EXPORT tickets, validates sufficient stock before approving
+     * Complete a ticket - update stock quantities and log to stock_ledger For
+     * EXPORT tickets, validates sufficient stock before approving
      */
     public boolean completeTicket(int ticketId, String keeperNote) throws SQLException {
         Connection conn = null;
@@ -285,9 +288,9 @@ public class TicketDAO extends DBContext {
                     int currentStock = getCurrentStock(conn, item.getProductDetailId());
                     if (currentStock < item.getQuantity()) {
                         conn.rollback();
-                        throw new SQLException("Insufficient stock for product: " + item.getProductName() +
-                                " (Config: " + item.getProductConfig() + "). " +
-                                "Available: " + currentStock + ", Requested: " + item.getQuantity());
+                        throw new SQLException("Insufficient stock for product: " + item.getProductName()
+                                + " (Config: " + item.getProductConfig() + "). "
+                                + "Available: " + currentStock + ", Requested: " + item.getQuantity());
                     }
                 }
             }
@@ -372,18 +375,18 @@ public class TicketDAO extends DBContext {
     }
 
     /**
-     * Validate stock availability for EXPORT ticket (used during ticket creation)
-     * Returns error message if insufficient stock, null if OK
+     * Validate stock availability for EXPORT ticket (used during ticket
+     * creation) Returns error message if insufficient stock, null if OK
      */
     public String validateExportStock(List<TicketItem> items) {
         StringBuilder errors = new StringBuilder();
 
         for (TicketItem item : items) {
-            String sql = "SELECT pd.quantity, p.product_name, " +
-                    "CONCAT(pd.cpu, ' / ', pd.ram, ' / ', pd.storage) as config " +
-                    "FROM product_details pd " +
-                    "JOIN products p ON pd.product_id = p.product_id " +
-                    "WHERE pd.product_detail_id = ?";
+            String sql = "SELECT pd.quantity, p.product_name, "
+                    + "CONCAT(pd.cpu, ' / ', pd.ram, ' / ', pd.storage) as config "
+                    + "FROM product_details pd "
+                    + "JOIN products p ON pd.product_id = p.product_id "
+                    + "WHERE pd.product_detail_id = ?";
 
             try (PreparedStatement ps = getConnection().prepareStatement(sql)) {
                 ps.setInt(1, item.getProductDetailId());
@@ -434,8 +437,7 @@ public class TicketDAO extends DBContext {
         List<Users> keepers = new ArrayList<>();
         String sql = "SELECT user_id, username, full_name, email FROM users WHERE role_id = 3 AND status = 'active'";
 
-        try (PreparedStatement ps = getConnection().prepareStatement(sql);
-                ResultSet rs = ps.executeQuery()) {
+        try (PreparedStatement ps = getConnection().prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
             while (rs.next()) {
                 Users user = new Users();
                 user.setUserId(rs.getInt("user_id"));
@@ -455,15 +457,14 @@ public class TicketDAO extends DBContext {
      */
     public List<TicketItem> getAvailableProducts() {
         List<TicketItem> products = new ArrayList<>();
-        String sql = "SELECT pd.product_detail_id, p.product_name, " +
-                "CONCAT(pd.cpu, ' / ', pd.ram, ' / ', pd.storage) as product_config, " +
-                "pd.quantity as current_stock " +
-                "FROM product_details pd " +
-                "JOIN products p ON pd.product_id = p.product_id " +
-                "WHERE p.status = 1";
+        String sql = "SELECT pd.product_detail_id, p.product_name, "
+                + "CONCAT(pd.cpu, ' / ', pd.ram, ' / ', pd.storage) as product_config, "
+                + "pd.quantity as current_stock "
+                + "FROM product_details pd "
+                + "JOIN products p ON pd.product_id = p.product_id "
+                + "WHERE p.status = 1";
 
-        try (PreparedStatement ps = getConnection().prepareStatement(sql);
-                ResultSet rs = ps.executeQuery()) {
+        try (PreparedStatement ps = getConnection().prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
             while (rs.next()) {
                 TicketItem item = new TicketItem();
                 item.setProductDetailId(rs.getInt("product_detail_id"));
@@ -509,5 +510,119 @@ public class TicketDAO extends DBContext {
         ticket.setPartnerName(rs.getString("partner_name"));
 
         return ticket;
+    }
+
+    public List<ImportReportDTO> getImportReport(String from, String to, String partnerId, String status) {
+        List<ImportReportDTO> list = new ArrayList<>();
+
+        StringBuilder sql = new StringBuilder(
+                "SELECT t.ticket_code, t.processed_at, t.status, "
+                + "u1.full_name AS creator_name, "
+                + "u2.full_name AS confirmed_by, "
+                + "p.partner_name "
+                + "FROM Tickets t "
+                + "LEFT JOIN Users u1 ON t.created_by = u1.user_id "
+                + "LEFT JOIN Users u2 ON t.assigned_keeper = u2.user_id "
+                + "LEFT JOIN Partners p ON t.partner_id = p.partner_id "
+                + "WHERE t.type = 'IMPORT' "
+        );
+
+        if (from != null && !from.isEmpty()) {
+            sql.append(" AND t.processed_at >= '").append(from).append(" 00:00:00'");
+        }
+        if (to != null && !to.isEmpty()) {
+            sql.append(" AND t.processed_at <= '").append(to).append(" 23:59:59'");
+        }
+
+        if (partnerId != null && !partnerId.isEmpty()) {
+            sql.append(" AND t.partner_id = ").append(partnerId);
+        }
+
+        if (status != null && !status.isEmpty()) {
+            sql.append(" AND t.status = '").append(status).append("'");
+        }
+
+        sql.append(" ORDER BY t.processed_at DESC");
+
+        try (Connection conn = DBContext.getConnection(); PreparedStatement ps = conn.prepareStatement(sql.toString()); ResultSet rs = ps.executeQuery()) {
+
+            while (rs.next()) {
+                ImportReportDTO dto = new ImportReportDTO();
+                dto.setTicketCode(rs.getString("ticket_code"));
+                dto.setProcessedAt(rs.getTimestamp("processed_at"));
+                dto.setCreatorName(rs.getString("creator_name"));
+                dto.setConfirmedBy(rs.getString("confirmed_by") != null ? rs.getString("confirmed_by") : "N/A");
+                dto.setPartnerName(rs.getString("partner_name") != null ? rs.getString("partner_name") : "N/A");
+                dto.setStatus(rs.getString("status"));
+
+                list.add(dto);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
+    
+    
+    public List<ImportReportDTO> getExportReport(String from, String to, String partnerId, String status) {
+        List<ImportReportDTO> list = new ArrayList<>();
+
+        StringBuilder sql = new StringBuilder(
+                "SELECT t.ticket_code, t.processed_at, t.status, "
+                + "u1.full_name AS creator_name, "
+                + "u2.full_name AS confirmed_by, "
+                + "p.partner_name "
+                + "FROM Tickets t "
+                + "LEFT JOIN Users u1 ON t.created_by = u1.user_id "
+                + "LEFT JOIN Users u2 ON t.assigned_keeper = u2.user_id "
+                + "LEFT JOIN Partners p ON t.partner_id = p.partner_id "
+                + "WHERE t.type = 'EXPORT' "
+        );
+
+        if (from != null && !from.isEmpty()) {
+            sql.append(" AND t.processed_at >= '").append(from).append(" 00:00:00'");
+        }
+        if (to != null && !to.isEmpty()) {
+            sql.append(" AND t.processed_at <= '").append(to).append(" 23:59:59'");
+        }
+
+        if (partnerId != null && !partnerId.isEmpty()) {
+            sql.append(" AND t.partner_id = ").append(partnerId);
+        }
+
+        if (status != null && !status.isEmpty()) {
+            sql.append(" AND t.status = '").append(status).append("'");
+        }
+
+        sql.append(" ORDER BY t.processed_at DESC");
+
+        try (Connection conn = DBContext.getConnection(); PreparedStatement ps = conn.prepareStatement(sql.toString()); ResultSet rs = ps.executeQuery()) {
+
+            while (rs.next()) {
+                ImportReportDTO dto = new ImportReportDTO();
+                dto.setTicketCode(rs.getString("ticket_code"));
+                dto.setProcessedAt(rs.getTimestamp("processed_at"));
+                dto.setCreatorName(rs.getString("creator_name"));
+                dto.setConfirmedBy(rs.getString("confirmed_by") != null ? rs.getString("confirmed_by") : "N/A");
+                dto.setPartnerName(rs.getString("partner_name") != null ? rs.getString("partner_name") : "N/A");
+                dto.setStatus(rs.getString("status"));
+
+                list.add(dto);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
+    
+    public static void main(String[] args) {
+        TicketDAO userDAO = new TicketDAO();
+
+        System.out.println("=== Testing ===");
+        List<ImportReportDTO> allUsers = userDAO.getImportReport(null, null, null, null);
+        System.out.println("Found " + allUsers.size() + " Users:");
+        for (ImportReportDTO user : allUsers) {
+            System.out.println(user);
+        }
     }
 }

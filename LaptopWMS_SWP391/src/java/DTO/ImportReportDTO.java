@@ -1,62 +1,58 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package DTO;
 
-import java.sql.Date;
+import java.sql.Timestamp;
 
-/**
- *
- * @author ASUS
- */
 public class ImportReportDTO {
 
-    private String orderCode;
-    private Date createdAt;
-    private String supplierName;
-    private int items;
-    private double value;
-    private String status;
+    private String ticketCode;      
+    private Timestamp processedAt;  
+    private String creatorName;     
+    private String confirmedBy;     
+    private String partnerName;     
+    private String status;          
 
-    public String getOrderCode() {
-        return orderCode;
+    public ImportReportDTO() {
     }
 
-    public void setOrderCode(String orderCode) {
-        this.orderCode = orderCode;
+
+    public String getTicketCode() {
+        return ticketCode;
     }
 
-    public Date getCreatedAt() {
-        return createdAt;
+    public void setTicketCode(String ticketCode) {
+        this.ticketCode = ticketCode;
     }
 
-    public void setCreatedAt(Date createdAt) {
-        this.createdAt = createdAt;
+    public Timestamp getProcessedAt() {
+        return processedAt;
     }
 
-    public String getSupplierName() {
-        return supplierName;
+    public void setProcessedAt(Timestamp processedAt) {
+        this.processedAt = processedAt;
     }
 
-    public void setSupplierName(String supplierName) {
-        this.supplierName = supplierName;
+    public String getCreatorName() {
+        return creatorName;
     }
 
-    public int getItems() {
-        return items;
+    public void setCreatorName(String creatorName) {
+        this.creatorName = creatorName;
     }
 
-    public void setItems(int items) {
-        this.items = items;
+    public String getConfirmedBy() {
+        return confirmedBy;
     }
 
-    public double getValue() {
-        return value;
+    public void setConfirmedBy(String confirmedBy) {
+        this.confirmedBy = confirmedBy;
     }
 
-    public void setValue(double value) {
-        this.value = value;
+    public String getPartnerName() {
+        return partnerName;
+    }
+
+    public void setPartnerName(String partnerName) {
+        this.partnerName = partnerName;
     }
 
     public String getStatus() {
