@@ -146,4 +146,118 @@ public class PartnerDAO {
             e.printStackTrace();
         }
     }
+
+    public List<Partners> searchSuppliers(String keyword, String status) {
+        List<Partners> list = new ArrayList<>();
+        StringBuilder sql = new StringBuilder("SELECT * FROM partners WHERE type = 1");
+
+        if (keyword != null && !keyword.trim().isEmpty()) {
+            sql.append(" AND partner_name LIKE ?");
+        }
+        if (status != null && !status.equals("all") && !status.isEmpty()) {
+            sql.append(" AND status = ?");
+        }
+
+        try (PreparedStatement ps = getConnection().prepareStatement(sql.toString())) {
+            int paramIndex = 1;
+
+            if (keyword != null && !keyword.trim().isEmpty()) {
+                ps.setString(paramIndex++, "%" + keyword.trim() + "%");
+            }
+            if (status != null && !status.equals("all") && !status.isEmpty()) {
+                ps.setString(paramIndex++, status);
+            }
+
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                Partners p = new Partners();
+                p.setPartnerId(rs.getInt("partner_id"));
+                p.setType(rs.getInt("type"));
+                p.setPartnerName(rs.getString("partner_name"));
+                p.setPartnerEmail(rs.getString("partner_email"));
+                p.setPartnerPhone(rs.getString("partner_phone"));
+                p.setStatus(rs.getString("status"));
+                list.add(p);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
+
+    public void updatePartner(Partners p) {
+        String sql = "UPDATE partners SET partner_name = ?, partner_email = ?, partner_phone = ? WHERE partner_id = ?";
+
+        try (PreparedStatement ps = getConnection().prepareStatement(sql)) {
+            ps.setString(1, p.getPartnerName());
+            ps.setString(2, p.getPartnerEmail());
+            ps.setString(3, p.getPartnerPhone());
+            ps.setInt(4, p.getPartnerId());
+
+            ps.executeUpdate();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public List<Partners> searchCustomers(String keyword, String status) {
+        List<Partners> list = new ArrayList<>();
+        StringBuilder sql = new StringBuilder("SELECT * FROM partners WHERE type = 2");
+
+        if (keyword != null && !keyword.trim().isEmpty()) {
+            sql.append(" AND partner_name LIKE ?");
+        }
+        if (status != null && !status.equals("all") && !status.isEmpty()) {
+            sql.append(" AND status = ?");
+        }
+
+        try (PreparedStatement ps = getConnection().prepareStatement(sql.toString())) {
+            int paramIndex = 1;
+
+            if (keyword != null && !keyword.trim().isEmpty()) {
+                ps.setString(paramIndex++, "%" + keyword.trim() + "%");
+            }
+            if (status != null && !status.equals("all") && !status.isEmpty()) {
+                ps.setString(paramIndex++, status);
+            }
+
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                Partners p = new Partners();
+                p.setPartnerId(rs.getInt("partner_id"));
+                p.setType(rs.getInt("type"));
+                p.setPartnerName(rs.getString("partner_name"));
+                p.setPartnerEmail(rs.getString("partner_email"));
+                p.setPartnerPhone(rs.getString("partner_phone"));
+                p.setStatus(rs.getString("status"));
+                list.add(p);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
+
+    public List<Partners> getAllCustomers() {
+        List<Partners> list = new ArrayList<>();
+        String sql = "SELECT * FROM partners WHERE type = 2";
+
+        try (PreparedStatement ps = getConnection().prepareStatement(sql)) {
+
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                Partners p = new Partners();
+                p.setPartnerId(rs.getInt("partner_id"));
+                p.setType(rs.getInt("type"));
+                p.setPartnerName(rs.getString("partner_name"));
+                p.setPartnerEmail(rs.getString("partner_email"));
+                p.setPartnerPhone(rs.getString("partner_phone"));
+                p.setStatus(rs.getString("status"));
+                list.add(p);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
 }

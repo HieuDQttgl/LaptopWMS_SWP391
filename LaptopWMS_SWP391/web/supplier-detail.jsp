@@ -192,6 +192,7 @@
 
             <div class="actions">
                 <a href="supplier-list" class="btn-back">← Back to List</a>
+                <a href="edit-supplier?id=${supplier.partnerId}" class="btn-edit">Edit Supplier</a>
             </div>
         </div>
 

@@ -19,17 +19,17 @@ import java.util.List;
  *
  * @author Admin
  */
-@WebServlet(name = "CustomerListServlet", urlPatterns = {"/customer-list"})
+@WebServlet(name = "CustomerListServlet", urlPatterns = { "/customer-list" })
 public class CustomerListServlet extends HttpServlet {
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
      * methods.
      *
-     * @param request servlet request
+     * @param request  servlet request
      * @param response servlet response
      * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
+     * @throws IOException      if an I/O error occurs
      */
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -48,22 +48,33 @@ public class CustomerListServlet extends HttpServlet {
         }
     }
 
-    // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
+    // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the
+    // + sign on the left to edit the code.">
     /**
      * Handles the HTTP <code>GET</code> method.
      *
-     * @param request servlet request
+     * @param request  servlet request
      * @param response servlet response
      * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
+     * @throws IOException      if an I/O error occurs
      */
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-       PartnerDAO dao = new PartnerDAO();
+        String keyword = request.getParameter("keyword");
+        String status = request.getParameter("status");
 
-        List<Partners> list = dao.getCustomers();
-        
+        PartnerDAO dao = new PartnerDAO();
+        List<Partners> list;
+
+        // If filters are provided, use search method
+        if ((keyword != null && !keyword.trim().isEmpty()) ||
+                (status != null && !status.equals("all") && !status.isEmpty())) {
+            list = dao.searchCustomers(keyword, status);
+        } else {
+            list = dao.getAllCustomers();
+        }
+
         request.setAttribute("customerList", list);
         request.getRequestDispatcher("customer-list.jsp").forward(request, response);
     }
@@ -71,10 +82,10 @@ public class CustomerListServlet extends HttpServlet {
     /**
      * Handles the HTTP <code>POST</code> method.
      *
-     * @param request servlet request
+     * @param request  servlet request
      * @param response servlet response
      * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
+     * @throws IOException      if an I/O error occurs
      */
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)

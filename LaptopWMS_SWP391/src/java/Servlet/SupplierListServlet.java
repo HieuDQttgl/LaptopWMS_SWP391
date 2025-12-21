@@ -61,9 +61,19 @@ public class SupplierListServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        PartnerDAO dao = new PartnerDAO();
+        String keyword = request.getParameter("keyword");
+        String status = request.getParameter("status");
 
-        List<Partners> list = dao.getAllSuppliers();
+        PartnerDAO dao = new PartnerDAO();
+        List<Partners> list;
+
+        // If filters are provided, use search method
+        if ((keyword != null && !keyword.trim().isEmpty()) ||
+                (status != null && !status.equals("all") && !status.isEmpty())) {
+            list = dao.searchSuppliers(keyword, status);
+        } else {
+            list = dao.getAllSuppliers();
+        }
 
         request.setAttribute("supplierList", list);
         request.getRequestDispatcher("supplier-list.jsp").forward(request, response);

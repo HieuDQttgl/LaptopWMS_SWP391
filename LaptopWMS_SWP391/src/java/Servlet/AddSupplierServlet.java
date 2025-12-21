@@ -80,10 +80,40 @@ public class AddSupplierServlet extends HttpServlet {
         String email = request.getParameter("email");
         String phone = request.getParameter("phone");
 
+        // Server-side validation
+        StringBuilder errorMsg = new StringBuilder();
+
+        // Validate name (required)
+        if (name == null || name.trim().isEmpty()) {
+            errorMsg.append("Supplier name is required. ");
+        }
+
+        // Validate email format (if provided)
+        if (email != null && !email.trim().isEmpty()) {
+            if (!email.matches("^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$")) {
+                errorMsg.append("Invalid email format. ");
+            }
+        }
+
+        // Validate phone format (if provided)
+        if (phone != null && !phone.trim().isEmpty()) {
+            String cleanPhone = phone.replaceAll("[\\s\\-]", "");
+            if (!cleanPhone.matches("^[0-9]{10,15}$")) {
+                errorMsg.append("Phone number must be 10-15 digits. ");
+            }
+        }
+
+        // If validation fails, return to form with error
+        if (errorMsg.length() > 0) {
+            request.setAttribute("error", errorMsg.toString());
+            request.getRequestDispatcher("add-supplier.jsp").forward(request, response);
+            return;
+        }
+
         Partners p = new Partners();
-        p.setPartnerName(name);
-        p.setPartnerEmail(email);
-        p.setPartnerPhone(phone);
+        p.setPartnerName(name.trim());
+        p.setPartnerEmail(email != null ? email.trim() : "");
+        p.setPartnerPhone(phone != null ? phone.trim() : "");
 
         p.setType(1); // 1 = supplier
         p.setStatus("active");

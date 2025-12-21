@@ -5,7 +5,7 @@
 <html>
 
     <head>
-        <title>Add New Supplier - WMS</title>
+        <title>Edit Supplier - WMS</title>
 
         <style>
             body {
@@ -26,15 +26,26 @@
             }
 
             .card-header {
-                background-color: #2ecc71;
+                background-color: #3498db;
                 color: white;
                 padding: 20px 25px;
                 border-radius: 10px 10px 0 0;
                 margin: -30px -30px 25px -30px;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
             }
 
             .card-header h2 {
                 margin: 0;
+                font-weight: 600;
+            }
+
+            .id-badge {
+                background: rgba(255, 255, 255, 0.2);
+                padding: 6px 14px;
+                border-radius: 20px;
+                font-size: 13px;
                 font-weight: 600;
             }
 
@@ -107,7 +118,7 @@
             }
 
             .btn-save {
-                background-color: #2ecc71;
+                background-color: #3498db;
                 color: white;
                 padding: 12px 24px;
                 border-radius: 6px;
@@ -118,7 +129,7 @@
             }
 
             .btn-save:hover {
-                background-color: #27ae60;
+                background-color: #2980b9;
             }
 
             .required::after {
@@ -138,6 +149,12 @@
                 color: #e74c3c;
                 border: 1px solid #e74c3c;
             }
+
+            .alert-success {
+                background-color: #e6f7ed;
+                color: #27ae60;
+                border: 1px solid #27ae60;
+            }
         </style>
     </head>
 
@@ -146,39 +163,45 @@
 
         <div class="container">
             <div class="card-header">
-                <h2>Add New Supplier</h2>
+                <h2>Edit Supplier</h2>
+                <span class="id-badge">ID: ${supplier.partnerId}</span>
             </div>
 
             <c:if test="${not empty error}">
                 <div class="alert alert-error">${error}</div>
             </c:if>
 
-            <form action="add-supplier" method="POST" onsubmit="return validateForm()">
+            <c:if test="${not empty success}">
+                <div class="alert alert-success">${success}</div>
+            </c:if>
+
+            <form action="edit-supplier" method="POST" onsubmit="return validateForm()">
+                <input type="hidden" name="id" value="${supplier.partnerId}">
+
                 <div class="form-group">
                     <label class="required">Full Name</label>
-                    <input type="text" id="name" name="name" placeholder="Enter supplier name" value="${param.name}"
-                           required>
+                    <input type="text" id="name" name="name" value="${supplier.partnerName}"
+                           placeholder="Enter supplier name" required>
                     <div id="nameError" class="error-message">Supplier name is required</div>
                 </div>
 
                 <div class="form-group">
                     <label>Email</label>
-                    <input type="email" id="email" name="email" placeholder="Enter email address"
-                           value="${param.email}">
-                    <div id="emailError" class="error-message">Please enter a valid email address</div>
+                    <input type="email" id="email" name="email" value="${supplier.partnerEmail}"
+                           placeholder="Enter email address">
+                    <div id="emailError" class="error-message">Please enter a valid email</div>
                 </div>
 
                 <div class="form-group">
                     <label>Phone Number</label>
-                    <input type="text" id="phone" name="phone" placeholder="Enter phone number"
-                           value="${param.phone}">
-                    <div id="phoneError" class="error-message">Please enter a valid phone number (10-15 digits)
-                    </div>
+                    <input type="text" id="phone" name="phone" value="${supplier.partnerPhone}"
+                           placeholder="Enter phone number">
+                    <div id="phoneError" class="error-message">Please enter a valid phone number</div>
                 </div>
 
                 <div class="actions">
                     <a href="supplier-list" class="btn-cancel">Cancel</a>
-                    <button type="submit" class="btn-save">Save Supplier</button>
+                    <button type="submit" class="btn-save">Save Changes</button>
                 </div>
             </form>
         </div>
@@ -191,7 +214,7 @@
                 document.querySelectorAll('.error-message').forEach(el => el.style.display = 'none');
                 document.querySelectorAll('.form-group input').forEach(el => el.classList.remove('error'));
 
-                // Validate name (required)
+                // Validate name
                 const name = document.getElementById('name').value.trim();
                 if (name === '') {
                     document.getElementById('nameError').style.display = 'block';
