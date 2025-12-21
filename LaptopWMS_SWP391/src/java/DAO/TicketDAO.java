@@ -1,6 +1,7 @@
 package DAO;
 
 import static DAO.DBContext.getConnection;
+import DTO.ExportReportDTO;
 import DTO.ImportReportDTO;
 import Model.Ticket;
 import Model.TicketItem;
@@ -585,8 +586,8 @@ public class TicketDAO extends DBContext {
         return list;
     }
 
-    public List<ImportReportDTO> getExportReport(String from, String to, String partnerId, String status) {
-        List<ImportReportDTO> list = new ArrayList<>();
+    public List<ExportReportDTO> getExportReport(String from, String to, String partnerId, String status) {
+        List<ExportReportDTO> list = new ArrayList<>();
 
         StringBuilder sql = new StringBuilder(
                 "SELECT t.ticket_code, t.processed_at, t.status, "
@@ -619,7 +620,7 @@ public class TicketDAO extends DBContext {
         try (Connection conn = DBContext.getConnection(); PreparedStatement ps = conn.prepareStatement(sql.toString()); ResultSet rs = ps.executeQuery()) {
 
             while (rs.next()) {
-                ImportReportDTO dto = new ImportReportDTO();
+                ExportReportDTO dto = new ExportReportDTO();
                 dto.setTicketCode(rs.getString("ticket_code"));
                 dto.setProcessedAt(rs.getTimestamp("processed_at"));
                 dto.setCreatorName(rs.getString("creator_name"));
