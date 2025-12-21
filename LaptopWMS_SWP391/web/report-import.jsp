@@ -285,7 +285,6 @@
                                 <th>Assigned By</th>
                                 <th>Supplier</th>
                                 <th>Status</th>
-                                <th style="text-align: center">Action</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -301,14 +300,11 @@
                                             ${item.status}
                                         </span>
                                     </td>
-                                    <td style="text-align: center">
-                                        <a href="ticket-detail?code=${item.ticketCode}" style="color: var(--primary); font-weight: 600; text-decoration: none;">View Detail</a>
-                                    </td>
                                 </tr>
                             </c:forEach>
                             <c:if test="${empty importData}">
                                 <tr>
-                                    <td colspan="7" style="text-align: center; padding: 40px; color: var(--text-muted);">
+                                    <td colspan="6" style="text-align: center; padding: 40px; color: var(--text-muted);">
                                         No transaction data found for the selected period.
                                     </td>
                                 </tr>
