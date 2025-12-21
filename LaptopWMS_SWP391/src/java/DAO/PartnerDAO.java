@@ -65,6 +65,30 @@ public class PartnerDAO {
         return list;
     }
 
+    public List<Partners> getAllSuppliers() {
+        List<Partners> list = new ArrayList<>();
+        String sql = "SELECT * FROM partners WHERE type = 1";
+
+        try (PreparedStatement ps = getConnection().prepareStatement(sql)) {
+
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                Partners p = new Partners();
+                p.setPartnerId(rs.getInt("partner_id"));
+                p.setType(rs.getInt("type"));
+                p.setPartnerName(rs.getString("partner_name"));
+                p.setPartnerEmail(rs.getString("partner_email"));
+                p.setPartnerPhone(rs.getString("partner_phone"));
+                p.setStatus(rs.getString("status"));
+
+                list.add(p);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
+
     public Partners getPartnerById(int id) {
         String sql = "SELECT * FROM partners WHERE partner_id = ?";
         try (PreparedStatement ps = getConnection().prepareStatement(sql)) {
