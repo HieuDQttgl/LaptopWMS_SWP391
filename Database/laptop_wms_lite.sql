@@ -1,4 +1,4 @@
-CREATE DATABASE  IF NOT EXISTS `laptop_wms_lite` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci */ /*!80016 DEFAULT ENCRYPTION='N' */;
+CREATE DATABASE  IF NOT EXISTS `laptop_wms_lite` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci */ /*!80016 DEFAULT ENCRYPTION='N' */;
 USE `laptop_wms_lite`;
 -- MySQL dump 10.13  Distrib 8.0.43, for Win64 (x86_64)
 --
@@ -27,7 +27,7 @@ DROP TABLE IF EXISTS `announcements`;
 CREATE TABLE `announcements` (
   `announcement_id` int NOT NULL AUTO_INCREMENT,
   `user_id` int NOT NULL,
-  `content` text NOT NULL,
+  `content` text COLLATE utf8mb4_general_ci NOT NULL,
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`announcement_id`),
   KEY `user_id` (`user_id`),
@@ -55,9 +55,9 @@ DROP TABLE IF EXISTS `notifications`;
 CREATE TABLE `notifications` (
   `notification_id` int NOT NULL AUTO_INCREMENT,
   `user_id` int NOT NULL,
-  `title` varchar(255) NOT NULL,
-  `message` text NOT NULL,
-  `link` varchar(255) DEFAULT NULL,
+  `title` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
+  `message` text COLLATE utf8mb4_general_ci NOT NULL,
+  `link` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
   `is_read` tinyint(1) DEFAULT '0',
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`notification_id`),
@@ -91,7 +91,7 @@ CREATE TABLE `partners` (
   `partner_phone` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `status` enum('active','inactive') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT 'active',
   PRIMARY KEY (`partner_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -100,11 +100,7 @@ CREATE TABLE `partners` (
 
 LOCK TABLES `partners` WRITE;
 /*!40000 ALTER TABLE `partners` DISABLE KEYS */;
-INSERT INTO partners (type, partner_name, partner_email, partner_phone, status) VALUES
-(1, 'Dell Supplier', 'supplier@dell.com', '0123456789', 'active'),
-(1, 'Apple Supplier', 'supplier@apple.com', '0987654321', 'active'),
-(2, 'TechStore Customer', 'order@techstore.vn', '0111222333', 'active'),
-(2, 'Laptop Retail', 'buy@laptopretail.vn', '0444555666', 'active');
+INSERT INTO `partners` VALUES (8,1,'Dell Supplier','supplier@dell.com','0123456789','active'),(9,1,'Apple Supplier','supplier@apple.com','0987654321','active'),(10,2,'TechStore Customer','order@techstore.vn','0111222333','active'),(11,2,'Laptop Retail','buy@laptopretail.vn','0444555666','active');
 /*!40000 ALTER TABLE `partners` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -117,11 +113,11 @@ DROP TABLE IF EXISTS `permissions`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `permissions` (
   `permission_id` int NOT NULL AUTO_INCREMENT,
-  `permission_url` varchar(100) NOT NULL,
-  `permission_description` text,
+  `permission_url` varchar(100) COLLATE utf8mb4_general_ci NOT NULL,
+  `permission_description` text COLLATE utf8mb4_general_ci,
   PRIMARY KEY (`permission_id`),
   UNIQUE KEY `permission_url` (`permission_url`)
-) ENGINE=InnoDB AUTO_INCREMENT=28 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=42 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -130,7 +126,7 @@ CREATE TABLE `permissions` (
 
 LOCK TABLES `permissions` WRITE;
 /*!40000 ALTER TABLE `permissions` DISABLE KEYS */;
-INSERT INTO `permissions` VALUES (1,'/dashboard','View Dashboard'),(2,'/ticket-list','View Tickets'),(3,'/create-ticket','Create New Ticket'),(4,'/approve-ticket','Approve/Reject Tickets'),(5,'/report-inventory','View Balance Report'),(6,'/user-list','View User List'),(7,'/user-detail','View/Edit User Details'),(8,'/admin-reset-password','Admin Reset User Password'),(9,'/product-list','View Product List'),(10,'/add-product','Add New Product'),(11,'/edit-product','Edit Product'),(12,'/toggleProduct','Toggle Product Status'),(13,'/add-product-detail','Add Product Configuration'),(14,'/edit-product-detail','Edit Product Configuration'),(15,'/role','View Roles'),(16,'/role-list','View Role List'),(17,'/add-role','Add New Role'),(18,'/edit-role','Edit Role'),(19,'/role-permission','Manage Role Permissions'),(20,'/ticket-detail','View Ticket Details'),(21,'/process-ticket','Process/Approve Tickets'),(22,'/profile','View/Edit Own Profile'),(23,'/change-password','Change Own Password'),(24,'/notifications','View Notifications'),(25,'/add-announcement','Post Team Announcements'),(26,'/team-board','View Team Board'),(27,'/manage-announcement','Edit/Delete Announcements');
+INSERT INTO `permissions` VALUES (1,'/dashboard','View Dashboard'),(2,'/ticket-list','View Tickets'),(3,'/create-ticket','Create New Ticket'),(4,'/approve-ticket','Approve/Reject Tickets'),(5,'/report-inventory','View Balance Report'),(6,'/user-list','View User List'),(7,'/user-detail','View/Edit User Details'),(8,'/admin-reset-password','Admin Reset User Password'),(9,'/product-list','View Product List'),(10,'/add-product','Add New Product'),(11,'/edit-product','Edit Product'),(12,'/toggleProduct','Toggle Product Status'),(13,'/add-product-detail','Add Product Configuration'),(14,'/edit-product-detail','Edit Product Configuration'),(15,'/role','View Roles'),(16,'/role-list','View Role List'),(17,'/add-role','Add New Role'),(18,'/edit-role','Edit Role'),(19,'/role-permission','Manage Role Permissions'),(20,'/ticket-detail','View Ticket Details'),(21,'/process-ticket','Process/Approve Tickets'),(22,'/profile','View/Edit Own Profile'),(23,'/change-password','Change Own Password'),(24,'/notifications','View Notifications'),(25,'/add-announcement','Post Team Announcements'),(26,'/team-board','View Team Board'),(27,'/manage-announcement','Edit/Delete Announcements'),(28,'/report-import','View Import Reports'),(29,'/report-export','View Export Reports'),(30,'/customer-list','View Customer List'),(31,'/add-customer','Add New Customer'),(32,'/customer-detail','View Customer Details'),(33,'/customer-status','Block/Unblock Customer'),(34,'/supplier-list','View Supplier List'),(35,'/supplier-detail','View Supplier Details'),(36,'/add-supplier','Add New Supplier'),(37,'/supplier-status','Toggle Supplier Status');
 /*!40000 ALTER TABLE `permissions` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -144,11 +140,11 @@ DROP TABLE IF EXISTS `product_details`;
 CREATE TABLE `product_details` (
   `product_detail_id` int NOT NULL AUTO_INCREMENT,
   `product_id` int NOT NULL,
-  `cpu` varchar(100) DEFAULT NULL,
-  `ram` varchar(50) DEFAULT NULL,
-  `storage` varchar(50) DEFAULT NULL,
-  `gpu` varchar(100) DEFAULT NULL,
-  `unit` varchar(20) DEFAULT 'piece',
+  `cpu` varchar(100) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `ram` varchar(50) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `storage` varchar(50) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `gpu` varchar(100) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `unit` varchar(20) COLLATE utf8mb4_general_ci DEFAULT 'piece',
   `quantity` int DEFAULT '0',
   PRIMARY KEY (`product_detail_id`),
   KEY `product_id` (`product_id`),
@@ -175,9 +171,9 @@ DROP TABLE IF EXISTS `products`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `products` (
   `product_id` int NOT NULL AUTO_INCREMENT,
-  `product_name` varchar(255) NOT NULL,
-  `brand` varchar(50) DEFAULT NULL,
-  `category` varchar(50) DEFAULT 'Laptop',
+  `product_name` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
+  `brand` varchar(50) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `category` varchar(50) COLLATE utf8mb4_general_ci DEFAULT 'Laptop',
   `status` tinyint(1) DEFAULT '1',
   PRIMARY KEY (`product_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=52 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
@@ -209,7 +205,7 @@ CREATE TABLE `role_permissions` (
   KEY `permission_id` (`permission_id`),
   CONSTRAINT `role_permissions_ibfk_1` FOREIGN KEY (`role_id`) REFERENCES `roles` (`role_id`) ON DELETE CASCADE,
   CONSTRAINT `role_permissions_ibfk_2` FOREIGN KEY (`permission_id`) REFERENCES `permissions` (`permission_id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=63 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=89 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -218,7 +214,7 @@ CREATE TABLE `role_permissions` (
 
 LOCK TABLES `role_permissions` WRITE;
 /*!40000 ALTER TABLE `role_permissions` DISABLE KEYS */;
-INSERT INTO `role_permissions` VALUES (1,1,4),(2,1,3),(3,1,1),(4,1,5),(5,1,2),(8,2,1),(9,2,2),(10,2,3),(11,3,1),(12,3,2),(13,3,4),(14,1,6),(15,1,7),(16,1,8),(17,1,9),(18,1,10),(19,1,11),(20,1,12),(21,1,13),(22,1,14),(23,1,15),(24,1,16),(25,1,17),(26,1,18),(27,1,19),(28,1,20),(29,1,21),(30,1,22),(31,1,23),(32,1,24),(33,2,9),(34,2,10),(35,2,11),(36,2,13),(37,2,14),(38,2,20),(39,2,22),(40,2,23),(41,2,24),(42,3,9),(43,3,20),(44,3,21),(45,3,22),(46,3,23),(47,3,24),(48,1,5),(49,2,5),(50,3,5),(51,1,14),(52,3,14),(53,1,25),(54,2,25),(55,3,25),(56,1,26),(57,1,27),(58,2,26),(59,2,27),(60,3,26),(61,3,27);
+INSERT INTO `role_permissions` VALUES (1,1,4),(2,1,3),(3,1,1),(4,1,5),(5,1,2),(8,2,1),(9,2,2),(10,2,3),(11,3,1),(12,3,2),(13,3,4),(14,1,6),(15,1,7),(16,1,8),(17,1,9),(18,1,10),(19,1,11),(20,1,12),(21,1,13),(22,1,14),(23,1,15),(24,1,16),(25,1,17),(26,1,18),(27,1,19),(28,1,20),(29,1,21),(30,1,22),(31,1,23),(32,1,24),(33,2,9),(34,2,10),(35,2,11),(36,2,13),(37,2,14),(38,2,20),(39,2,22),(40,2,23),(41,2,24),(42,3,9),(43,3,20),(44,3,21),(45,3,22),(46,3,23),(47,3,24),(48,1,5),(49,2,5),(50,3,5),(51,1,14),(52,3,14),(53,1,25),(54,2,25),(55,3,25),(56,1,26),(57,1,27),(58,2,26),(59,2,27),(60,3,26),(61,3,27),(63,1,30),(64,1,29),(65,1,28),(66,2,30),(67,2,29),(68,2,28),(69,1,31),(70,1,32),(71,1,33),(72,2,31),(73,2,32),(74,2,33),(75,1,36),(76,1,35),(77,1,34),(78,1,37),(82,2,36),(83,2,35),(84,2,34),(85,2,37);
 /*!40000 ALTER TABLE `role_permissions` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -231,8 +227,8 @@ DROP TABLE IF EXISTS `roles`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `roles` (
   `role_id` int NOT NULL AUTO_INCREMENT,
-  `role_name` varchar(50) NOT NULL,
-  `role_description` text,
+  `role_name` varchar(50) COLLATE utf8mb4_general_ci NOT NULL,
+  `role_description` text COLLATE utf8mb4_general_ci,
   PRIMARY KEY (`role_id`),
   UNIQUE KEY `role_name` (`role_name`)
 ) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
@@ -261,7 +257,7 @@ CREATE TABLE `stock_ledger` (
   `ticket_id` int NOT NULL,
   `quantity_change` int NOT NULL,
   `balance_after` int NOT NULL,
-  `type` enum('IMPORT','EXPORT') NOT NULL,
+  `type` enum('IMPORT','EXPORT') COLLATE utf8mb4_general_ci NOT NULL,
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`ledger_id`),
   KEY `product_detail_id` (`product_detail_id`),
@@ -320,16 +316,16 @@ DROP TABLE IF EXISTS `tickets`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `tickets` (
   `ticket_id` int NOT NULL AUTO_INCREMENT,
-  `ticket_code` varchar(20) DEFAULT NULL,
-  `type` enum('IMPORT','EXPORT') NOT NULL,
-  `title` varchar(150) DEFAULT NULL,
-  `description` text,
-  `status` enum('PENDING','APPROVED','REJECTED') DEFAULT 'PENDING',
+  `ticket_code` varchar(20) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `type` enum('IMPORT','EXPORT') COLLATE utf8mb4_general_ci NOT NULL,
+  `title` varchar(150) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `description` text COLLATE utf8mb4_general_ci,
+  `status` enum('PENDING','APPROVED','REJECTED') COLLATE utf8mb4_general_ci DEFAULT 'PENDING',
   `created_by` int NOT NULL,
   `assigned_keeper` int DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   `processed_at` timestamp NULL DEFAULT NULL,
-  `keeper_note` text,
+  `keeper_note` text COLLATE utf8mb4_general_ci,
   `partner_id` int DEFAULT NULL,
   PRIMARY KEY (`ticket_id`),
   UNIQUE KEY `ticket_code` (`ticket_code`),
@@ -361,12 +357,12 @@ DROP TABLE IF EXISTS `users`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `users` (
   `user_id` int NOT NULL AUTO_INCREMENT,
-  `username` varchar(100) NOT NULL,
-  `password` varchar(255) NOT NULL,
-  `full_name` varchar(255) NOT NULL,
-  `email` varchar(255) NOT NULL,
+  `username` varchar(100) COLLATE utf8mb4_general_ci NOT NULL,
+  `password` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
+  `full_name` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
+  `email` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
   `role_id` int NOT NULL,
-  `status` enum('active','inactive') DEFAULT 'active',
+  `status` enum('active','inactive') COLLATE utf8mb4_general_ci DEFAULT 'active',
   `password_changed_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`user_id`),
   UNIQUE KEY `username` (`username`),
@@ -403,4 +399,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-12-21  2:15:38
+-- Dump completed on 2025-12-21 10:29:31
