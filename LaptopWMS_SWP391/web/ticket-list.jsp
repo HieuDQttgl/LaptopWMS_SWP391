@@ -227,6 +227,53 @@
                 display: flex;
                 gap: 8px;
             }
+            .pagination {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                gap: 5px;
+                margin-top: 25px;
+                padding-bottom: 30px;
+            }
+
+            .pagination a {
+                color: #475569;
+                padding: 8px 16px;
+                text-decoration: none;
+                background: white;
+                border: 1px solid #e2e8f0;
+                border-radius: 8px;
+                font-weight: 600;
+                transition: all 0.3s;
+            }
+
+            .pagination a.active {
+                background: #667eea;
+                color: white;
+                border-color: #667eea;
+            }
+
+            .pagination a:hover:not(.active) {
+                background: #f1f5f9;
+            }
+
+            .btn-reset {
+                background: #94a3b8;
+                color: white;
+                text-decoration: none;
+                padding: 10px 16px;
+                border-radius: 8px;
+                font-size: 14px;
+                font-weight: 500;
+                transition: all 0.3s;
+                display: inline-flex;
+                align-items: center;
+            }
+
+            .btn-reset:hover {
+                background: #64748b;
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            }
         </style>
     </head>
 
@@ -254,30 +301,42 @@
                 }
             %>
 
-            <form method="get" class="filters">
+            <form method="get" action="ticket-list" class="filters" style="display: flex; gap: 15px; align-items: flex-end; flex-wrap: wrap;">
+
+                <div class="filter-group">
+                    <label>Search:</label>
+                    <div style="display: flex; gap: 5px;">
+                        <input type="text" name="partnerSearch" 
+                               placeholder="Partner name..." 
+                               value="${currentPartnerSearch}"
+                               style="padding: 8px 12px; border: 2px solid #e2e8f0; border-radius: 8px; font-size: 14px; outline: none;">
+                        <button type="submit" style="padding: 8px 15px; background: #667eea; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600;">
+                            Search
+                        </button>
+                    </div>
+                </div>
+
                 <div class="filter-group">
                     <label>Status:</label>
                     <select name="status" onchange="this.form.submit()">
-                        <option value="all" ${currentStatus==null || currentStatus=='all'
-                                              ? 'selected' : '' }>All</option>
-                        <option value="PENDING" ${currentStatus=='PENDING' ? 'selected' : ''
-                                }>Pending</option>
-                        <option value="COMPLETED" ${currentStatus=='COMPLETED' ? 'selected'
-                                                    : '' }>Completed</option>
-                        <option value="CANCELLED" ${currentStatus=='CANCELLED' ? 'selected'
-                                                    : '' }>Cancelled</option>
+                        <option value="all" ${currentStatus==null || currentStatus=='all' ? 'selected' : '' }>All</option>
+                        <option value="PENDING" ${currentStatus=='PENDING' ? 'selected' : '' }>Pending</option>
+                        <option value="COMPLETED" ${currentStatus=='COMPLETED' ? 'selected' : '' }>Completed</option>
+                        <option value="CANCELLED" ${currentStatus=='CANCELLED' ? 'selected' : '' }>Cancelled</option>
                     </select>
                 </div>
+
                 <div class="filter-group">
                     <label>Type:</label>
                     <select name="type" onchange="this.form.submit()">
-                        <option value="all" ${currentType==null || currentType=='all'
-                                              ? 'selected' : '' }>All</option>
-                        <option value="IMPORT" ${currentType=='IMPORT' ? 'selected' : '' }>
-                            Import</option>
-                        <option value="EXPORT" ${currentType=='EXPORT' ? 'selected' : '' }>
-                            Export</option>
+                        <option value="all" ${currentType==null || currentType=='all' ? 'selected' : '' }>All</option>
+                        <option value="IMPORT" ${currentType=='IMPORT' ? 'selected' : '' }>Import</option>
+                        <option value="EXPORT" ${currentType=='EXPORT' ? 'selected' : '' }>Export</option>
                     </select>
+                </div>
+
+                <div class="filter-group">
+                    <a href="ticket-list" style="text-decoration: none; padding: 8px 15px; background: #94a3b8; color: white; border-radius: 8px; font-size: 14px; font-weight: 500;">Reset</a>
                 </div>
             </form>
 
@@ -369,6 +428,35 @@
                     </tbody>
                 </table>
             </div>
+            <%
+                Integer totalPages = (Integer) request.getAttribute("totalPages");
+                Integer currentPage = (Integer) request.getAttribute("currentPage");
+                String currentStatus = (String) request.getAttribute("currentStatus");
+                String currentType = (String) request.getAttribute("currentType");
+                String currentPartnerSearch = (String) request.getAttribute("currentPartnerSearch");
+                if (currentPartnerSearch == null) {
+                    currentPartnerSearch = "";
+                }
+
+                if (totalPages != null && totalPages > 1) {
+            %>
+            <div class="pagination">
+                <% if (currentPage > 1) {%>
+                <a href="?page=<%= currentPage - 1%>&status=<%= currentStatus%>&type=<%= currentType%>&partnerSearch=<%= currentPartnerSearch%>">«</a>
+                <% } %>
+
+                <% for (int i = 1; i <= totalPages; i++) {%>
+                <a href="?page=<%= i%>&status=<%= currentStatus%>&type=<%= currentType%>&partnerSearch=<%= currentPartnerSearch%>" 
+                   class="<%= (currentPage == i) ? "active" : ""%>">
+                    <%= i%>
+                </a>
+                <% } %>
+
+                <% if (currentPage < totalPages) {%>
+                <a href="?page=<%= currentPage + 1%>&status=<%= currentStatus%>&type=<%= currentType%>&partnerSearch=<%= currentPartnerSearch%>">»</a>
+                <% } %>
+            </div>
+            <% }%>
         </div>
     </body>
 

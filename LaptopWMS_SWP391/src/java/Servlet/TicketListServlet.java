@@ -4,6 +4,7 @@ import DAO.TicketDAO;
 import Model.Ticket;
 import Model.Users;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -12,9 +13,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
-/**
- * Servlet for listing all tickets
- */
 @WebServlet(name = "TicketListServlet", urlPatterns = { "/ticket-list" })
 public class TicketListServlet extends HttpServlet {
 
@@ -32,24 +30,54 @@ public class TicketListServlet extends HttpServlet {
             return;
         }
 
-        // Get filter parameters
         String status = request.getParameter("status");
         String type = request.getParameter("type");
+        String partnerSearch = request.getParameter("partnerSearch");
 
-        List<Ticket> tickets;
+        if (status == null) status = "all";
+        if (type == null) type = "all";
+        if (partnerSearch == null) partnerSearch = "";
 
-        // If keeper, show only assigned tickets
+        List<Ticket> fullList;
         if (currentUser.getRoleId() == 3) {
-            tickets = ticketDAO.getTicketsForKeeper(currentUser.getUserId(), status, type);
+            fullList = ticketDAO.getTicketsForKeeper(currentUser.getUserId(), status, type, partnerSearch);
         } else {
-            tickets = ticketDAO.getAllTickets(status, type);
+            fullList = ticketDAO.getAllTickets(status, type, partnerSearch);
         }
 
-        request.setAttribute("tickets", tickets);
+        int page = 1;
+        int pageSize = 5;
+        if (request.getParameter("page") != null) {
+            try {
+                page = Integer.parseInt(request.getParameter("page"));
+            } catch (NumberFormatException e) {
+                page = 1;
+            }
+        }
+
+        int totalItems = fullList.size();
+        int totalPages = (int) Math.ceil((double) totalItems / pageSize);
+
+        if (page < 1) page = 1;
+        if (page > totalPages && totalPages > 0) page = totalPages;
+
+        int start = (page - 1) * pageSize;
+        int end = Math.min(start + pageSize, totalItems);
+
+        List<Ticket> pageList = new ArrayList<>();
+        if (totalItems > 0 && start < totalItems) {
+            pageList = fullList.subList(start, end);
+        }
+
+        request.setAttribute("tickets", pageList);
+        request.setAttribute("totalPages", totalPages);
+        request.setAttribute("currentPage", page);
+        request.setAttribute("totalItems", totalItems);
+        
         request.setAttribute("currentStatus", status);
         request.setAttribute("currentType", type);
+        request.setAttribute("currentPartnerSearch", partnerSearch);
 
-        // Check for success message
         String successMessage = (String) session.getAttribute("successMessage");
         if (successMessage != null) {
             request.setAttribute("successMessage", successMessage);
@@ -57,5 +85,11 @@ public class TicketListServlet extends HttpServlet {
         }
 
         request.getRequestDispatcher("/ticket-list.jsp").forward(request, response);
+    }
+
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        doGet(request, response);
     }
 }

@@ -130,18 +130,18 @@ public class TicketDAO extends DBContext {
     /**
      * Get all tickets with optional filters
      */
-    public List<Ticket> getAllTickets(String status, String type) {
+    public List<Ticket> getAllTickets(String status, String type, String partnerSearch) {
         List<Ticket> tickets = new ArrayList<>();
         StringBuilder sql = new StringBuilder(
                 "SELECT t.*, "
-                        + "u1.full_name as creator_name, "
-                        + "u2.full_name as keeper_name, "
-                        + "p.partner_name "
-                        + "FROM tickets t "
-                        + "LEFT JOIN users u1 ON t.created_by = u1.user_id "
-                        + "LEFT JOIN users u2 ON t.assigned_keeper = u2.user_id "
-                        + "LEFT JOIN partners p ON t.partner_id = p.partner_id "
-                        + "WHERE 1=1 ");
+                + "u1.full_name as creator_name, "
+                + "u2.full_name as keeper_name, "
+                + "p.partner_name "
+                + "FROM tickets t "
+                + "LEFT JOIN users u1 ON t.created_by = u1.user_id "
+                + "LEFT JOIN users u2 ON t.assigned_keeper = u2.user_id "
+                + "LEFT JOIN partners p ON t.partner_id = p.partner_id "
+                + "WHERE 1=1 ");
 
         List<Object> params = new ArrayList<>();
 
@@ -153,6 +153,11 @@ public class TicketDAO extends DBContext {
         if (type != null && !type.isEmpty() && !type.equals("all")) {
             sql.append("AND t.type = ? ");
             params.add(type);
+        }
+
+        if (partnerSearch != null && !partnerSearch.trim().isEmpty()) {
+            sql.append("AND p.partner_name LIKE ? ");
+            params.add("%" + partnerSearch.trim() + "%");
         }
 
         sql.append("ORDER BY t.created_at DESC");
@@ -176,20 +181,19 @@ public class TicketDAO extends DBContext {
     /**
      * Get tickets for a specific keeper
      */
-    public List<Ticket> getTicketsForKeeper(int keeperId, String status, String type) {
+    public List<Ticket> getTicketsForKeeper(int keeperId, String status, String type, String partnerSearch) {
         List<Ticket> tickets = new ArrayList<>();
         StringBuilder sql = new StringBuilder(
                 "SELECT t.*, u1.full_name as creator_name, u2.full_name as keeper_name, p.partner_name "
-                        + "FROM tickets t "
-                        + "LEFT JOIN users u1 ON t.created_by = u1.user_id "
-                        + "LEFT JOIN users u2 ON t.assigned_keeper = u2.user_id "
-                        + "LEFT JOIN partners p ON t.partner_id = p.partner_id "
-                        + "WHERE t.assigned_keeper = ? ");
+                + "FROM tickets t "
+                + "LEFT JOIN users u1 ON t.created_by = u1.user_id "
+                + "LEFT JOIN users u2 ON t.assigned_keeper = u2.user_id "
+                + "LEFT JOIN partners p ON t.partner_id = p.partner_id "
+                + "WHERE t.assigned_keeper = ? ");
 
         List<Object> params = new ArrayList<>();
         params.add(keeperId);
 
-        // Thêm các điều kiện lọc giống như getAllTickets
         if (status != null && !status.isEmpty() && !status.equals("all")) {
             sql.append("AND t.status = ? ");
             params.add(status);
@@ -197,6 +201,11 @@ public class TicketDAO extends DBContext {
         if (type != null && !type.isEmpty() && !type.equals("all")) {
             sql.append("AND t.type = ? ");
             params.add(type);
+        }
+
+        if (partnerSearch != null && !partnerSearch.trim().isEmpty()) {
+            sql.append("AND p.partner_name LIKE ? ");
+            params.add("%" + partnerSearch.trim() + "%");
         }
 
         sql.append("ORDER BY t.created_at DESC");
@@ -531,14 +540,14 @@ public class TicketDAO extends DBContext {
 
         StringBuilder sql = new StringBuilder(
                 "SELECT t.ticket_code, t.processed_at, t.status, "
-                        + "u1.full_name AS creator_name, "
-                        + "u2.full_name AS confirmed_by, "
-                        + "p.partner_name "
-                        + "FROM Tickets t "
-                        + "LEFT JOIN Users u1 ON t.created_by = u1.user_id "
-                        + "LEFT JOIN Users u2 ON t.assigned_keeper = u2.user_id "
-                        + "LEFT JOIN Partners p ON t.partner_id = p.partner_id "
-                        + "WHERE t.type = 'IMPORT' ");
+                + "u1.full_name AS creator_name, "
+                + "u2.full_name AS confirmed_by, "
+                + "p.partner_name "
+                + "FROM Tickets t "
+                + "LEFT JOIN Users u1 ON t.created_by = u1.user_id "
+                + "LEFT JOIN Users u2 ON t.assigned_keeper = u2.user_id "
+                + "LEFT JOIN Partners p ON t.partner_id = p.partner_id "
+                + "WHERE t.type = 'IMPORT' ");
 
         if (from != null && !from.isEmpty()) {
             sql.append(" AND t.processed_at >= '").append(from).append(" 00:00:00'");
@@ -557,9 +566,7 @@ public class TicketDAO extends DBContext {
 
         sql.append(" ORDER BY t.processed_at DESC");
 
-        try (Connection conn = DBContext.getConnection();
-                PreparedStatement ps = conn.prepareStatement(sql.toString());
-                ResultSet rs = ps.executeQuery()) {
+        try (Connection conn = DBContext.getConnection(); PreparedStatement ps = conn.prepareStatement(sql.toString()); ResultSet rs = ps.executeQuery()) {
 
             while (rs.next()) {
                 ImportReportDTO dto = new ImportReportDTO();
@@ -583,14 +590,14 @@ public class TicketDAO extends DBContext {
 
         StringBuilder sql = new StringBuilder(
                 "SELECT t.ticket_code, t.processed_at, t.status, "
-                        + "u1.full_name AS creator_name, "
-                        + "u2.full_name AS confirmed_by, "
-                        + "p.partner_name "
-                        + "FROM Tickets t "
-                        + "LEFT JOIN Users u1 ON t.created_by = u1.user_id "
-                        + "LEFT JOIN Users u2 ON t.assigned_keeper = u2.user_id "
-                        + "LEFT JOIN Partners p ON t.partner_id = p.partner_id "
-                        + "WHERE t.type = 'EXPORT' ");
+                + "u1.full_name AS creator_name, "
+                + "u2.full_name AS confirmed_by, "
+                + "p.partner_name "
+                + "FROM Tickets t "
+                + "LEFT JOIN Users u1 ON t.created_by = u1.user_id "
+                + "LEFT JOIN Users u2 ON t.assigned_keeper = u2.user_id "
+                + "LEFT JOIN Partners p ON t.partner_id = p.partner_id "
+                + "WHERE t.type = 'EXPORT' ");
 
         if (from != null && !from.isEmpty()) {
             sql.append(" AND t.processed_at >= '").append(from).append(" 00:00:00'");
@@ -609,9 +616,7 @@ public class TicketDAO extends DBContext {
 
         sql.append(" ORDER BY t.processed_at DESC");
 
-        try (Connection conn = DBContext.getConnection();
-                PreparedStatement ps = conn.prepareStatement(sql.toString());
-                ResultSet rs = ps.executeQuery()) {
+        try (Connection conn = DBContext.getConnection(); PreparedStatement ps = conn.prepareStatement(sql.toString()); ResultSet rs = ps.executeQuery()) {
 
             while (rs.next()) {
                 ImportReportDTO dto = new ImportReportDTO();
