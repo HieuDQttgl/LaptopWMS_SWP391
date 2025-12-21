@@ -76,7 +76,7 @@ public class ProcessTicketServlet extends HttpServlet {
                 success = ticketDAO.completeTicket(ticketId, keeperNote);
                 message = success ? "Ticket approved successfully! Stock has been updated."
                         : "Failed to approve ticket";
-                newStatus = "APPROVED";
+                newStatus = "COMPLETED";
             } else if ("cancel".equals(action)) {
                 success = ticketDAO.cancelTicket(ticketId, keeperNote);
                 message = success ? "Ticket rejected successfully!"

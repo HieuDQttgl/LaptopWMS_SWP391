@@ -1,14 +1,11 @@
-<%-- 
-    Document   : dashboard
-    Created on : Dec 18, 2025, 9:59:24 AM
-    Author     : super
---%>
+<%-- Document : dashboard Created on : Dec 18, 2025, 9:59:24 AM Author : super --%>
 
-<%@page contentType="text/html" pageEncoding="UTF-8"%>
-<%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %> 
+<%@page contentType="text/html" pageEncoding="UTF-8" %>
+<%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
 <!DOCTYPE html>
 <html>
+
     <head>
         <title>Dashboard | Laptop WMS</title>
         <style>
@@ -26,8 +23,9 @@
                 border-radius: 8px;
                 margin-bottom: 20px;
                 margin-top: 40px;
-                box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+                box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
             }
+
             h1 {
                 margin: 0;
                 color: #2c3e50;
@@ -39,13 +37,14 @@
                 gap: 20px;
                 flex-wrap: wrap;
             }
+
             .widget {
                 flex: 1;
                 min-width: 300px;
                 background: white;
                 padding: 20px;
                 border-radius: 8px;
-                box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+                box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
             }
 
             .widget h3 {
@@ -66,6 +65,7 @@
                 padding: 12px 0;
                 border-bottom: 1px solid #f9f9f9;
             }
+
             .list-item:last-child {
                 border-bottom: none;
             }
@@ -75,6 +75,7 @@
                 color: #333;
                 display: block;
             }
+
             .item-sub {
                 display: block;
                 font-size: 12px;
@@ -88,18 +89,22 @@
                 font-size: 12px;
                 font-weight: bold;
             }
+
             .badge-green {
                 background: #e8f8f5;
                 color: #27ae60;
             }
+
             .badge-orange {
                 background: #fef5e7;
                 color: #e67e22;
             }
+
             .badge-red {
                 background: #fdedec;
                 color: #c0392b;
             }
+
             .badge-blue {
                 background: #ebf5fb;
                 color: #3498db;
@@ -115,17 +120,21 @@
                 font-weight: 600;
                 transition: background 0.2s;
             }
+
             .btn-action:hover {
                 background: #2980b9;
             }
+
             .btn-purple {
                 background: #8e44ad;
             }
+
             .btn-purple:hover {
                 background: #71368a;
             }
         </style>
     </head>
+
     <body>
 
         <jsp:include page="header.jsp" />
@@ -133,7 +142,7 @@
         <div class="welcome-banner">
             <h1>Welcome back, ${currentUser != null ? currentUser.fullName : 'Guest'}</h1>
             <p style="color: #7f8c8d; margin: 5px 0 0;">
-                Role: 
+                Role:
                 <c:choose>
                     <c:when test="${currentUser.roleId == 1}">Administrator</c:when>
                     <c:when test="${currentUser.roleId == 2}">Sales Staff</c:when>
@@ -143,8 +152,10 @@
             </p>
 
             <h3 style="margin-top: 40px;">
-                Team Updates 
-                <a href="team-board" style="font-size:16px; float:right; text-decoration: none; color: black;">View Board &rarr;</a>
+                Team Updates
+                <a href="team-board"
+                   style="font-size:16px; float:right; text-decoration: none; color: black;">View Board
+                    &rarr;</a>
             </h3>
 
             <div style="min-height: 100px;">
@@ -153,7 +164,8 @@
                         <div style="font-size: 11px; color: #999;">
                             <strong>${a.senderName}</strong> • ${a.formattedDate}
                         </div>
-                        <div style="font-size: 13px; color: #444; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;">
+                        <div
+                            style="font-size: 13px; color: #444; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;">
                             ${a.content}
                         </div>
                     </div>
@@ -165,7 +177,8 @@
 
             <div style="text-align: center; margin-top: 10px;">
                 <form action="add-announcement" method="POST" style="display:flex; gap:5px;">
-                    <input type="text" name="content" placeholder="Quick post..." style="flex:1; padding:5px; font-size:12px;">
+                    <input type="text" name="content" placeholder="Quick post..."
+                           style="flex:1; padding:5px; font-size:12px;">
                     <button type="submit" class="btn-action">Post</button>
                 </form>
             </div>
@@ -173,15 +186,16 @@
 
         <div class="dash-container">
 
-            <%-- ================== ROLE: SALES STAFF (ID 2) ================== --%>
+            <%--==================ROLE: SALES STAFF (ID 2)==================--%>
             <c:if test="${currentUser.roleId == 2}">
 
                 <div class="widget">
-                    <h3>High Availability <span style="font-size:12px; color:#27ae60">Ready to Sell</span></h3>
+                    <h3>High Availability <span style="font-size:12px; color:#27ae60">Ready to Sell</span>
+                    </h3>
                     <c:forEach var="p" items="${topProducts}">
                         <div class="list-item">
                             <div>
-                                <span class="item-main">${p.cpu}</span> 
+                                <span class="item-main">${p.cpu}</span>
                                 <span class="item-sub">${p.ram}</span>
                             </div>
                             <span class="badge badge-green">${p.quantity} Units</span>
@@ -190,23 +204,25 @@
                 </div>
 
                 <div class="widget">
-                    <h3>My Recent Tickets <a href="ticket-list" style="font-size:12px; text-decoration: none;">View All</a></h3>
-                    <%-- FIXED: Iterate 'myTickets', use Ticket properties --%>
-                    <c:forEach var="t" items="${myTickets}">
+                    <h3>My Recent Tickets <a href="ticket-list"
+                                             style="font-size:12px; text-decoration: none;">View All</a></h3>
+                        <%-- FIXED: Iterate 'myTickets' , use Ticket properties --%>
+                        <c:forEach var="t" items="${myTickets}">
                         <div class="list-item">
                             <div>
                                 <span class="item-main">${t.ticketCode}</span>
                                 <span class="item-sub">${t.title}</span>
                             </div>
                             <c:choose>
-                                <c:when test="${t.status == 'APPROVED'}">
-                                    <span class="badge badge-green">APPROVED</span>
+                                <c:when test="${t.status == 'COMPLETED'}">
+                                    <span class="badge badge-green">COMPLETED</span>
                                 </c:when>
                                 <c:when test="${t.status == 'REJECTED'}">
                                     <span class="badge badge-red">REJECTED</span>
                                 </c:when>
                                 <c:otherwise>
-                                    <span class="badge badge-orange" style="background:#fff3e0; color:#e67e22;">PENDING</span>
+                                    <span class="badge badge-orange"
+                                          style="background:#fff3e0; color:#e67e22;">PENDING</span>
                                 </c:otherwise>
                             </c:choose>
                         </div>
@@ -233,7 +249,7 @@
                 </div>
             </c:if>
 
-            <%-- ================== ROLE: KEEPER (ID 3) ================== --%>
+            <%--==================ROLE: KEEPER (ID 3)==================--%>
             <c:if test="${currentUser.roleId == 3}">
 
                 <div class="widget">
@@ -251,7 +267,8 @@
                         </div>
                     </c:forEach>
                     <c:if test="${empty pendingTickets}">
-                        <p style="color:#999; text-align:center; padding:10px;">No pending tickets.</p>
+                        <p style="color:#999; text-align:center; padding:10px;">No pending tickets.
+                        </p>
                     </c:if>
                 </div>
 
@@ -276,19 +293,21 @@
                 </div>
 
                 <div class="widget">
-                    <h3>My History <span style="font-size:12px; color:#7f8c8d">Recently Completed</span></h3>
+                    <h3>My History <span style="font-size:12px; color:#7f8c8d">Recently Completed</span>
+                    </h3>
 
                     <c:forEach var="t" items="${keeperHistory}">
                         <div class="list-item">
                             <div>
-                                <span class="item-main" style="color: #7f8c8d; text-decoration: line-through;">
+                                <span class="item-main"
+                                      style="color: #7f8c8d; text-decoration: line-through;">
                                     ${t.ticketCode}
                                 </span>
                                 <span class="item-sub">${t.title}</span>
                             </div>
                             <c:choose>
-                                <c:when test="${t.status == 'APPROVED'}">
-                                    <span class="badge badge-green">Done</span>
+                                <c:when test="${t.status == 'COMPLETED'}">
+                                    <span class="badge badge-green">Completed</span>
                                 </c:when>
                                 <c:otherwise>
                                     <span class="badge badge-red">Rejected</span>
@@ -306,14 +325,16 @@
                 </div>
             </c:if>
 
-            <%-- ================== ROLE: ADMIN (ID 1) ================== --%>
+            <%--==================ROLE: ADMIN (ID 1)==================--%>
             <c:if test="${currentUser.roleId == 1}">
 
-                <div class="widget" style="flex: 2;"> 
-                    <h3>Newest Users <a href="user-list" style="font-size:12px; text-decoration: none;">Manage Users</a></h3>
+                <div class="widget" style="flex: 2;">
+                    <h3>Newest Users <a href="user-list"
+                                        style="font-size:12px; text-decoration: none;">Manage Users</a></h3>
                     <table style="width: 100%; border-collapse: collapse; font-size: 13px;">
                         <thead>
-                            <tr style="text-align: left; color: #7f8c8d; border-bottom: 1px solid #eee;">
+                            <tr
+                                style="text-align: left; color: #7f8c8d; border-bottom: 1px solid #eee;">
                                 <th style="padding: 8px;">User</th>
                                 <th style="padding: 8px;">Role</th>
                                 <th style="padding: 8px;">Status</th>
@@ -324,11 +345,14 @@
                                 <tr style="border-bottom: 1px solid #f9f9f9;">
                                     <td style="padding: 8px;">
                                         <strong style="color:#333;">${u.username}</strong><br>
-                                        <span style="color: #999; font-size: 11px;">${u.email}</span>
+                                        <span
+                                            style="color: #999; font-size: 11px;">${u.email}</span>
                                     </td>
-                                    <td style="padding: 8px;"><span class="badge badge-blue">${u.roleName}</span></td>
+                                    <td style="padding: 8px;"><span
+                                            class="badge badge-blue">${u.roleName}</span></td>
                                     <td style="padding: 8px;">
-                                        <span style="color: ${u.status == 'active' ? '#27ae60' : '#c0392b'}; font-weight: bold;">
+                                        <span
+                                            style="color: ${u.status == 'active' ? '#27ae60' : '#c0392b'}; font-weight: bold;">
                                             ${u.status}
                                         </span>
                                     </td>
@@ -342,7 +366,8 @@
                     <h3>System Roles</h3>
                     <table style="width: 100%; border-collapse: collapse; font-size: 13px;">
                         <thead>
-                            <tr style="text-align: left; color: #7f8c8d; border-bottom: 1px solid #eee;">
+                            <tr
+                                style="text-align: left; color: #7f8c8d; border-bottom: 1px solid #eee;">
                                 <th style="padding: 8px;">Role Name</th>
                             </tr>
                         </thead>
@@ -361,4 +386,5 @@
 
         <jsp:include page="footer.jsp" />
     </body>
+
 </html>

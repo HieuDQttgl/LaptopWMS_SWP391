@@ -320,7 +320,7 @@ CREATE TABLE `tickets` (
   `type` enum('IMPORT','EXPORT') COLLATE utf8mb4_general_ci NOT NULL,
   `title` varchar(150) COLLATE utf8mb4_general_ci DEFAULT NULL,
   `description` text COLLATE utf8mb4_general_ci,
-  `status` enum('PENDING','APPROVED','REJECTED') COLLATE utf8mb4_general_ci DEFAULT 'PENDING',
+  `status` enum('PENDING','COMPLETED','REJECTED') COLLATE utf8mb4_general_ci DEFAULT 'PENDING',
   `created_by` int NOT NULL,
   `assigned_keeper` int DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
@@ -344,7 +344,7 @@ CREATE TABLE `tickets` (
 
 LOCK TABLES `tickets` WRITE;
 /*!40000 ALTER TABLE `tickets` DISABLE KEYS */;
-INSERT INTO `tickets` VALUES (1,'IMP-DEC-001','IMPORT','Start Import','aaaa','APPROVED',2,3,'2025-12-20 10:24:51','2025-12-20 10:31:52','',NULL),(2,'EXP-DEC-001','EXPORT','Test Export','','APPROVED',2,4,'2025-12-20 10:31:07','2025-12-20 10:32:18','',NULL),(3,'IMP-DEC-002','IMPORT','New import','','APPROVED',2,3,'2025-12-20 10:50:10','2025-12-20 10:50:51','',NULL),(50,'IMP-HIST-001','IMPORT','Bulk Import ASUS',NULL,'APPROVED',2,3,'2025-12-15 18:00:19','2025-12-15 18:00:19',NULL,NULL),(51,'EXP-HIST-001','EXPORT','Wholesale ASUS Order',NULL,'APPROVED',2,3,'2025-12-17 18:00:19','2025-12-17 18:00:19',NULL,NULL),(52,'IMP-HIST-002','IMPORT','Restock Lenovo',NULL,'APPROVED',2,3,'2025-12-18 18:00:19','2025-12-18 18:00:19',NULL,NULL),(53,'EXP-HIST-002','EXPORT','Retail Lenovo Sales',NULL,'APPROVED',2,3,'2025-12-19 18:00:19','2025-12-19 18:00:19',NULL,NULL),(54,'IMP-NEW-001','IMPORT','Urgent Restock Request',NULL,'PENDING',2,3,'2025-12-20 18:00:19',NULL,NULL,NULL);
+INSERT INTO `tickets` VALUES (1,'IMP-DEC-001','IMPORT','Start Import','aaaa','COMPLETED',2,3,'2025-12-20 10:24:51','2025-12-20 10:31:52','',NULL),(2,'EXP-DEC-001','EXPORT','Test Export','','COMPLETED',2,4,'2025-12-20 10:31:07','2025-12-20 10:32:18','',NULL),(3,'IMP-DEC-002','IMPORT','New import','','COMPLETED',2,3,'2025-12-20 10:50:10','2025-12-20 10:50:51','',NULL),(50,'IMP-HIST-001','IMPORT','Bulk Import ASUS',NULL,'COMPLETED',2,3,'2025-12-15 18:00:19','2025-12-15 18:00:19',NULL,NULL),(51,'EXP-HIST-001','EXPORT','Wholesale ASUS Order',NULL,'COMPLETED',2,3,'2025-12-17 18:00:19','2025-12-17 18:00:19',NULL,NULL),(52,'IMP-HIST-002','IMPORT','Restock Lenovo',NULL,'COMPLETED',2,3,'2025-12-18 18:00:19','2025-12-18 18:00:19',NULL,NULL),(53,'EXP-HIST-002','EXPORT','Retail Lenovo Sales',NULL,'COMPLETED',2,3,'2025-12-19 18:00:19','2025-12-19 18:00:19',NULL,NULL),(54,'IMP-NEW-001','IMPORT','Urgent Restock Request',NULL,'PENDING',2,3,'2025-12-20 18:00:19',NULL,NULL,NULL);
 /*!40000 ALTER TABLE `tickets` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -400,3 +400,12 @@ UNLOCK TABLES;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
 -- Dump completed on 2025-12-21 10:29:31
+
+-- Add edit-supplier permission
+INSERT INTO `permissions` (`permission_url`, `permission_description`) VALUES
+('/edit-supplier', 'Edit Supplier Details');
+-- Grant to Admin (role_id = 1)
+INSERT INTO `role_permissions` (`role_id`, `permission_id`)
+SELECT 1, permission_id FROM `permissions` WHERE permission_url = '/edit-supplier';
+INSERT INTO `role_permissions` (`role_id`, `permission_id`)
+SELECT 2, permission_id FROM `permissions` WHERE permission_url = '/edit-supplier';

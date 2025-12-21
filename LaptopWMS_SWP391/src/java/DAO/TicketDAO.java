@@ -134,14 +134,14 @@ public class TicketDAO extends DBContext {
         List<Ticket> tickets = new ArrayList<>();
         StringBuilder sql = new StringBuilder(
                 "SELECT t.*, "
-                + "u1.full_name as creator_name, "
-                + "u2.full_name as keeper_name, "
-                + "p.partner_name "
-                + "FROM tickets t "
-                + "LEFT JOIN users u1 ON t.created_by = u1.user_id "
-                + "LEFT JOIN users u2 ON t.assigned_keeper = u2.user_id "
-                + "LEFT JOIN partners p ON t.partner_id = p.partner_id "
-                + "WHERE 1=1 ");
+                        + "u1.full_name as creator_name, "
+                        + "u2.full_name as keeper_name, "
+                        + "p.partner_name "
+                        + "FROM tickets t "
+                        + "LEFT JOIN users u1 ON t.created_by = u1.user_id "
+                        + "LEFT JOIN users u2 ON t.assigned_keeper = u2.user_id "
+                        + "LEFT JOIN partners p ON t.partner_id = p.partner_id "
+                        + "WHERE 1=1 ");
 
         List<Object> params = new ArrayList<>();
 
@@ -180,11 +180,11 @@ public class TicketDAO extends DBContext {
         List<Ticket> tickets = new ArrayList<>();
         StringBuilder sql = new StringBuilder(
                 "SELECT t.*, u1.full_name as creator_name, u2.full_name as keeper_name, p.partner_name "
-                + "FROM tickets t "
-                + "LEFT JOIN users u1 ON t.created_by = u1.user_id "
-                + "LEFT JOIN users u2 ON t.assigned_keeper = u2.user_id "
-                + "LEFT JOIN partners p ON t.partner_id = p.partner_id "
-                + "WHERE t.assigned_keeper = ? ");
+                        + "FROM tickets t "
+                        + "LEFT JOIN users u1 ON t.created_by = u1.user_id "
+                        + "LEFT JOIN users u2 ON t.assigned_keeper = u2.user_id "
+                        + "LEFT JOIN partners p ON t.partner_id = p.partner_id "
+                        + "WHERE t.assigned_keeper = ? ");
 
         List<Object> params = new ArrayList<>();
         params.add(keeperId);
@@ -310,7 +310,7 @@ public class TicketDAO extends DBContext {
             }
 
             // Update ticket status
-            String sqlUpdateTicket = "UPDATE tickets SET status = 'APPROVED', processed_at = NOW(), keeper_note = ? WHERE ticket_id = ?";
+            String sqlUpdateTicket = "UPDATE tickets SET status = 'COMPLETED', processed_at = NOW(), keeper_note = ? WHERE ticket_id = ?";
             try (PreparedStatement ps = conn.prepareStatement(sqlUpdateTicket)) {
                 ps.setString(1, keeperNote);
                 ps.setInt(2, ticketId);
@@ -531,15 +531,14 @@ public class TicketDAO extends DBContext {
 
         StringBuilder sql = new StringBuilder(
                 "SELECT t.ticket_code, t.processed_at, t.status, "
-                + "u1.full_name AS creator_name, "
-                + "u2.full_name AS confirmed_by, "
-                + "p.partner_name "
-                + "FROM Tickets t "
-                + "LEFT JOIN Users u1 ON t.created_by = u1.user_id "
-                + "LEFT JOIN Users u2 ON t.assigned_keeper = u2.user_id "
-                + "LEFT JOIN Partners p ON t.partner_id = p.partner_id "
-                + "WHERE t.type = 'IMPORT' "
-        );
+                        + "u1.full_name AS creator_name, "
+                        + "u2.full_name AS confirmed_by, "
+                        + "p.partner_name "
+                        + "FROM Tickets t "
+                        + "LEFT JOIN Users u1 ON t.created_by = u1.user_id "
+                        + "LEFT JOIN Users u2 ON t.assigned_keeper = u2.user_id "
+                        + "LEFT JOIN Partners p ON t.partner_id = p.partner_id "
+                        + "WHERE t.type = 'IMPORT' ");
 
         if (from != null && !from.isEmpty()) {
             sql.append(" AND t.processed_at >= '").append(from).append(" 00:00:00'");
@@ -558,7 +557,9 @@ public class TicketDAO extends DBContext {
 
         sql.append(" ORDER BY t.processed_at DESC");
 
-        try (Connection conn = DBContext.getConnection(); PreparedStatement ps = conn.prepareStatement(sql.toString()); ResultSet rs = ps.executeQuery()) {
+        try (Connection conn = DBContext.getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql.toString());
+                ResultSet rs = ps.executeQuery()) {
 
             while (rs.next()) {
                 ImportReportDTO dto = new ImportReportDTO();
@@ -582,15 +583,14 @@ public class TicketDAO extends DBContext {
 
         StringBuilder sql = new StringBuilder(
                 "SELECT t.ticket_code, t.processed_at, t.status, "
-                + "u1.full_name AS creator_name, "
-                + "u2.full_name AS confirmed_by, "
-                + "p.partner_name "
-                + "FROM Tickets t "
-                + "LEFT JOIN Users u1 ON t.created_by = u1.user_id "
-                + "LEFT JOIN Users u2 ON t.assigned_keeper = u2.user_id "
-                + "LEFT JOIN Partners p ON t.partner_id = p.partner_id "
-                + "WHERE t.type = 'EXPORT' "
-        );
+                        + "u1.full_name AS creator_name, "
+                        + "u2.full_name AS confirmed_by, "
+                        + "p.partner_name "
+                        + "FROM Tickets t "
+                        + "LEFT JOIN Users u1 ON t.created_by = u1.user_id "
+                        + "LEFT JOIN Users u2 ON t.assigned_keeper = u2.user_id "
+                        + "LEFT JOIN Partners p ON t.partner_id = p.partner_id "
+                        + "WHERE t.type = 'EXPORT' ");
 
         if (from != null && !from.isEmpty()) {
             sql.append(" AND t.processed_at >= '").append(from).append(" 00:00:00'");
@@ -609,7 +609,9 @@ public class TicketDAO extends DBContext {
 
         sql.append(" ORDER BY t.processed_at DESC");
 
-        try (Connection conn = DBContext.getConnection(); PreparedStatement ps = conn.prepareStatement(sql.toString()); ResultSet rs = ps.executeQuery()) {
+        try (Connection conn = DBContext.getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql.toString());
+                ResultSet rs = ps.executeQuery()) {
 
             while (rs.next()) {
                 ImportReportDTO dto = new ImportReportDTO();
