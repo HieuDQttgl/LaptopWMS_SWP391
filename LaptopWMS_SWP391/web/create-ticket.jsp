@@ -1,528 +1,531 @@
 <%@page import="Model.TicketItem" %>
-<%@page import="Model.Users" %>
-<%@page import="Model.Partners" %>
-<%@page import="java.util.List" %>
-<%@page contentType="text/html" pageEncoding="UTF-8" %>
-<!DOCTYPE html>
-<html>
+    <%@page import="Model.Users" %>
+        <%@page import="Model.Partners" %>
+            <%@page import="java.util.List" %>
+                <%@page contentType="text/html" pageEncoding="UTF-8" %>
+                    <!DOCTYPE html>
+                    <html>
 
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Create Ticket - WMS</title>
-        <style>
-            * {
-                margin: 0;
-                padding: 0;
-                box-sizing: border-box;
-            }
+                    <head>
+                        <meta charset="UTF-8">
+                        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                        <title>Create Ticket | Laptop WMS</title>
+                        <link
+                            href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+                            rel="stylesheet">
+                        <style>
+                            body {
+                                font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+                                background: linear-gradient(135deg, #f0f4ff 0%, #f8fafc 50%, #f0fdf4 100%);
+                                margin: 0;
+                                padding: 0;
+                                min-height: 100vh;
+                            }
 
-            body {
-                font-family: "Segoe UI", sans-serif;
-                background: #f5f6fa;
-                min-height: 100vh;
-            }
+                            .page-container {
+                                max-width: 900px;
+                                margin: 0 auto;
+                                padding: 2rem;
+                            }
 
-            .container {
-                max-width: 900px;
-                margin: 0 auto;
-                padding: 30px 20px;
-            }
+                            .back-link {
+                                display: inline-flex;
+                                align-items: center;
+                                gap: 0.5rem;
+                                margin-bottom: 1.5rem;
+                                font-size: 0.875rem;
+                                color: #667eea;
+                                text-decoration: none;
+                                font-weight: 500;
+                            }
 
-            .card {
-                background: #fff;
-                border-radius: 16px;
-                box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
-                padding: 40px;
-            }
+                            .back-link:hover {
+                                color: #764ba2;
+                            }
 
-            h1 {
-                color: #1e293b;
-                margin-bottom: 30px;
-                font-size: 28px;
-                display: flex;
-                align-items: center;
-                gap: 12px;
-            }
+                            .card {
+                                background: white;
+                                border-radius: 1rem;
+                                box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+                                padding: 2.5rem;
+                                border: 1px solid #f1f5f9;
+                                animation: fadeIn 0.3s ease-out;
+                            }
 
-            .form-group {
-                margin-bottom: 24px;
-            }
+                            @keyframes fadeIn {
+                                from {
+                                    opacity: 0;
+                                    transform: translateY(-10px);
+                                }
 
-            label {
-                display: block;
-                margin-bottom: 8px;
-                font-weight: 600;
-                color: #374151;
-            }
+                                to {
+                                    opacity: 1;
+                                    transform: translateY(0);
+                                }
+                            }
 
-            input[type="text"],
-            textarea,
-            select {
-                width: 100%;
-                padding: 12px 16px;
-                border: 2px solid #e5e7eb;
-                border-radius: 10px;
-                font-size: 15px;
-                transition: all 0.3s;
-            }
+                            h1 {
+                                color: #1e293b;
+                                margin: 0 0 2rem 0;
+                                font-size: 1.75rem;
+                                font-weight: 700;
+                                display: flex;
+                                align-items: center;
+                                gap: 0.75rem;
+                            }
 
-            input:focus,
-            textarea:focus,
-            select:focus {
-                outline: none;
-                border-color: #667eea;
-                box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-            }
+                            .form-group {
+                                margin-bottom: 1.5rem;
+                            }
 
-            textarea {
-                resize: vertical;
-                min-height: 100px;
-            }
+                            label {
+                                display: block;
+                                margin-bottom: 0.5rem;
+                                font-weight: 600;
+                                color: #475569;
+                                font-size: 0.875rem;
+                            }
 
-            .type-selector {
-                display: flex;
-                gap: 20px;
-                margin-bottom: 24px;
-            }
+                            input[type="text"],
+                            textarea,
+                            select {
+                                width: 100%;
+                                padding: 0.875rem 1rem;
+                                border: 2px solid #e2e8f0;
+                                border-radius: 0.5rem;
+                                font-size: 0.9375rem;
+                                transition: all 0.2s ease;
+                                box-sizing: border-box;
+                                outline: none;
+                                font-family: inherit;
+                            }
 
-            .type-option {
-                flex: 1;
-                padding: 20px;
-                border: 3px solid #e5e7eb;
-                border-radius: 12px;
-                text-align: center;
-                cursor: pointer;
-                transition: all 0.3s;
-            }
+                            input:focus,
+                            textarea:focus,
+                            select:focus {
+                                border-color: #667eea;
+                                box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.15);
+                            }
 
-            .type-option:hover {
-                border-color: #667eea;
-            }
+                            textarea {
+                                resize: vertical;
+                                min-height: 100px;
+                            }
 
-            .type-option.selected {
-                border-color: #667eea;
-                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-                color: white;
-            }
+                            .type-selector {
+                                display: flex;
+                                gap: 1rem;
+                                margin-bottom: 1.5rem;
+                            }
 
-            .type-option.selected .type-icon {
-                color: white;
-            }
+                            .type-option {
+                                flex: 1;
+                                padding: 1.5rem;
+                                border: 3px solid #e2e8f0;
+                                border-radius: 0.75rem;
+                                text-align: center;
+                                cursor: pointer;
+                                transition: all 0.2s ease;
+                            }
 
-            .type-icon {
-                font-size: 32px;
-                margin-bottom: 8px;
-            }
+                            .type-option:hover {
+                                border-color: #667eea;
+                                background: #f8fafc;
+                            }
 
-            .type-label {
-                font-weight: 600;
-                font-size: 16px;
-            }
+                            .type-option.selected {
+                                border-color: #667eea;
+                                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                                color: white;
+                            }
 
-            .products-section {
-                background: #f8fafc;
-                border-radius: 12px;
-                padding: 24px;
-                margin-bottom: 24px;
-            }
+                            .type-option.selected .type-icon,
+                            .type-option.selected .type-desc {
+                                color: white;
+                            }
 
-            .products-section h3 {
-                margin-bottom: 16px;
-                color: #374151;
-            }
+                            .type-icon {
+                                font-size: 2rem;
+                                margin-bottom: 0.5rem;
+                            }
 
-            .product-row {
-                display: flex;
-                gap: 12px;
-                margin-bottom: 12px;
-                align-items: center;
-            }
+                            .type-label {
+                                font-weight: 700;
+                                font-size: 1rem;
+                            }
 
-            .product-row select {
-                flex: 2;
-            }
+                            .type-desc {
+                                font-size: 0.75rem;
+                                color: #64748b;
+                                margin-top: 0.25rem;
+                            }
 
-            .product-row input[type="number"] {
-                flex: 1;
-                padding: 12px;
-                border: 2px solid #e5e7eb;
-                border-radius: 10px;
-            }
+                            .products-section {
+                                background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+                                border-radius: 0.75rem;
+                                padding: 1.5rem;
+                                margin-bottom: 1.5rem;
+                            }
 
-            .btn-remove {
-                background: #ef4444;
-                color: white;
-                border: none;
-                width: 40px;
-                height: 40px;
-                border-radius: 10px;
-                cursor: pointer;
-                font-size: 18px;
-                transition: all 0.3s;
-            }
+                            .products-section h3 {
+                                margin: 0 0 1rem 0;
+                                color: #475569;
+                                font-size: 1rem;
+                                font-weight: 600;
+                            }
 
-            .btn-remove:hover {
-                background: #dc2626;
-            }
+                            .product-row {
+                                display: flex;
+                                gap: 0.75rem;
+                                margin-bottom: 0.75rem;
+                                align-items: center;
+                            }
 
-            .btn-add {
-                background: #10b981;
-                color: white;
-                border: none;
-                padding: 12px 24px;
-                border-radius: 10px;
-                cursor: pointer;
-                font-weight: 600;
-                transition: all 0.3s;
-            }
+                            .product-row select {
+                                flex: 2;
+                            }
 
-            .btn-add:hover {
-                background: #059669;
-            }
+                            .product-row input[type="number"] {
+                                flex: 1;
+                                padding: 0.875rem 1rem;
+                                border: 2px solid #e2e8f0;
+                                border-radius: 0.5rem;
+                                font-size: 0.9375rem;
+                                outline: none;
+                            }
 
-            .btn-submit {
-                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-                color: white;
-                border: none;
-                padding: 16px 40px;
-                border-radius: 12px;
-                font-size: 16px;
-                font-weight: 600;
-                cursor: pointer;
-                width: 100%;
-                transition: all 0.3s;
-            }
+                            .product-row input[type="number"]:focus {
+                                border-color: #667eea;
+                                box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.15);
+                            }
 
-            .btn-submit:hover {
-                transform: translateY(-2px);
-                box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
-            }
+                            .btn-remove {
+                                background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+                                color: white;
+                                border: none;
+                                width: 44px;
+                                height: 44px;
+                                border-radius: 0.5rem;
+                                cursor: pointer;
+                                font-size: 1.25rem;
+                                transition: all 0.2s ease;
+                                flex-shrink: 0;
+                            }
 
-            .btn-back {
-                display: inline-block;
-                color: #667eea;
-                text-decoration: none;
-                margin-bottom: 20px;
-                font-weight: 500;
-            }
+                            .btn-remove:hover {
+                                transform: scale(1.05);
+                            }
 
-            .btn-back:hover {
-                text-decoration: underline;
-            }
+                            .btn-add {
+                                background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+                                color: white;
+                                border: none;
+                                padding: 0.75rem 1.5rem;
+                                border-radius: 0.5rem;
+                                cursor: pointer;
+                                font-weight: 600;
+                                font-size: 0.875rem;
+                                transition: all 0.2s ease;
+                            }
 
-            .error-message {
-                background: #fef2f2;
-                border: 1px solid #fecaca;
-                color: #dc2626;
-                padding: 12px 16px;
-                border-radius: 10px;
-                margin-bottom: 20px;
-            }
+                            .btn-add:hover {
+                                transform: translateY(-1px);
+                                box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
+                            }
 
-            .stock-info {
-                font-size: 12px;
-                color: #6b7280;
-                margin-top: 4px;
-            }
-        </style>
-    </head>
+                            .btn-submit {
+                                width: 100%;
+                                padding: 1rem;
+                                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                                color: white;
+                                border: none;
+                                border-radius: 0.5rem;
+                                font-size: 1rem;
+                                font-weight: 600;
+                                cursor: pointer;
+                                transition: all 0.2s ease;
+                                box-shadow: 0 4px 14px rgba(102, 126, 234, 0.4);
+                            }
 
-    <body>
-        <%@include file="header.jsp" %>
+                            .btn-submit:hover {
+                                transform: translateY(-2px);
+                                box-shadow: 0 6px 20px rgba(102, 126, 234, 0.5);
+                            }
 
-        <div class="container">
-            <a href="<%= request.getContextPath()%>/ticket-list" class="btn-back">← Back to
-                Tickets</a>
+                            .error-message {
+                                display: flex;
+                                align-items: center;
+                                gap: 0.5rem;
+                                padding: 1rem 1.25rem;
+                                background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+                                border: 1px solid #fca5a5;
+                                color: #dc2626;
+                                border-radius: 0.75rem;
+                                margin-bottom: 1.5rem;
+                                font-weight: 500;
+                            }
 
-            <div class="card">
-                <h1>📝 Create New Ticket</h1>
+                            @media (max-width: 768px) {
+                                .page-container {
+                                    padding: 1rem;
+                                }
 
-                <% String error = (String) request.getAttribute("error"); %>
-                <% if (error != null) {%>
-                <div class="error-message">
-                    <%= error%>
-                </div>
-                <% } %>
+                                .card {
+                                    padding: 1.5rem;
+                                }
 
-                <form method="post" id="ticketForm">
-                    <!-- Ticket Type -->
-                    <div class="form-group">
-                        <label>Ticket Type *</label>
-                        <div class="type-selector">
-                            <div class="type-option" onclick="selectType('IMPORT')"
-                                 id="type-import">
-                                <div class="type-icon">📥</div>
-                                <div class="type-label">IMPORT</div>
-                                <div style="font-size: 13px; color: #6b7280;">Nhập hàng
-                                    vào
-                                    kho</div>
+                                .type-selector {
+                                    flex-direction: column;
+                                }
+
+                                .product-row {
+                                    flex-wrap: wrap;
+                                }
+
+                                .product-row select {
+                                    flex: 1 1 100%;
+                                }
+
+                                .product-row input[type="number"] {
+                                    flex: 1 1 calc(50% - 2rem);
+                                }
+                            }
+                        </style>
+                    </head>
+
+                    <body>
+                        <%@include file="header.jsp" %>
+
+                            <div class="page-container">
+                                <a href="<%= request.getContextPath()%>/ticket-list" class="back-link">← Back to
+                                    Tickets</a>
+
+                                <div class="card">
+                                    <h1>📝 Create New Ticket</h1>
+
+                                    <% String error=(String) request.getAttribute("error"); %>
+                                        <% if (error !=null) {%>
+                                            <div class="error-message">⚠ <%= error%>
+                                            </div>
+                                            <% } %>
+
+                                                <form method="post" id="ticketForm">
+                                                    <div class="form-group">
+                                                        <label>Ticket Type *</label>
+                                                        <div class="type-selector">
+                                                            <div class="type-option" onclick="selectType('IMPORT')"
+                                                                id="type-import">
+                                                                <div class="type-icon">📥</div>
+                                                                <div class="type-label">IMPORT</div>
+                                                                <div class="type-desc">Nhập hàng vào kho</div>
+                                                            </div>
+                                                            <div class="type-option" onclick="selectType('EXPORT')"
+                                                                id="type-export">
+                                                                <div class="type-icon">📤</div>
+                                                                <div class="type-label">EXPORT</div>
+                                                                <div class="type-desc">Xuất hàng ra kho</div>
+                                                            </div>
+                                                        </div>
+                                                        <input type="hidden" name="type" id="ticketType" required>
+                                                    </div>
+
+                                                    <div class="form-group">
+                                                        <label for="title">Title *</label>
+                                                        <input type="text" id="title" name="title"
+                                                            placeholder="Enter ticket title" required>
+                                                    </div>
+
+                                                    <div class="form-group">
+                                                        <label for="description">Description</label>
+                                                        <textarea id="description" name="description"
+                                                            placeholder="Enter description (optional)"></textarea>
+                                                    </div>
+
+                                                    <div class="form-group">
+                                                        <label for="keeperId">Assign to Keeper *</label>
+                                                        <select id="keeperId" name="keeperId" required>
+                                                            <option value="">-- Select Keeper --</option>
+                                                            <% List<Users> keepers = (List<Users>)
+                                                                    request.getAttribute("keepers");
+                                                                    if (keepers != null) {
+                                                                    for (Users keeper : keepers) { %>
+                                                                    <option value="<%= keeper.getUserId()%>">
+                                                                        <%= keeper.getFullName()%> (<%=
+                                                                                keeper.getUsername()%>)
+                                                                    </option>
+                                                                    <% } } %>
+                                                        </select>
+                                                    </div>
+
+                                                    <div class="form-group" id="partnerSection">
+                                                        <label for="partnerId" id="partnerLabel">Partner</label>
+                                                        <select id="partnerId" name="partnerId">
+                                                            <option value="">-- Select Partner --</option>
+                                                        </select>
+                                                        <div id="supplierOptions" style="display: none;">
+                                                            <% List<Partners> suppliers = (List<Partners>)
+                                                                    request.getAttribute("suppliers");
+                                                                    if (suppliers != null) {
+                                                                    for (Partners supplier : suppliers) { %>
+                                                                    <option value="<%= supplier.getPartnerId()%>"
+                                                                        data-type="supplier">
+                                                                        <%= supplier.getPartnerName()%>
+                                                                    </option>
+                                                                    <% } } %>
+                                                        </div>
+                                                        <div id="customerOptions" style="display: none;">
+                                                            <% List<Partners> customers = (List<Partners>)
+                                                                    request.getAttribute("customers");
+                                                                    if (customers != null) {
+                                                                    for (Partners customer : customers) { %>
+                                                                    <option value="<%= customer.getPartnerId()%>"
+                                                                        data-type="customer">
+                                                                        <%= customer.getPartnerName()%>
+                                                                    </option>
+                                                                    <% } } %>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="products-section">
+                                                        <h3>📦 Products</h3>
+                                                        <div id="productRows">
+                                                            <div class="product-row">
+                                                                <select name="productDetailId" required
+                                                                    onchange="updateProductOptions()">
+                                                                    <option value="">-- Select Product --</option>
+                                                                    <% List<TicketItem> products = (List<TicketItem>)
+                                                                            request.getAttribute("products");
+                                                                            if (products != null) {
+                                                                            for (TicketItem p : products) { %>
+                                                                            <option value="<%= p.getProductDetailId()%>"
+                                                                                data-stock="<%= p.getCurrentStock()%>">
+                                                                                <%= p.getProductName()%> - <%=
+                                                                                        p.getProductConfig()%> (Stock:
+                                                                                        <%= p.getCurrentStock()%>)
+                                                                            </option>
+                                                                            <% } } %>
+                                                                </select>
+                                                                <input type="number" name="quantity" placeholder="Qty"
+                                                                    min="1" value="1" required>
+                                                                <button type="button" class="btn-remove"
+                                                                    onclick="removeRow(this)"
+                                                                    style="visibility: hidden;">×</button>
+                                                            </div>
+                                                        </div>
+                                                        <button type="button" class="btn-add"
+                                                            onclick="addProductRow()">+ Add Product</button>
+                                                    </div>
+
+                                                    <button type="submit" class="btn-submit">Create Ticket</button>
+                                                </form>
+                                </div>
                             </div>
-                            <div class="type-option" onclick="selectType('EXPORT')"
-                                 id="type-export">
-                                <div class="type-icon">📤</div>
-                                <div class="type-label">EXPORT</div>
-                                <div style="font-size: 13px; color: #6b7280;">Xuất hàng
-                                    ra
-                                    kho</div>
-                            </div>
-                        </div>
-                        <input type="hidden" name="type" id="ticketType" required>
-                    </div>
 
-                    <!-- Title -->
-                    <div class="form-group">
-                        <label for="title">Title *</label>
-                        <input type="text" id="title" name="title"
-                               placeholder="Enter ticket title" required>
-                    </div>
+                            <script>
+                                function selectType(type) {
+                                    document.getElementById('ticketType').value = type;
+                                    document.querySelectorAll('.type-option').forEach(el => el.classList.remove('selected'));
+                                    document.getElementById('type-' + type.toLowerCase()).classList.add('selected');
+                                    updatePartnerOptions(type);
+                                }
 
-                    <!-- Description -->
-                    <div class="form-group">
-                        <label for="description">Description</label>
-                        <textarea id="description" name="description"
-                                  placeholder="Enter description (optional)"></textarea>
-                    </div>
+                                function updatePartnerOptions(type) {
+                                    const partnerSection = document.getElementById('partnerSection');
+                                    const partnerLabel = document.getElementById('partnerLabel');
+                                    const partnerSelect = document.getElementById('partnerId');
 
-                    <!-- Assign Keeper -->
-                    <div class="form-group">
-                        <label for="keeperId">Assign to Keeper *</label>
-                        <select id="keeperId" name="keeperId" required>
-                            <option value="">-- Select Keeper --</option>
-                            <% List<Users> keepers = (List<Users>) request.getAttribute("keepers");
-                                if (keepers != null) {
-                                    for (Users keeper : keepers) {
-                            %>
-                            <option value="<%= keeper.getUserId()%>">
-                                <%= keeper.getFullName()%> (
-                                <%=keeper.getUsername()%>)
-                            </option>
-                            <% }
-                                                                        } %>
-                        </select>
-                    </div>
+                                    if (!type) {
+                                        partnerSection.style.display = 'none';
+                                        return;
+                                    }
 
-                    <!-- Partner Selection -->
-                    <div class="form-group" id="partnerSection">
-                        <label for="partnerId" id="partnerLabel">Partner</label>
-                        <select id="partnerId" name="partnerId">
-                            <option value="">-- Select Partner --</option>
-                        </select>
-                        <div id="supplierOptions" style="display: none;">
-                            <% List<Partners> suppliers = (List<Partners>) request.getAttribute("suppliers");
-                                if (suppliers != null) {
-                                    for (Partners supplier : suppliers) {
-                            %>
-                            <option value="<%= supplier.getPartnerId()%>"
-                                    data-type="supplier">
-                                <%= supplier.getPartnerName()%>
-                            </option>
-                            <% }
-                                                                        } %>
-                        </div>
-                        <div id="customerOptions" style="display: none;">
-                            <% List<Partners> customers = (List<Partners>) request.getAttribute("customers");
-                                if (customers != null) {
-                                    for (Partners customer : customers) {
-                            %>
-                            <option value="<%= customer.getPartnerId()%>"
-                                    data-type="customer">
-                                <%= customer.getPartnerName()%>
-                            </option>
-                            <% }
-                                                                        } %>
-                        </div>
-                    </div>
+                                    partnerSection.style.display = 'block';
+                                    partnerSelect.innerHTML = '<option value="">-- Select Partner --</option>';
 
-                    <!-- Products -->
-                    <div class="products-section">
-                        <h3>📦 Products</h3>
-                        <div id="productRows">
-                            <div class="product-row">
-                                <select name="productDetailId" required
-                                        onchange="updateProductOptions()">
-                                    <option value="">-- Select Product --</option>
-                                    <% List<TicketItem> products = (List<TicketItem>) request.getAttribute("products");
-                                        if (products != null) {
-                                            for (TicketItem p : products) {
-                                    %>
-                                    <option value="<%= p.getProductDetailId()%>"
-                                            data-stock="<%= p.getCurrentStock()%>">
-                                        <%= p.getProductName()%> -
-                                        <%=p.getProductConfig()%> (Stock:
-                                        <%=p.getCurrentStock()%>)
-                                    </option>
-                                    <% }
-                                                                                }%>
-                                </select>
-                                <input type="number" name="quantity" placeholder="Qty"
-                                       min="1" value="1" required>
-                                <button type="button" class="btn-remove"
-                                        onclick="removeRow(this)"
-                                        style="visibility: hidden;">×</button>
-                            </div>
-                        </div>
-                        <button type="button" class="btn-add"
-                                onclick="addProductRow()">+
-                            Add Product</button>
-                    </div>
+                                    if (type === 'IMPORT') {
+                                        partnerLabel.textContent = 'Supplier';
+                                        document.querySelectorAll('#supplierOptions option').forEach(opt => {
+                                            partnerSelect.appendChild(opt.cloneNode(true));
+                                        });
+                                    } else {
+                                        partnerLabel.textContent = 'Customer';
+                                        document.querySelectorAll('#customerOptions option').forEach(opt => {
+                                            partnerSelect.appendChild(opt.cloneNode(true));
+                                        });
+                                    }
+                                }
 
-                    <!-- Submit -->
-                    <button type="submit" class="btn-submit">Create Ticket</button>
-                </form>
-            </div>
-        </div>
+                                function addProductRow() {
+                                    const container = document.getElementById('productRows');
+                                    const firstRow = container.querySelector('.product-row');
+                                    const newRow = firstRow.cloneNode(true);
+                                    newRow.querySelector('select').value = '';
+                                    newRow.querySelector('input').value = '1';
+                                    newRow.querySelector('.btn-remove').style.visibility = 'visible';
+                                    container.appendChild(newRow);
+                                    updateRemoveButtons();
+                                    updateProductOptions();
+                                }
 
-        <script>
-            function selectType(type) {
-                document.getElementById('ticketType').value = type;
-                document.querySelectorAll('.type-option').forEach(el => el.classList.remove('selected'));
-                document.getElementById('type-' + type.toLowerCase()).classList.add('selected');
+                                function removeRow(btn) {
+                                    btn.closest('.product-row').remove();
+                                    updateRemoveButtons();
+                                    updateProductOptions();
+                                }
 
-                // Update partner dropdown based on type
-                updatePartnerOptions(type);
-            }
+                                function updateRemoveButtons() {
+                                    const rows = document.querySelectorAll('.product-row');
+                                    rows.forEach((row, i) => {
+                                        row.querySelector('.btn-remove').style.visibility = rows.length > 1 ? 'visible' : 'hidden';
+                                    });
+                                }
 
-            function updatePartnerOptions(type) {
-                const partnerSection = document.getElementById('partnerSection');
-                const partnerLabel = document.getElementById('partnerLabel');
-                const partnerSelect = document.getElementById('partnerId');
+                                function updateProductOptions() {
+                                    const selects = document.querySelectorAll('select[name="productDetailId"]');
+                                    const selected = [];
+                                    selects.forEach(s => { if (s.value) selected.push(s.value); });
 
-                if (!type) {
-                    partnerSection.style.display = 'none';
-                    return;
-                }
+                                    selects.forEach(select => {
+                                        const current = select.value;
+                                        select.querySelectorAll('option').forEach(opt => {
+                                            opt.disabled = opt.value && opt.value !== current && selected.includes(opt.value);
+                                        });
+                                    });
+                                }
 
-                partnerSection.style.display = 'block';
+                                function hasDuplicateProducts() {
+                                    const selects = document.querySelectorAll('select[name="productDetailId"]');
+                                    const values = [];
+                                    for (let s of selects) {
+                                        if (s.value) {
+                                            if (values.includes(s.value)) return true;
+                                            values.push(s.value);
+                                        }
+                                    }
+                                    return false;
+                                }
 
-                partnerSelect.innerHTML = '<option value="">-- Select Partner --</option>';
+                                document.getElementById('ticketForm').addEventListener('submit', function (e) {
+                                    if (!document.getElementById('ticketType').value) {
+                                        e.preventDefault();
+                                        showToast('warning', 'Missing Field', 'Please select a ticket type');
+                                        return;
+                                    }
+                                    if (!document.getElementById('keeperId').value) {
+                                        e.preventDefault();
+                                        showToast('warning', 'Missing Field', 'Please select a Keeper');
+                                        return;
+                                    }
+                                    if (hasDuplicateProducts()) {
+                                        e.preventDefault();
+                                        showToast('error', 'Duplicate Products', 'Each product can only be selected once');
+                                        return;
+                                    }
+                                });
 
-                if (type === 'IMPORT') {
-                    partnerLabel.textContent = 'Supplier';
-                    const supplierOptions = document.querySelectorAll('#supplierOptions option');
-                    supplierOptions.forEach(opt => {
-                        partnerSelect.appendChild(opt.cloneNode(true));
-                    });
-                } else if (type === 'EXPORT') {
-                    partnerLabel.textContent = 'Customer';
-                    const customerOptions = document.querySelectorAll('#customerOptions option');
-                    customerOptions.forEach(opt => {
-                        partnerSelect.appendChild(opt.cloneNode(true));
-                    });
-                }
-            }
+                                document.addEventListener('DOMContentLoaded', updateProductOptions);
+                            </script>
+                            <%@include file="common-dialogs.jsp" %>
+                    </body>
 
-            function addProductRow() {
-                const container = document.getElementById('productRows');
-                const firstRow = container.querySelector('.product-row');
-                const newRow = firstRow.cloneNode(true);
-
-                // Reset the new row
-                const newSelect = newRow.querySelector('select');
-                newSelect.value = '';
-                newSelect.onchange = updateProductOptions;
-                newRow.querySelector('input').value = '1';
-                newRow.querySelector('.btn-remove').style.visibility = 'visible';
-
-                container.appendChild(newRow);
-                updateRemoveButtons();
-                updateProductOptions();
-            }
-
-            function removeRow(btn) {
-                const row = btn.closest('.product-row');
-                row.remove();
-                updateRemoveButtons();
-                updateProductOptions();
-            }
-
-            function updateRemoveButtons() {
-                const rows = document.querySelectorAll('.product-row');
-                rows.forEach((row, index) => {
-                    const btn = row.querySelector('.btn-remove');
-                    btn.style.visibility = rows.length > 1 ? 'visible' : 'hidden';
-                });
-            }
-
-            // Update product options to disable already selected products
-            function updateProductOptions() {
-                const selects = document.querySelectorAll('select[name="productDetailId"]');
-
-                // Get all selected values
-                const selectedValues = [];
-                selects.forEach(select => {
-                    if (select.value) {
-                        selectedValues.push(select.value);
-                    }
-                });
-
-                // Update each select's options
-                selects.forEach(select => {
-                    const currentValue = select.value;
-                    const options = select.querySelectorAll('option');
-
-                    options.forEach(option => {
-                        if (option.value === '') {
-                            // Keep the placeholder enabled
-                            option.disabled = false;
-                        } else if (option.value === currentValue) {
-                            // Keep current selection enabled
-                            option.disabled = false;
-                        } else if (selectedValues.includes(option.value)) {
-                            // Disable if selected in another row
-                            option.disabled = true;
-                        } else {
-                            // Enable if not selected anywhere
-                            option.disabled = false;
-                        }
-                    });
-                });
-            }
-
-            // Check for duplicate products
-            function hasDuplicateProducts() {
-                const selects = document.querySelectorAll('select[name="productDetailId"]');
-                const values = [];
-
-                for (let select of selects) {
-                    if (select.value) {
-                        if (values.includes(select.value)) {
-                            return true;
-                        }
-                        values.push(select.value);
-                    }
-                }
-                return false;
-            }
-
-            document.getElementById('ticketForm').addEventListener('submit', function (e) {
-                // Check ticket type
-                if (!document.getElementById('ticketType').value) {
-                    e.preventDefault();
-                    alert('Please select a ticket type');
-                    return;
-                }
-
-                // Check keeper selection
-                if (!document.getElementById('keeperId').value) {
-                    e.preventDefault();
-                    alert('Please select a Keeper to assign');
-                    return;
-                }
-
-                // Check for duplicate products
-                if (hasDuplicateProducts()) {
-                    e.preventDefault();
-                    alert('Each product can only be selected once. Please remove duplicate products.');
-                    return;
-                }
-            });
-
-            // Initialize product options on page load
-            document.addEventListener('DOMContentLoaded', function () {
-                updateProductOptions();
-            });
-        </script>
-    </body>
-
-</html>
+                    </html>

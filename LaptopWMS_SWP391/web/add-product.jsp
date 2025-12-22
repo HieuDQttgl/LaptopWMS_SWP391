@@ -1,129 +1,240 @@
 <%@ page contentType="text/html" pageEncoding="UTF-8" %>
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<!DOCTYPE html>
-<html>
+    <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+        <!DOCTYPE html>
+        <html>
 
-    <head>
-        <title>Laptop Warehouse Management System</title>
-        <style>
-            body {
-                font-family: "Segoe UI", sans-serif;
-                background: #f5f6fa;
-                margin: 0;
-                padding: 0;
-                min-height: 100vh;
-            }
+        <head>
+            <meta charset="UTF-8">
+            <title>Add Product | Laptop WMS</title>
+            <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+                rel="stylesheet">
+            <style>
+                body {
+                    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+                    background: linear-gradient(135deg, #f0f4ff 0%, #f8fafc 50%, #f0fdf4 100%);
+                    margin: 0;
+                    padding: 0;
+                    min-height: 100vh;
+                }
 
-            .form-container {
-                max-width: 500px;
-                margin: 40px auto;
-                background: white;
-                padding: 30px;
-                border-radius: 8px;
-                box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-            }
+                .page-container {
+                    max-width: 550px;
+                    margin: 2rem auto;
+                    padding: 2rem;
+                }
 
-            h2 {
-                text-align: center;
-                color: #2c3e50;
-                margin-top: 0;
-            }
+                .form-card {
+                    background: white;
+                    border-radius: 1rem;
+                    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+                    overflow: hidden;
+                    border: 1px solid #f1f5f9;
+                    animation: fadeIn 0.3s ease-out;
+                }
 
-            .form-group {
-                margin-bottom: 15px;
-            }
+                @keyframes fadeIn {
+                    from {
+                        opacity: 0;
+                        transform: translateY(-10px);
+                    }
 
-            label {
-                display: block;
-                margin-bottom: 5px;
-                font-weight: 600;
-                color: #333;
-            }
+                    to {
+                        opacity: 1;
+                        transform: translateY(0);
+                    }
+                }
 
-            input,
-            select {
-                width: 100%;
-                padding: 10px;
-                border: 1px solid #ddd;
-                border-radius: 4px;
-                box-sizing: border-box;
-            }
+                .card-header {
+                    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                    color: white;
+                    padding: 1.5rem 2rem;
+                }
 
-            .btn-save {
-                width: 100%;
-                padding: 12px;
-                background: #2ecc71;
-                color: white;
-                border: none;
-                border-radius: 4px;
-                cursor: pointer;
-                font-size: 16px;
-                font-weight: bold;
-            }
+                .card-header h2 {
+                    margin: 0;
+                    font-size: 1.375rem;
+                    font-weight: 700;
+                    display: flex;
+                    align-items: center;
+                    gap: 0.5rem;
+                }
 
-            .btn-save:hover {
-                background: #27ae60;
-            }
+                .card-body {
+                    padding: 2rem;
+                }
 
-            .link-back {
-                display: block;
-                text-align: center;
-                margin-top: 15px;
-                color: #7f8c8d;
-                text-decoration: none;
-            }
-        </style>
-    </head>
+                .alert {
+                    display: flex;
+                    align-items: center;
+                    gap: 0.5rem;
+                    padding: 1rem 1.25rem;
+                    border-radius: 0.75rem;
+                    margin-bottom: 1.5rem;
+                    font-weight: 500;
+                }
 
-    <body>
+                .alert-error {
+                    background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+                    color: #dc2626;
+                    border: 1px solid #fca5a5;
+                }
 
-        <jsp:include page="header.jsp" />
+                .form-group {
+                    margin-bottom: 1.5rem;
+                }
 
-        <div class="form-container">
-            <h2>Create New Product</h2>
+                .form-group label {
+                    display: block;
+                    font-weight: 600;
+                    color: #475569;
+                    margin-bottom: 0.5rem;
+                    font-size: 0.875rem;
+                }
 
-            <c:if test="${not empty error}">
-                <div
-                    style="color: #721c24; background-color: #f8d7da; border: 1px solid #f5c6cb; padding: 10px; margin-bottom: 15px; border-radius: 4px;">
-                    <strong>Error:</strong> ${error}
+                .form-group input,
+                .form-group select {
+                    width: 100%;
+                    padding: 0.875rem 1rem;
+                    border: 2px solid #e2e8f0;
+                    border-radius: 0.5rem;
+                    font-size: 0.9375rem;
+                    transition: all 0.2s ease;
+                    box-sizing: border-box;
+                    outline: none;
+                }
+
+                .form-group input:focus,
+                .form-group select:focus {
+                    border-color: #667eea;
+                    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.15);
+                }
+
+                .form-group input::placeholder {
+                    color: #94a3b8;
+                }
+
+                .form-actions {
+                    margin-top: 2rem;
+                    padding-top: 1.5rem;
+                    border-top: 1px solid #f1f5f9;
+                }
+
+                .btn-save {
+                    width: 100%;
+                    padding: 1rem;
+                    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                    color: white;
+                    border: none;
+                    border-radius: 0.5rem;
+                    font-weight: 600;
+                    font-size: 1rem;
+                    cursor: pointer;
+                    transition: all 0.2s ease;
+                    box-shadow: 0 4px 14px rgba(102, 126, 234, 0.4);
+                }
+
+                .btn-save:hover {
+                    transform: translateY(-2px);
+                    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.5);
+                }
+
+                .link-back {
+                    display: block;
+                    text-align: center;
+                    margin-top: 1rem;
+                    color: #64748b;
+                    text-decoration: none;
+                    font-size: 0.875rem;
+                    font-weight: 500;
+                }
+
+                .link-back:hover {
+                    color: #667eea;
+                }
+
+                .back-link {
+                    display: inline-flex;
+                    align-items: center;
+                    gap: 0.5rem;
+                    margin-bottom: 1.5rem;
+                    font-size: 0.875rem;
+                    color: #64748b;
+                    text-decoration: none;
+                    font-weight: 500;
+                }
+
+                .back-link:hover {
+                    color: #667eea;
+                }
+
+                @media (max-width: 640px) {
+                    .page-container {
+                        padding: 1rem;
+                        margin: 1rem;
+                    }
+
+                    .card-body {
+                        padding: 1.5rem;
+                    }
+                }
+            </style>
+        </head>
+
+        <body>
+            <jsp:include page="header.jsp" />
+
+            <div class="page-container">
+                <a href="product-list" class="back-link">← Back to Products</a>
+
+                <div class="form-card">
+                    <div class="card-header">
+                        <h2>💻 Create New Product</h2>
+                    </div>
+
+                    <div class="card-body">
+                        <c:if test="${not empty error}">
+                            <div class="alert alert-error">⚠ ${error}</div>
+                        </c:if>
+
+                        <form action="add-product" method="post">
+                            <div class="form-group">
+                                <label>Model Name *</label>
+                                <input type="text" name="name" required placeholder="e.g. Dell XPS 15 9530">
+                            </div>
+
+                            <div class="form-group">
+                                <label>Brand *</label>
+                                <select name="brand" required>
+                                    <option value="">-- Select Brand --</option>
+                                    <option value="Dell">Dell</option>
+                                    <option value="HP">HP</option>
+                                    <option value="ASUS">ASUS</option>
+                                    <option value="Apple">Apple</option>
+                                    <option value="Lenovo">Lenovo</option>
+                                    <option value="Acer">Acer</option>
+                                    <option value="MSI">MSI</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Category</label>
+                                <select name="category">
+                                    <option value="Office">Office</option>
+                                    <option value="Gaming">Gaming</option>
+                                    <option value="Workstation">Workstation</option>
+                                </select>
+                            </div>
+
+                            <div class="form-actions">
+                                <button type="submit" class="btn-save">Create Product</button>
+                                <a href="product-list" class="link-back">Cancel</a>
+                            </div>
+                        </form>
+                    </div>
                 </div>
-            </c:if>
+            </div>
 
-            <form action="add-product" method="post">
-                <div class="form-group">
-                    <label>Model Name</label>
-                    <input type="text" name="name" required placeholder="e.g. Dell XPS 15 9530">
-                </div>
+            <jsp:include page="footer.jsp" />
+        </body>
 
-                <div class="form-group">
-                    <label>Brand</label>
-                    <select name="brand" required>
-                        <option value="">-- Select Brand --</option>
-                        <option value="Dell">Dell</option>
-                        <option value="HP">HP</option>
-                        <option value="ASUS">ASUS</option>
-                        <option value="Apple">Apple</option>
-                        <option value="Lenovo">Lenovo</option>
-                        <option value="Acer">Acer</option>
-                        <option value="MSI">MSI</option>
-                    </select>
-                </div>
-
-                <div class="form-group">
-                    <label>Category</label>
-                    <select name="category">
-                        <option value="Office">Office</option>
-                        <option value="Gaming">Gaming</option>
-                        <option value="Workstation">Workstation</option>
-                    </select>
-                </div>
-
-                <button type="submit" class="btn-save">Create Product</button>
-                <a href="product-list" class="link-back">Cancel</a>
-            </form>
-        </div>
-
-        <jsp:include page="footer.jsp" />
-    </body>
-
-</html>
+        </html>

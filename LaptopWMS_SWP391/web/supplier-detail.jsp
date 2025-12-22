@@ -1,202 +1,292 @@
 <%@ page contentType="text/html" pageEncoding="UTF-8" %>
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+    <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
-<!DOCTYPE html>
-<html>
+        <!DOCTYPE html>
+        <html>
 
-    <head>
-        <title>Supplier Details - WMS</title>
+        <head>
+            <meta charset="UTF-8">
+            <title>Supplier Details | Laptop WMS</title>
+            <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+                rel="stylesheet">
+            <style>
+                body {
+                    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+                    background: linear-gradient(135deg, #f0f4ff 0%, #f8fafc 50%, #f0fdf4 100%);
+                    margin: 0;
+                    padding: 0;
+                    min-height: 100vh;
+                }
 
-        <style>
-            body {
-                font-family: "Segoe UI", Arial, sans-serif;
-                background-color: #f5f6fa;
-                margin: 0;
-                padding: 0;
-                color: #2c3e50;
-            }
+                .page-container {
+                    max-width: 700px;
+                    margin: 2rem auto;
+                    padding: 2rem;
+                }
 
-            .container {
-                max-width: 800px;
-                margin: 40px auto;
-                background-color: white;
-                padding: 30px;
-                border-radius: 12px;
-                box-shadow: 0 4px 20px rgba(0, 0, 0, 0.07);
-            }
+                .card {
+                    background: white;
+                    border-radius: 1rem;
+                    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+                    overflow: hidden;
+                    border: 1px solid #f1f5f9;
+                    animation: fadeIn 0.3s ease-out;
+                }
 
-            .card-header {
-                background-color: #2c3e50;
-                color: white;
-                padding: 20px 25px;
-                border-radius: 10px 10px 0 0;
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-                margin: -30px -30px 25px -30px;
-            }
+                @keyframes fadeIn {
+                    from {
+                        opacity: 0;
+                        transform: translateY(-10px);
+                    }
 
-            .card-header h2 {
-                margin: 0;
-                font-weight: 600;
-            }
+                    to {
+                        opacity: 1;
+                        transform: translateY(0);
+                    }
+                }
 
-            .id-badge {
-                background: rgba(255, 255, 255, 0.2);
-                padding: 6px 14px;
-                border-radius: 20px;
-                font-size: 13px;
-                font-weight: 600;
-            }
+                .card-header {
+                    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+                    color: white;
+                    padding: 1.5rem 2rem;
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                }
 
-            .detail-row {
-                display: flex;
-                padding: 15px 0;
-                border-bottom: 1px solid #f0f0f0;
-            }
+                .card-header h2 {
+                    margin: 0;
+                    font-size: 1.375rem;
+                    font-weight: 700;
+                    display: flex;
+                    align-items: center;
+                    gap: 0.5rem;
+                }
 
-            .detail-row:last-child {
-                border-bottom: none;
-            }
+                .id-badge {
+                    background: rgba(255, 255, 255, 0.2);
+                    padding: 0.375rem 0.875rem;
+                    border-radius: 2rem;
+                    font-size: 0.8125rem;
+                    font-weight: 600;
+                }
 
-            .detail-label {
-                width: 150px;
-                font-weight: 600;
-                color: #7f8c8d;
-                font-size: 14px;
-            }
+                .card-body {
+                    padding: 2rem;
+                }
 
-            .detail-value {
-                flex: 1;
-                font-size: 15px;
-                color: #2c3e50;
-            }
+                .detail-row {
+                    display: flex;
+                    padding: 1rem 0;
+                    border-bottom: 1px solid #f1f5f9;
+                }
 
-            .status-badge {
-                padding: 5px 14px;
-                border-radius: 20px;
-                font-size: 12px;
-                font-weight: bold;
-                text-transform: uppercase;
-            }
+                .detail-row:last-child {
+                    border-bottom: none;
+                }
 
-            .status-active {
-                background: #e6f7ed;
-                color: #27ae60;
-                border: 1px solid #27ae60;
-            }
+                .detail-label {
+                    width: 140px;
+                    font-weight: 600;
+                    color: #64748b;
+                    font-size: 0.875rem;
+                }
 
-            .status-inactive {
-                background: #fbebeb;
-                color: #e74c3c;
-                border: 1px solid #e74c3c;
-            }
+                .detail-value {
+                    flex: 1;
+                    font-size: 0.9375rem;
+                    color: #1e293b;
+                    font-weight: 500;
+                }
 
-            .type-badge {
-                background: #e8f4fd;
-                color: #3498db;
-                padding: 5px 14px;
-                border-radius: 20px;
-                font-size: 12px;
-                font-weight: 600;
-            }
+                .status-badge {
+                    display: inline-flex;
+                    align-items: center;
+                    gap: 0.25rem;
+                    padding: 0.375rem 0.875rem;
+                    border-radius: 2rem;
+                    font-size: 0.6875rem;
+                    font-weight: 600;
+                    text-transform: uppercase;
+                }
 
-            .actions {
-                margin-top: 30px;
-                padding-top: 20px;
-                border-top: 1px solid #eee;
-                display: flex;
-                justify-content: flex-end;
-                gap: 10px;
-            }
+                .status-active {
+                    background: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%);
+                    color: #16a34a;
+                }
 
-            .btn-back {
-                background-color: #95a5a6;
-                color: white;
-                padding: 10px 20px;
-                border-radius: 6px;
-                text-decoration: none;
-                font-weight: 600;
-                transition: background-color 0.2s;
-            }
+                .status-inactive {
+                    background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+                    color: #dc2626;
+                }
 
-            .btn-back:hover {
-                background-color: #7f8c8d;
-            }
+                .type-badge {
+                    display: inline-flex;
+                    align-items: center;
+                    gap: 0.25rem;
+                    padding: 0.375rem 0.875rem;
+                    background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+                    color: #2563eb;
+                    border-radius: 2rem;
+                    font-size: 0.6875rem;
+                    font-weight: 600;
+                    text-transform: uppercase;
+                }
 
-            .btn-edit {
-                background-color: #3498db;
-                color: white;
-                padding: 10px 20px;
-                border-radius: 6px;
-                text-decoration: none;
-                font-weight: 600;
-                transition: background-color 0.2s;
-            }
+                .form-actions {
+                    display: flex;
+                    justify-content: flex-end;
+                    gap: 1rem;
+                    margin-top: 1.5rem;
+                    padding-top: 1.5rem;
+                    border-top: 1px solid #f1f5f9;
+                }
 
-            .btn-edit:hover {
-                background-color: #2980b9;
-            }
-        </style>
-    </head>
+                .btn {
+                    padding: 0.75rem 1.5rem;
+                    border-radius: 0.5rem;
+                    font-weight: 600;
+                    font-size: 0.875rem;
+                    border: none;
+                    cursor: pointer;
+                    transition: all 0.2s ease;
+                    text-decoration: none;
+                    display: inline-flex;
+                    align-items: center;
+                    gap: 0.5rem;
+                }
 
-    <body>
-        <jsp:include page="header.jsp" />
+                .btn-back {
+                    background: #94a3b8;
+                    color: white;
+                }
 
-        <div class="container">
-            <div class="card-header">
-                <h2>Supplier Details</h2>
-                <span class="id-badge">ID: ${supplier.partnerId}</span>
-            </div>
+                .btn-back:hover {
+                    background: #64748b;
+                    color: white;
+                }
 
-            <div class="detail-row">
-                <div class="detail-label">Full Name</div>
-                <div class="detail-value"><strong>${supplier.partnerName}</strong></div>
-            </div>
+                .btn-edit {
+                    background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+                    color: white;
+                    box-shadow: 0 4px 14px rgba(245, 158, 11, 0.4);
+                }
 
-            <div class="detail-row">
-                <div class="detail-label">Email</div>
-                <div class="detail-value">${supplier.partnerEmail}</div>
-            </div>
+                .btn-edit:hover {
+                    transform: translateY(-2px);
+                    box-shadow: 0 6px 20px rgba(245, 158, 11, 0.5);
+                    color: white;
+                }
 
-            <div class="detail-row">
-                <div class="detail-label">Phone</div>
-                <div class="detail-value">${supplier.partnerPhone}</div>
-            </div>
+                .back-link {
+                    display: inline-flex;
+                    align-items: center;
+                    gap: 0.5rem;
+                    margin-bottom: 1.5rem;
+                    font-size: 0.875rem;
+                    color: #64748b;
+                    text-decoration: none;
+                    font-weight: 500;
+                }
 
-            <div class="detail-row">
-                <div class="detail-label">Type</div>
-                <div class="detail-value">
-                    <span class="type-badge">
-                        <c:choose>
-                            <c:when test="${supplier.type == 1}">Supplier</c:when>
-                            <c:when test="${supplier.type == 2}">Customer</c:when>
-                        </c:choose>
-                    </span>
+                .back-link:hover {
+                    color: #10b981;
+                }
+
+                @media (max-width: 640px) {
+                    .page-container {
+                        padding: 1rem;
+                        margin: 1rem;
+                    }
+
+                    .card-body {
+                        padding: 1.5rem;
+                    }
+
+                    .detail-row {
+                        flex-direction: column;
+                        gap: 0.25rem;
+                    }
+
+                    .detail-label {
+                        width: 100%;
+                    }
+
+                    .form-actions {
+                        flex-direction: column;
+                    }
+
+                    .btn {
+                        width: 100%;
+                        justify-content: center;
+                    }
+                }
+            </style>
+        </head>
+
+        <body>
+            <jsp:include page="header.jsp" />
+
+            <div class="page-container">
+                <a href="supplier-list" class="back-link">← Back to Suppliers</a>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h2>🏭 Supplier Details</h2>
+                        <span class="id-badge">ID: ${supplier.partnerId}</span>
+                    </div>
+
+                    <div class="card-body">
+                        <div class="detail-row">
+                            <div class="detail-label">Full Name</div>
+                            <div class="detail-value"><strong>${supplier.partnerName}</strong></div>
+                        </div>
+
+                        <div class="detail-row">
+                            <div class="detail-label">Email</div>
+                            <div class="detail-value">${empty supplier.partnerEmail ? '—' : supplier.partnerEmail}</div>
+                        </div>
+
+                        <div class="detail-row">
+                            <div class="detail-label">Phone</div>
+                            <div class="detail-value">${empty supplier.partnerPhone ? '—' : supplier.partnerPhone}</div>
+                        </div>
+
+                        <div class="detail-row">
+                            <div class="detail-label">Type</div>
+                            <div class="detail-value">
+                                <span class="type-badge">
+                                    <c:choose>
+                                        <c:when test="${supplier.type == 1}">🏭 Supplier</c:when>
+                                        <c:when test="${supplier.type == 2}">🛒 Customer</c:when>
+                                    </c:choose>
+                                </span>
+                            </div>
+                        </div>
+
+                        <div class="detail-row">
+                            <div class="detail-label">Status</div>
+                            <div class="detail-value">
+                                <c:choose>
+                                    <c:when test="${supplier.status == 'active'}">
+                                        <span class="status-badge status-active">● Active</span>
+                                    </c:when>
+                                    <c:otherwise>
+                                        <span class="status-badge status-inactive">● Inactive</span>
+                                    </c:otherwise>
+                                </c:choose>
+                            </div>
+                        </div>
+
+                        <div class="form-actions">
+                            <a href="supplier-list" class="btn btn-back">← Back to List</a>
+                            <a href="edit-supplier?id=${supplier.partnerId}" class="btn btn-edit">✏️ Edit Supplier</a>
+                        </div>
+                    </div>
                 </div>
             </div>
 
-            <div class="detail-row">
-                <div class="detail-label">Status</div>
-                <div class="detail-value">
-                    <c:choose>
-                        <c:when test="${supplier.status == 'active'}">
-                            <span class="status-badge status-active">Active</span>
-                        </c:when>
-                        <c:otherwise>
-                            <span class="status-badge status-inactive">Inactive</span>
-                        </c:otherwise>
-                    </c:choose>
-                </div>
-            </div>
+            <jsp:include page="footer.jsp" />
+        </body>
 
-            <div class="actions">
-                <a href="supplier-list" class="btn-back">← Back to List</a>
-                <a href="edit-supplier?id=${supplier.partnerId}" class="btn-edit">Edit Supplier</a>
-            </div>
-        </div>
-
-        <jsp:include page="footer.jsp" />
-    </body>
-
-</html>
+        </html>

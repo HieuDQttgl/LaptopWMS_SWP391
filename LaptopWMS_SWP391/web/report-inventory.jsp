@@ -1,625 +1,639 @@
 <%@ page contentType="text/html;charset=UTF-8" %>
-<%@ page import="java.util.*" %>
-<%@ page import="java.text.SimpleDateFormat" %>
-<%@ page import="DAO.ReportDAO.ReportItem" %>
-<%@ page import="DAO.ReportDAO.LedgerEntry" %>
-<%@ page import="DAO.ReportDAO.ReportSummary" %>
-<%@ page import="Model.Users" %>
-
-<!DOCTYPE html>
-<html>
-
-    <head>
-        <jsp:include page="header.jsp" />
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Inventory Report - Laptop WMS</title>
-        <style>
-            :root {
-                --primary: #2563eb;
-                --primary-hover: #1d4ed8;
-                --success: #10b981;
-                --danger: #ef4444;
-                --warning: #f59e0b;
-                --bg: #f1f5f9;
-                --card-bg: #ffffff;
-                --border: #e2e8f0;
-                --text: #1e293b;
-                --text-muted: #64748b;
-            }
-
-            * {
-                box-sizing: border-box;
-            }
-
-            body {
-                font-family: 'Segoe UI', system-ui, sans-serif;
-                background: var(--bg);
-                margin: 0;
-                color: var(--text);
-            }
-
-            .container {
-                max-width: 1400px;
-                margin: 0 auto;
-                padding: 30px 20px;
-            }
-
-            .page-header {
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-                margin-bottom: 24px;
-            }
-
-            .page-header h1 {
-                margin: 0;
-                font-size: 28px;
-                font-weight: 700;
-                color: var(--text);
-            }
-
-            /* Filter Section */
-            .filter-card {
-                background: var(--card-bg);
-                border-radius: 12px;
-                padding: 20px;
-                margin-bottom: 24px;
-                border: 1px solid var(--border);
-            }
-
-            .filter-row {
-                display: flex;
-                gap: 16px;
-                flex-wrap: wrap;
-                align-items: flex-end;
-            }
-
-            .filter-group {
-                display: flex;
-                flex-direction: column;
-                gap: 6px;
-            }
-
-            .filter-group label {
-                font-size: 13px;
-                font-weight: 600;
-                color: var(--text-muted);
-            }
-
-            .filter-group input,
-            .filter-group select {
-                padding: 10px 14px;
-                border: 1px solid var(--border);
-                border-radius: 8px;
-                font-size: 14px;
-                min-width: 160px;
-            }
-
-            .filter-group input:focus,
-            .filter-group select:focus {
-                outline: none;
-                border-color: var(--primary);
-                box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
-            }
-
-            .btn {
-                padding: 10px 20px;
-                border: none;
-                border-radius: 8px;
-                font-size: 14px;
-                font-weight: 600;
-                cursor: pointer;
-                display: inline-flex;
-                align-items: center;
-                gap: 8px;
-                transition: all 0.15s;
-                text-decoration: none;
-            }
-
-            .btn-primary {
-                background: var(--primary);
-                color: white;
-            }
-
-            .btn-primary:hover {
-                background: var(--primary-hover);
-            }
-
-            .btn-success {
-                background: var(--success);
-                color: white;
-            }
-
-            .btn-success:hover {
-                background: #059669;
-            }
-
-            .btn-outline {
-                background: white;
-                color: var(--text);
-                border: 1px solid var(--border);
-            }
-
-            .btn-outline:hover {
-                background: var(--bg);
-            }
-
-            /* Summary Cards */
-            .summary-grid {
-                display: grid;
-                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-                gap: 20px;
-                margin-bottom: 24px;
-            }
-
-            .summary-card {
-                background: var(--card-bg);
-                border-radius: 12px;
-                padding: 24px;
-                border: 1px solid var(--border);
-                text-align: center;
-            }
-
-            .summary-card .icon {
-                font-size: 32px;
-                margin-bottom: 8px;
-            }
-
-            .summary-card .value {
-                font-size: 32px;
-                font-weight: 700;
-                color: var(--text);
-            }
-
-            .summary-card .label {
-                font-size: 13px;
-                color: var(--text-muted);
-                margin-top: 4px;
-            }
-
-            .summary-card.import {
-                border-left: 4px solid var(--success);
-            }
-
-            .summary-card.export {
-                border-left: 4px solid var(--danger);
-            }
-
-            .summary-card.stock {
-                border-left: 4px solid var(--primary);
-            }
-
-            .summary-card.transactions {
-                border-left: 4px solid var(--warning);
-            }
-
-            /* Tabs */
-            .tabs {
-                display: flex;
-                gap: 4px;
-                margin-bottom: 20px;
-                background: var(--bg);
-                padding: 4px;
-                border-radius: 10px;
-                width: fit-content;
-            }
-
-            .tab {
-                padding: 10px 20px;
-                border: none;
-                background: transparent;
-                border-radius: 8px;
-                font-size: 14px;
-                font-weight: 500;
-                cursor: pointer;
-                color: var(--text-muted);
-                transition: all 0.15s;
-            }
-
-            .tab.active {
-                background: white;
-                color: var(--text);
-                box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-            }
-
-            .tab:hover:not(.active) {
-                color: var(--text);
-            }
-
-            /* Table */
-            .table-card {
-                background: var(--card-bg);
-                border-radius: 12px;
-                border: 1px solid var(--border);
-                overflow: hidden;
-            }
-
-            .table-header {
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-                padding: 16px 20px;
-                border-bottom: 1px solid var(--border);
-            }
-
-            .table-header h3 {
-                margin: 0;
-                font-size: 16px;
-                font-weight: 600;
-            }
-
-            .table-container {
-                overflow-x: auto;
-            }
-
-            table {
-                width: 100%;
-                border-collapse: collapse;
-            }
-
-            thead th {
-                background: #f8fafc;
-                padding: 14px 16px;
-                text-align: left;
-                font-size: 12px;
-                font-weight: 700;
-                text-transform: uppercase;
-                color: var(--text-muted);
-                border-bottom: 1px solid var(--border);
-            }
-
-            tbody td {
-                padding: 14px 16px;
-                font-size: 14px;
-                border-bottom: 1px solid #f1f5f9;
-            }
-
-            tbody tr:hover {
-                background: #f8fafc;
-            }
-
-            tbody tr:last-child td {
-                border-bottom: none;
-            }
-
-            .badge {
-                display: inline-block;
-                padding: 4px 10px;
-                border-radius: 20px;
-                font-size: 12px;
-                font-weight: 600;
-            }
-
-            .badge-import {
-                background: #dcfce7;
-                color: #166534;
-            }
-
-            .badge-export {
-                background: #fee2e2;
-                color: #991b1b;
-            }
-
-            .text-right {
-                text-align: right;
-            }
-
-            .text-center {
-                text-align: center;
-            }
-
-            .tab-panel {
-                display: none;
-            }
-
-            .tab-panel.active {
-                display: block;
-            }
-
-            .empty-state {
-                text-align: center;
-                padding: 60px 20px;
-                color: var(--text-muted);
-            }
-
-            .empty-state .icon {
-                font-size: 48px;
-                margin-bottom: 16px;
-            }
-
-            @media print {
-
-                .filter-card,
-                .page-header .btn,
-                .table-header .btn {
-                    display: none !important;
-                }
-            }
-        </style>
-    </head>
-
-    <body>
-        <% Users currentUser = (Users) session.getAttribute("currentUser");
-            List<ReportItem> inventoryReport = (List<ReportItem>) request.getAttribute("inventoryReport");
-            List<LedgerEntry> ledgerEntries = (List<LedgerEntry>) request.getAttribute("ledgerEntries");
-            ReportSummary summary = (ReportSummary) request.getAttribute("summary");
-
-            String startDate = (String) request.getAttribute("startDate");
-            String endDate = (String) request.getAttribute("endDate");
-            String type = (String) request.getAttribute("type");
-
-            if (inventoryReport == null) {
-                inventoryReport = new ArrayList<>();
-            }
-            if (ledgerEntries == null) {
-                ledgerEntries = new ArrayList<>();
-            }
-            if (summary == null) {
-                summary = new ReportSummary();
-            }
-
-            SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm");
-        %>
-
-        <div class="container">
-            <div class="page-header">
-                <h1>📊 Báo Cáo Xuất Nhập Tồn</h1>
-                <button class="btn btn-outline"
-                        onclick="window.print()">
-                    🖨️ In Báo Cáo
-                </button>
-            </div>
-
-            <!-- Filters -->
-            <div class="filter-card">
-                <form method="get" action="report-inventory">
-                    <div class="filter-row">
-                        <div class="filter-group">
-                            <label>Từ Ngày</label>
-                            <input type="date" name="startDate"
-                                   value="<%= startDate != null ? startDate : ""%>">
-                        </div>
-                        <div class="filter-group">
-                            <label>Đến Ngày</label>
-                            <input type="date" name="endDate"
-                                   value="<%= endDate != null ? endDate : ""%>">
-                        </div>
-                        <div class="filter-group">
-                            <label>Loại</label>
-                            <select name="type">
-                                <option value="all" <%="all"
-                                        .equals(type) || type == null
-                                        ? "selected" : ""%>>Tất cả</option>
-                                <option value="IMPORT" <%="IMPORT"
-                                        .equals(type) ? "selected" : ""%>
-                                        >Nhập kho</option>
-                                <option value="EXPORT" <%="EXPORT"
-                                        .equals(type) ? "selected" : ""%>
-                                        >Xuất kho</option>
-                            </select>
-                        </div>
-                        <button type="submit" class="btn btn-primary">
-                            🔍 Lọc Báo Cáo
-                        </button>
-                        <a href="report-inventory"
-                           class="btn btn-outline">
-                            ↺ Đặt Lại
-                        </a>
-                    </div>
-                </form>
-            </div>
-
-            <!-- Summary Cards -->
-            <div class="summary-grid">
-                <div class="summary-card import">
-                    <div class="icon">📥</div>
-                    <div class="value">
-                        <%= summary.totalImport%>
-                    </div>
-                    <div class="label">Tổng Nhập Kho</div>
-                </div>
-                <div class="summary-card export">
-                    <div class="icon">📤</div>
-                    <div class="value">
-                        <%= summary.totalExport%>
-                    </div>
-                    <div class="label">Tổng Xuất Kho</div>
-                </div>
-                <div class="summary-card stock">
-                    <div class="icon">📦</div>
-                    <div class="value">
-                        <%= summary.totalStock%>
-                    </div>
-                    <div class="label">Tồn Kho Hiện Tại</div>
-                </div>
-                <div class="summary-card transactions">
-                    <div class="icon">📋</div>
-                    <div class="value">
-                        <%= summary.totalTransactions%>
-                    </div>
-                    <div class="label">Số Phiếu</div>
-                </div>
-            </div>
-
-            <!-- Tabs -->
-            <div class="tabs">
-                <button class="tab active"
-                        onclick="showTab('inventory')">📊 Tồn Kho Theo Sản
-                    Phẩm</button>
-                <button class="tab" onclick="showTab('ledger')">📜 Chi
-                    Tiết Giao Dịch</button>
-            </div>
-
-            <!-- Inventory Tab -->
-            <div id="tab-inventory" class="tab-panel active">
-                <div class="table-card">
-                    <div class="table-header">
-                        <h3>Báo Cáo Tồn Kho</h3>
-                        <a href="report-inventory?action=export&startDate=<%= startDate != null ? startDate : ""%>&endDate=<%= endDate != null ? endDate : ""%>&type=<%= type != null ? type : "all"%>"
-                           class="btn btn-success">
-                            📥 Tải CSV
-                        </a>
-                    </div>
-                    <div class="table-container">
-                        <% if (inventoryReport.isEmpty()) { %>
-                        <div class="empty-state">
-                            <div class="icon">📭</div>
-                            <p>Không có dữ liệu trong khoảng thời
-                                gian này</p>
-                        </div>
-                        <% } else { %>
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>Sản Phẩm</th>
-                                    <th>Cấu Hình</th>
-                                    <th>Đơn Vị</th>
-                                    <th class="text-right">Nhập
-                                    </th>
-                                    <th class="text-right">Xuất
-                                    </th>
-                                    <th class="text-right">Tồn
-                                        Kho</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <% for (ReportItem item
-                                            : inventoryReport) {%>
-                                <tr>
-                                    <td><strong>
-                                            <%= item.productName%>
-                                        </strong></td>
-                                    <td>
-                                        <%= item.config%>
-                                    </td>
-                                    <td>
-                                        <%= item.unit != null
-                                                ? item.unit
-                                                : "unit"%>
-                                    </td>
-                                    <td class="text-right"
-                                        style="color: var(--success); font-weight: 600;">
-                                        +<%= item.totalImport%>
-                                    </td>
-                                    <td class="text-right"
-                                        style="color: var(--danger); font-weight: 600;">
-                                        -<%= item.totalExport%>
-                                    </td>
-                                    <td class="text-right"
-                                        style="font-weight: 700;">
-                                        <%= item.currentStock%>
-                                    </td>
-                                </tr>
-                                <% } %>
-                            </tbody>
-                        </table>
-                        <% }%>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Ledger Tab -->
-            <div id="tab-ledger" class="tab-panel">
-                <div class="table-card">
-                    <div class="table-header">
-                        <h3>Chi Tiết Giao Dịch Kho</h3>
-                        <a href="report-inventory?action=exportLedger&startDate=<%= startDate != null ? startDate : ""%>&endDate=<%= endDate != null ? endDate : ""%>&type=<%= type != null ? type : "all"%>"
-                           class="btn btn-success">
-                            📥 Tải CSV
-                        </a>
-                    </div>
-                    <div class="table-container">
-                        <% if (ledgerEntries.isEmpty()) { %>
-                        <div class="empty-state">
-                            <div class="icon">📭</div>
-                            <p>Không có giao dịch trong khoảng thời
-                                gian này</p>
-                        </div>
-                        <% } else { %>
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>Thời Gian</th>
-                                    <th>Loại</th>
-                                    <th>Mã Phiếu</th>
-                                    <th>Sản Phẩm</th>
-                                    <th>Cấu Hình</th>
-                                    <th class="text-right">Số
-                                        Lượng</th>
-                                    <th class="text-right">Tồn
-                                        Sau</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <% for (LedgerEntry entry
-                                            : ledgerEntries) {%>
-                                <tr>
-                                    <td>
-                                        <%= entry.createdAt
-                                                != null
-                                                        ? dateFormat.format(entry.createdAt)
-                                                        : ""%>
-                                    </td>
-                                    <td>
-                                        <span
-                                            class="badge badge-<%= entry.type.toLowerCase()%>">
-                                            <%= "IMPORT"
-                                                    .equals(entry.type)
-                                                    ? "Nhập"
-                                                    : "Xuất"%>
-                                        </span>
-                                    </td>
-                                    <td>
-                                        <%= entry.ticketCode%>
-                                    </td>
-                                    <td><strong>
-                                            <%= entry.productName%>
-                                        </strong></td>
-                                    <td>
-                                        <%= entry.config%>
-                                    </td>
-                                    <td class="text-right"
-                                        style="font-weight: 600; color: <%= "IMPORT".equals(entry.type)
-                                                ? "var(--success)"
-                                                : "var(--danger)"%>
-                                        ;">
-                                        <%= "IMPORT"
-                                                .equals(entry.type)
-                                                ? "+" : "-"%>
-                                        <%= entry.quantityChange%>
-                                    </td>
-                                    <td class="text-right"
-                                        style="font-weight: 700;">
-                                        <%= entry.balanceAfter%>
-                                    </td>
-                                </tr>
-                                <% } %>
-                            </tbody>
-                        </table>
-                        <% }%>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <jsp:include page="footer.jsp" />
-
-        <script>
-            function showTab(tabName) {
-                // Hide all tabs
-                document.querySelectorAll('.tab-panel').forEach(panel => {
-                    panel.classList.remove('active');
-                });
-                document.querySelectorAll('.tab').forEach(tab => {
-                    tab.classList.remove('active');
-                });
-
-                // Show selected tab
-                document.getElementById('tab-' + tabName).classList.add('active');
-                event.target.classList.add('active');
-            }
-        </script>
-    </body>
-
-</html>
+    <%@ page import="java.util.*" %>
+        <%@ page import="java.text.SimpleDateFormat" %>
+            <%@ page import="DAO.ReportDAO.ReportItem" %>
+                <%@ page import="DAO.ReportDAO.LedgerEntry" %>
+                    <%@ page import="DAO.ReportDAO.ReportSummary" %>
+                        <%@ page import="Model.Users" %>
+                            <!DOCTYPE html>
+                            <html>
+
+                            <head>
+                                <meta charset="UTF-8">
+                                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                                <title>Inventory Report | Laptop WMS</title>
+                                <link
+                                    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+                                    rel="stylesheet">
+                                <style>
+                                    body {
+                                        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+                                        background: linear-gradient(135deg, #f0f4ff 0%, #f8fafc 50%, #f0fdf4 100%);
+                                        margin: 0;
+                                        padding: 0;
+                                        min-height: 100vh;
+                                    }
+
+                                    .page-container {
+                                        max-width: 1400px;
+                                        margin: 0 auto;
+                                        padding: 2rem;
+                                    }
+
+                                    .page-header {
+                                        display: flex;
+                                        justify-content: space-between;
+                                        align-items: center;
+                                        margin-bottom: 1.5rem;
+                                    }
+
+                                    .page-title {
+                                        font-size: 1.75rem;
+                                        font-weight: 700;
+                                        color: #1e293b;
+                                        display: flex;
+                                        align-items: center;
+                                        gap: 0.75rem;
+                                    }
+
+                                    .btn {
+                                        padding: 0.625rem 1.25rem;
+                                        border-radius: 0.5rem;
+                                        font-weight: 600;
+                                        font-size: 0.875rem;
+                                        cursor: pointer;
+                                        transition: all 0.2s ease;
+                                        text-decoration: none;
+                                        display: inline-flex;
+                                        align-items: center;
+                                        gap: 0.5rem;
+                                        border: none;
+                                    }
+
+                                    .btn-outline {
+                                        background: white;
+                                        color: #475569;
+                                        border: 1px solid #e2e8f0;
+                                    }
+
+                                    .btn-outline:hover {
+                                        background: #f1f5f9;
+                                    }
+
+                                    .btn-primary {
+                                        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                                        color: white;
+                                        box-shadow: 0 4px 14px rgba(102, 126, 234, 0.3);
+                                    }
+
+                                    .btn-primary:hover {
+                                        transform: translateY(-1px);
+                                        box-shadow: 0 6px 18px rgba(102, 126, 234, 0.4);
+                                    }
+
+                                    .btn-success {
+                                        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+                                        color: white;
+                                        box-shadow: 0 4px 14px rgba(16, 185, 129, 0.3);
+                                    }
+
+                                    .btn-success:hover {
+                                        transform: translateY(-1px);
+                                        box-shadow: 0 6px 18px rgba(16, 185, 129, 0.4);
+                                    }
+
+                                    .filter-card {
+                                        background: white;
+                                        border-radius: 1rem;
+                                        padding: 1.5rem;
+                                        margin-bottom: 1.5rem;
+                                        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+                                        border: 1px solid #f1f5f9;
+                                    }
+
+                                    .filter-row {
+                                        display: flex;
+                                        gap: 1rem;
+                                        flex-wrap: wrap;
+                                        align-items: flex-end;
+                                    }
+
+                                    .filter-group {
+                                        display: flex;
+                                        flex-direction: column;
+                                        gap: 0.375rem;
+                                    }
+
+                                    .filter-group label {
+                                        font-size: 0.75rem;
+                                        font-weight: 600;
+                                        color: #64748b;
+                                        text-transform: uppercase;
+                                        letter-spacing: 0.5px;
+                                    }
+
+                                    .filter-group input,
+                                    .filter-group select {
+                                        padding: 0.625rem 0.875rem;
+                                        border: 2px solid #e2e8f0;
+                                        border-radius: 0.5rem;
+                                        font-size: 0.875rem;
+                                        min-width: 140px;
+                                        outline: none;
+                                        transition: all 0.2s ease;
+                                    }
+
+                                    .filter-group input:focus,
+                                    .filter-group select:focus {
+                                        border-color: #667eea;
+                                        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.15);
+                                    }
+
+                                    .summary-grid {
+                                        display: grid;
+                                        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+                                        gap: 1.25rem;
+                                        margin-bottom: 1.5rem;
+                                    }
+
+                                    .summary-card {
+                                        background: white;
+                                        border-radius: 1rem;
+                                        padding: 1.5rem;
+                                        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+                                        border: 1px solid #f1f5f9;
+                                        text-align: center;
+                                    }
+
+                                    .summary-card .icon {
+                                        font-size: 2rem;
+                                        margin-bottom: 0.5rem;
+                                    }
+
+                                    .summary-card .stat-value {
+                                        font-size: 2rem;
+                                        font-weight: 800;
+                                    }
+
+                                    .summary-card .stat-label {
+                                        font-size: 0.6875rem;
+                                        color: #64748b;
+                                        margin-top: 0.25rem;
+                                        font-weight: 600;
+                                        text-transform: uppercase;
+                                        letter-spacing: 0.5px;
+                                    }
+
+                                    .summary-card.import {
+                                        border-left: 4px solid #10b981;
+                                    }
+
+                                    .summary-card.import .stat-value {
+                                        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+                                        -webkit-background-clip: text;
+                                        -webkit-text-fill-color: transparent;
+                                        background-clip: text;
+                                    }
+
+                                    .summary-card.export {
+                                        border-left: 4px solid #ef4444;
+                                    }
+
+                                    .summary-card.export .stat-value {
+                                        background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+                                        -webkit-background-clip: text;
+                                        -webkit-text-fill-color: transparent;
+                                        background-clip: text;
+                                    }
+
+                                    .summary-card.stock {
+                                        border-left: 4px solid #667eea;
+                                    }
+
+                                    .summary-card.stock .stat-value {
+                                        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                                        -webkit-background-clip: text;
+                                        -webkit-text-fill-color: transparent;
+                                        background-clip: text;
+                                    }
+
+                                    .summary-card.transactions {
+                                        border-left: 4px solid #f59e0b;
+                                    }
+
+                                    .summary-card.transactions .stat-value {
+                                        background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+                                        -webkit-background-clip: text;
+                                        -webkit-text-fill-color: transparent;
+                                        background-clip: text;
+                                    }
+
+                                    .tabs {
+                                        display: flex;
+                                        gap: 0.25rem;
+                                        margin-bottom: 1.5rem;
+                                        background: white;
+                                        padding: 0.375rem;
+                                        border-radius: 0.75rem;
+                                        width: fit-content;
+                                        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+                                    }
+
+                                    .tab {
+                                        padding: 0.75rem 1.5rem;
+                                        border: none;
+                                        background: transparent;
+                                        border-radius: 0.5rem;
+                                        font-size: 0.875rem;
+                                        font-weight: 600;
+                                        cursor: pointer;
+                                        color: #64748b;
+                                        transition: all 0.2s ease;
+                                    }
+
+                                    .tab.active {
+                                        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                                        color: white;
+                                    }
+
+                                    .tab:hover:not(.active) {
+                                        color: #1e293b;
+                                        background: #f8fafc;
+                                    }
+
+                                    .table-card {
+                                        background: white;
+                                        border-radius: 1rem;
+                                        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+                                        border: 1px solid #f1f5f9;
+                                        overflow: hidden;
+                                    }
+
+                                    .table-header {
+                                        display: flex;
+                                        justify-content: space-between;
+                                        align-items: center;
+                                        padding: 1rem 1.5rem;
+                                        border-bottom: 1px solid #f1f5f9;
+                                    }
+
+                                    .table-header h3 {
+                                        margin: 0;
+                                        font-size: 1rem;
+                                        font-weight: 600;
+                                        color: #1e293b;
+                                    }
+
+                                    table {
+                                        width: 100%;
+                                        border-collapse: collapse;
+                                    }
+
+                                    thead th {
+                                        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                                        color: white;
+                                        padding: 1rem;
+                                        text-align: left;
+                                        font-size: 0.75rem;
+                                        font-weight: 700;
+                                        text-transform: uppercase;
+                                        letter-spacing: 0.5px;
+                                    }
+
+                                    tbody td {
+                                        padding: 1rem;
+                                        font-size: 0.875rem;
+                                        border-bottom: 1px solid #f1f5f9;
+                                        color: #475569;
+                                    }
+
+                                    tbody tr:hover td {
+                                        background: #f8fafc;
+                                    }
+
+                                    .text-right {
+                                        text-align: right;
+                                    }
+
+                                    .badge {
+                                        display: inline-flex;
+                                        align-items: center;
+                                        padding: 0.375rem 0.75rem;
+                                        border-radius: 2rem;
+                                        font-size: 0.6875rem;
+                                        font-weight: 700;
+                                        text-transform: uppercase;
+                                    }
+
+                                    .badge-import {
+                                        background: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%);
+                                        color: #16a34a;
+                                    }
+
+                                    .badge-export {
+                                        background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+                                        color: #dc2626;
+                                    }
+
+                                    .tab-panel {
+                                        display: none;
+                                    }
+
+                                    .tab-panel.active {
+                                        display: block;
+                                    }
+
+                                    .empty-state {
+                                        text-align: center;
+                                        padding: 3rem;
+                                        color: #94a3b8;
+                                    }
+
+                                    .empty-state .icon {
+                                        font-size: 3rem;
+                                        margin-bottom: 1rem;
+                                    }
+
+                                    @media print {
+
+                                        .filter-card,
+                                        .btn,
+                                        .page-header .btn,
+                                        .tabs {
+                                            display: none !important;
+                                        }
+                                    }
+
+                                    @media (max-width: 768px) {
+                                        .page-container {
+                                            padding: 1rem;
+                                        }
+
+                                        .filter-row {
+                                            flex-direction: column;
+                                        }
+
+                                        .tabs {
+                                            width: 100%;
+                                        }
+
+                                        .tab {
+                                            flex: 1;
+                                            text-align: center;
+                                        }
+                                    }
+                                </style>
+                            </head>
+
+                            <body>
+                                <jsp:include page="header.jsp" />
+
+                                <% Users currentUser=(Users) session.getAttribute("currentUser"); List<ReportItem>
+                                    inventoryReport = (List<ReportItem>) request.getAttribute("inventoryReport");
+                                        List<LedgerEntry> ledgerEntries = (List<LedgerEntry>)
+                                                request.getAttribute("ledgerEntries");
+                                                ReportSummary summary = (ReportSummary) request.getAttribute("summary");
+                                                String startDate = (String) request.getAttribute("startDate");
+                                                String endDate = (String) request.getAttribute("endDate");
+                                                String type = (String) request.getAttribute("type");
+                                                if (inventoryReport == null) inventoryReport = new ArrayList<>();
+                                                    if (ledgerEntries == null) ledgerEntries = new ArrayList<>();
+                                                        if (summary == null) summary = new ReportSummary();
+                                                        SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm");
+                                                        %>
+
+                                                        <div class="page-container">
+                                                            <div class="page-header">
+                                                                <h1 class="page-title">📊 Inventory Report</h1>
+                                                                <button class="btn btn-outline"
+                                                                    onclick="window.print()">🖨️ Print Report</button>
+                                                            </div>
+
+                                                            <div class="filter-card">
+                                                                <form method="get" action="report-inventory">
+                                                                    <div class="filter-row">
+                                                                        <div class="filter-group">
+                                                                            <label>From Date</label>
+                                                                            <input type="date" name="startDate"
+                                                                                value="<%= startDate != null ? startDate : "" %>">
+                                                                        </div>
+                                                                        <div class="filter-group">
+                                                                            <label>To Date</label>
+                                                                            <input type="date" name="endDate"
+                                                                                value="<%= endDate != null ? endDate : "" %>">
+                                                                        </div>
+                                                                        <div class="filter-group">
+                                                                            <label>Type</label>
+                                                                            <select name="type">
+                                                                                <option value="all" <%="all"
+                                                                                    .equals(type) || type==null
+                                                                                    ? "selected" : "" %>>All</option>
+                                                                                <option value="IMPORT" <%="IMPORT"
+                                                                                    .equals(type) ? "selected" : "" %>
+                                                                                    >Import</option>
+                                                                                <option value="EXPORT" <%="EXPORT"
+                                                                                    .equals(type) ? "selected" : "" %>
+                                                                                    >Export</option>
+                                                                            </select>
+                                                                        </div>
+                                                                        <button type="submit" class="btn btn-primary">🔍
+                                                                            Filter</button>
+                                                                        <a href="report-inventory"
+                                                                            class="btn btn-outline">↺ Reset</a>
+                                                                    </div>
+                                                                </form>
+                                                            </div>
+
+                                                            <div class="summary-grid">
+                                                                <div class="summary-card import">
+                                                                    <div class="icon">📥</div>
+                                                                    <div class="stat-value">
+                                                                        <%= summary.totalImport %>
+                                                                    </div>
+                                                                    <div class="stat-label">Total Import</div>
+                                                                </div>
+                                                                <div class="summary-card export">
+                                                                    <div class="icon">📤</div>
+                                                                    <div class="stat-value">
+                                                                        <%= summary.totalExport %>
+                                                                    </div>
+                                                                    <div class="stat-label">Total Export</div>
+                                                                </div>
+                                                                <div class="summary-card stock">
+                                                                    <div class="icon">📦</div>
+                                                                    <div class="stat-value">
+                                                                        <%= summary.totalStock %>
+                                                                    </div>
+                                                                    <div class="stat-label">Current Stock</div>
+                                                                </div>
+                                                                <div class="summary-card transactions">
+                                                                    <div class="icon">📋</div>
+                                                                    <div class="stat-value">
+                                                                        <%= summary.totalTransactions %>
+                                                                    </div>
+                                                                    <div class="stat-label">Transactions</div>
+                                                                </div>
+                                                            </div>
+
+                                                            <div class="tabs">
+                                                                <button class="tab active"
+                                                                    onclick="showTab('inventory')">📊 Stock by
+                                                                    Product</button>
+                                                                <button class="tab" onclick="showTab('ledger')">📜
+                                                                    Transaction Details</button>
+                                                            </div>
+
+                                                            <div id="tab-inventory" class="tab-panel active">
+                                                                <div class="table-card">
+                                                                    <div class="table-header">
+                                                                        <h3>Inventory Report</h3>
+                                                                        <a href="report-inventory?action=export&startDate=<%= startDate != null ? startDate : "" %>&endDate=<%= endDate != null ? endDate : "" %>&type=<%= type != null ? type : "all" %>" class="btn btn-success">📥 Download
+                                                                            CSV</a>
+                                                                    </div>
+                                                                    <div style="overflow-x: auto;">
+                                                                        <% if (inventoryReport.isEmpty()) { %>
+                                                                            <div class="empty-state">
+                                                                                <div class="icon">📭</div>
+                                                                                <p>No data found for the selected period
+                                                                                </p>
+                                                                            </div>
+                                                                            <% } else { %>
+                                                                                <table>
+                                                                                    <thead>
+                                                                                        <tr>
+                                                                                            <th>Product</th>
+                                                                                            <th>Configuration</th>
+                                                                                            <th>Unit</th>
+                                                                                            <th class="text-right">
+                                                                                                Import</th>
+                                                                                            <th class="text-right">
+                                                                                                Export</th>
+                                                                                            <th class="text-right">Stock
+                                                                                            </th>
+                                                                                        </tr>
+                                                                                    </thead>
+                                                                                    <tbody>
+                                                                                        <% for (ReportItem item : inventoryReport) { %>
+                                                                                            <tr>
+                                                                                                <td><strong>
+                                                                                                        <%= item.productName
+                                                                                                            %>
+                                                                                                    </strong></td>
+                                                                                                <td>
+                                                                                                    <%= item.config %>
+                                                                                                </td>
+                                                                                                <td>
+                                                                                                    <%= item.unit !=null
+                                                                                                        ? item.unit
+                                                                                                        : "unit" %>
+                                                                                                </td>
+                                                                                                <td class="text-right"
+                                                                                                    style="color: #16a34a; font-weight: 600;">
+                                                                                                    +<%= item.totalImport
+                                                                                                        %>
+                                                                                                </td>
+                                                                                                <td class="text-right"
+                                                                                                    style="color: #dc2626; font-weight: 600;">
+                                                                                                    -<%= item.totalExport
+                                                                                                        %>
+                                                                                                </td>
+                                                                                                <td class="text-right"
+                                                                                                    style="font-weight: 700;">
+                                                                                                    <%= item.currentStock
+                                                                                                        %>
+                                                                                                </td>
+                                                                                            </tr>
+                                                                                            <% } %>
+                                                                                    </tbody>
+                                                                                </table>
+                                                                                <% } %>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+
+                                                            <div id="tab-ledger" class="tab-panel">
+                                                                <div class="table-card">
+                                                                    <div class="table-header">
+                                                                        <h3>Transaction Ledger</h3>
+                                                                        <a href="report-inventory?action=exportLedger&startDate=<%= startDate != null ? startDate : "" %>&endDate=<%= endDate != null ? endDate : "" %>&type=<%= type != null ? type : "all" %>" class="btn btn-success">📥 Download
+                                                                            CSV</a>
+                                                                    </div>
+                                                                    <div style="overflow-x: auto;">
+                                                                        <% if (ledgerEntries.isEmpty()) { %>
+                                                                            <div class="empty-state">
+                                                                                <div class="icon">📭</div>
+                                                                                <p>No transactions found for the
+                                                                                    selected period</p>
+                                                                            </div>
+                                                                            <% } else { %>
+                                                                                <table>
+                                                                                    <thead>
+                                                                                        <tr>
+                                                                                            <th>Timestamp</th>
+                                                                                            <th>Type</th>
+                                                                                            <th>Ticket Code</th>
+                                                                                            <th>Product</th>
+                                                                                            <th>Configuration</th>
+                                                                                            <th class="text-right">
+                                                                                                Quantity</th>
+                                                                                            <th class="text-right">
+                                                                                                Balance After</th>
+                                                                                        </tr>
+                                                                                    </thead>
+                                                                                    <tbody>
+                                                                                        <% for (LedgerEntry entry :
+                                                                                            ledgerEntries) { %>
+                                                                                            <tr>
+                                                                                                <td>
+                                                                                                    <%= entry.createdAt
+                                                                                                        !=null ?
+                                                                                                        dateFormat.format(entry.createdAt)
+                                                                                                        : "" %>
+                                                                                                </td>
+                                                                                                <td><span
+                                                                                                        class="badge badge-<%= entry.type.toLowerCase() %>">
+                                                                                                        <%= "IMPORT"
+                                                                                                            .equals(entry.type)
+                                                                                                            ? "Import"
+                                                                                                            : "Export"
+                                                                                                            %>
+                                                                                                    </span></td>
+                                                                                                <td>
+                                                                                                    <%= entry.ticketCode
+                                                                                                        %>
+                                                                                                </td>
+                                                                                                <td><strong>
+                                                                                                        <%= entry.productName
+                                                                                                            %>
+                                                                                                    </strong></td>
+                                                                                                <td>
+                                                                                                    <%= entry.config %>
+                                                                                                </td>
+                                                                                                <td class="text-right"
+                                                                                                    style="font-weight: 600; color: <%= "IMPORT".equals(entry.type)
+                                                                                                    ? "#16a34a"
+                                                                                                    : "#dc2626" %>;">
+                                                                                                    <%= "IMPORT"
+                                                                                                        .equals(entry.type)
+                                                                                                        ? "+" : "-" %>
+                                                                                                        <%= entry.quantityChange
+                                                                                                            %>
+                                                                                                </td>
+                                                                                                <td class="text-right"
+                                                                                                    style="font-weight: 700;">
+                                                                                                    <%= entry.balanceAfter
+                                                                                                        %>
+                                                                                                </td>
+                                                                                            </tr>
+                                                                                            <% } %>
+                                                                                    </tbody>
+                                                                                </table>
+                                                                                <% } %>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                        <jsp:include page="footer.jsp" />
+
+                                                        <script>
+                                                            function showTab(tabName) {
+                                                                document.querySelectorAll('.tab-panel').forEach(panel => panel.classList.remove('active'));
+                                                                document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+                                                                document.getElementById('tab-' + tabName).classList.add('active');
+                                                                event.target.classList.add('active');
+                                                            }
+                                                        </script>
+                            </body>
+
+                            </html>

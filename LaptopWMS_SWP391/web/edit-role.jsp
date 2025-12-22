@@ -1,103 +1,192 @@
 <%@ page import="Model.Users" %>
-<%@ page language="java" contentType="text/html; charset=UTF-8"
-    pageEncoding="UTF-8"%>
-<!DOCTYPE html>
-<html>
-<head>
-    <jsp:include page="header.jsp"/>
-    <meta charset="UTF-8">
-    <title>Laptop Warehouse Management System</title>
+    <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+        <!DOCTYPE html>
+        <html>
 
-    <style>
-        body {
-            font-family: "Segoe UI", sans-serif;
-            background: #f5f6fa;
-            padding: 0;
-            margin: 0;
-        }
+        <head>
+            <jsp:include page="header.jsp" />
+            <meta charset="UTF-8">
+            <title>Edit User Role | Laptop WMS</title>
+            <style>
+                body {
+                    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+                    background: linear-gradient(135deg, #f0f4ff 0%, #f8fafc 50%, #f0fdf4 100%);
+                    margin: 0;
+                    padding: 0;
+                    min-height: 100vh;
+                }
 
-        .container {
-            width: 450px;
-            margin: 60px auto;
-            background: white;
-            padding: 30px;
-            border-radius: 12px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
-        }
+                .page-container {
+                    max-width: 480px;
+                    margin: 2rem auto;
+                    padding: 2rem;
+                }
 
-        h2 {
-            text-align: center;
-            margin-bottom: 25px;
-            color: #2c3e50;
-        }
+                .form-card {
+                    background: white;
+                    border-radius: 1rem;
+                    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+                    overflow: hidden;
+                    border: 1px solid #f1f5f9;
+                    animation: fadeIn 0.3s ease-out;
+                }
 
-        label {
-            font-weight: 600;
-            color: #34495e;
-        }
+                @keyframes fadeIn {
+                    from {
+                        opacity: 0;
+                        transform: translateY(-10px);
+                    }
 
-        input[type="text"], select {
-            width: 100%;
-            padding: 10px 12px;
-            margin-top: 5px;
-            margin-bottom: 18px;
-            border: 1px solid #dcdde1;
-            border-radius: 8px;
-            font-size: 15px;
-            background: #fdfdfd;
-            box-sizing: border-box;
-        }
+                    to {
+                        opacity: 1;
+                        transform: translateY(0);
+                    }
+                }
 
-        input[disabled] {
-            background: #ecf0f1;
-            color: #7f8c8d;
-        }
+                .card-header {
+                    background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+                    color: white;
+                    padding: 1.5rem 2rem;
+                }
 
-        button {
-            width: 100%;
-            padding: 12px;
-            background: #3498db;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-size: 16px;
-            cursor: pointer;
-            font-weight: bold;
-            transition: 0.2s;
-        }
+                .card-header h2 {
+                    margin: 0;
+                    font-size: 1.375rem;
+                    font-weight: 700;
+                    display: flex;
+                    align-items: center;
+                    gap: 0.5rem;
+                }
 
-        button:hover {
-            background: #2980b9;
-        }
-    </style>
+                .card-body {
+                    padding: 2rem;
+                }
 
-</head>
-<body>
+                .form-group {
+                    margin-bottom: 1.5rem;
+                }
 
-    <div class="container">
-        <h2>Edit User Role</h2>
+                .form-group label {
+                    display: block;
+                    font-weight: 600;
+                    color: #475569;
+                    margin-bottom: 0.5rem;
+                    font-size: 0.875rem;
+                }
 
-        <%
-            Users user = (Users) request.getAttribute("user");
-        %>
+                .form-group input[type="text"],
+                .form-group select {
+                    width: 100%;
+                    padding: 0.875rem 1rem;
+                    border: 2px solid #e2e8f0;
+                    border-radius: 0.5rem;
+                    font-size: 0.9375rem;
+                    transition: all 0.2s ease;
+                    box-sizing: border-box;
+                    outline: none;
+                }
 
-        <form action="edit-role" method="post">
+                .form-group input:focus,
+                .form-group select:focus {
+                    border-color: #8b5cf6;
+                    box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.15);
+                }
 
-            <input type="hidden" name="id" value="<%= user.getUserId() %>">
+                .form-group input[disabled] {
+                    background: #f8fafc;
+                    color: #64748b;
+                    cursor: not-allowed;
+                }
 
-            <label>Username:</label>
-            <input type="text" value="<%= user.getUsername() %>" disabled>
+                .form-actions {
+                    margin-top: 2rem;
+                    padding-top: 1.5rem;
+                    border-top: 1px solid #f1f5f9;
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                }
 
-            <label>Role:</label>
-            <select name="roleId">
-                <option value="1" <%= user.getRoleId() == 1 ? "selected" : "" %>>Administrator</option>
-                <option value="2" <%= user.getRoleId() == 2 ? "selected" : "" %>>Warehouse Keeper</option>
-                <option value="3" <%= user.getRoleId() == 3 ? "selected" : "" %>>Sale</option>
-            </select>
+                .btn-back {
+                    color: #64748b;
+                    text-decoration: none;
+                    font-size: 0.875rem;
+                    font-weight: 500;
+                }
 
-            <button type="submit">Save</button>
-        </form>
-    </div>
-<jsp:include page="footer.jsp"/>
-</body>
-</html>
+                .btn-back:hover {
+                    color: #8b5cf6;
+                }
+
+                .btn-save {
+                    padding: 0.875rem 2rem;
+                    background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+                    color: white;
+                    border: none;
+                    border-radius: 0.5rem;
+                    font-weight: 600;
+                    font-size: 0.9375rem;
+                    cursor: pointer;
+                    transition: all 0.2s ease;
+                    box-shadow: 0 4px 14px rgba(139, 92, 246, 0.4);
+                }
+
+                .btn-save:hover {
+                    transform: translateY(-2px);
+                    box-shadow: 0 6px 20px rgba(139, 92, 246, 0.5);
+                }
+
+                @media (max-width: 540px) {
+                    .page-container {
+                        padding: 1rem;
+                        margin: 1rem;
+                    }
+
+                    .card-body {
+                        padding: 1.5rem;
+                    }
+                }
+            </style>
+        </head>
+
+        <body>
+            <div class="page-container">
+                <div class="form-card">
+                    <div class="card-header">
+                        <h2>🛡️ Edit User Role</h2>
+                    </div>
+
+                    <div class="card-body">
+                        <% Users user=(Users) request.getAttribute("user"); %>
+
+                            <form action="edit-role" method="post">
+                                <input type="hidden" name="id" value="<%= user.getUserId() %>">
+
+                                <div class="form-group">
+                                    <label>Username</label>
+                                    <input type="text" value="<%= user.getUsername() %>" disabled>
+                                </div>
+
+                                <div class="form-group">
+                                    <label>Role</label>
+                                    <select name="roleId">
+                                        <option value="1" <%=user.getRoleId()==1 ? "selected" : "" %>>Administrator
+                                        </option>
+                                        <option value="2" <%=user.getRoleId()==2 ? "selected" : "" %>>Warehouse Keeper
+                                        </option>
+                                        <option value="3" <%=user.getRoleId()==3 ? "selected" : "" %>>Sale</option>
+                                    </select>
+                                </div>
+
+                                <div class="form-actions">
+                                    <a href="javascript:history.back()" class="btn-back">← Back</a>
+                                    <button type="submit" class="btn-save">Save Role</button>
+                                </div>
+                            </form>
+                    </div>
+                </div>
+            </div>
+            <jsp:include page="footer.jsp" />
+        </body>
+
+        </html>

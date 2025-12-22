@@ -1,321 +1,469 @@
 <%@ page contentType="text/html" pageEncoding="UTF-8" %>
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+    <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
-<!DOCTYPE html>
-<html>
+        <!DOCTYPE html>
+        <html>
 
-    <head>
-        <title>Supplier Management - WMS</title>
+        <head>
+            <title>Suppliers | Laptop WMS</title>
+            <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+                rel="stylesheet">
+            <style>
+                body {
+                    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+                    background: linear-gradient(135deg, #f0f4ff 0%, #f8fafc 50%, #f0fdf4 100%);
+                    margin: 0;
+                    padding: 0;
+                    min-height: 100vh;
+                }
 
-        <style>
-            body {
-                font-family: "Segoe UI", Arial, sans-serif;
-                background-color: #f5f6fa;
-                margin: 0;
-                padding: 0;
-                color: #2c3e50;
-            }
+                .page-container {
+                    max-width: 1200px;
+                    margin: 2rem auto;
+                    padding: 2rem;
+                }
 
-            .container {
-                max-width: 1200px;
-                margin: 40px auto;
-                background-color: white;
-                padding: 30px;
-                border-radius: 12px;
-                box-shadow: 0 4px 20px rgba(0, 0, 0, 0.07);
-            }
+                .page-header {
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    margin-bottom: 2rem;
+                }
 
-            h1 {
-                text-align: center;
-                color: #2c3e50;
-                font-weight: 700;
-                margin-bottom: 25px;
-            }
+                .page-title {
+                    display: flex;
+                    align-items: center;
+                    gap: 0.75rem;
+                    font-size: 1.75rem;
+                    font-weight: 700;
+                    color: #1e293b;
+                }
 
-            .btn-add {
-                background-color: #2ecc71;
-                color: white;
-                padding: 10px 18px;
-                border: none;
-                border-radius: 6px;
-                cursor: pointer;
-                font-weight: 700;
-                margin-bottom: 20px;
-                text-decoration: none;
-                display: inline-block;
-                transition: background-color 0.2s;
-            }
+                .btn-add {
+                    display: inline-flex;
+                    align-items: center;
+                    gap: 0.5rem;
+                    padding: 0.75rem 1.5rem;
+                    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+                    color: white;
+                    text-decoration: none;
+                    border-radius: 0.75rem;
+                    font-weight: 600;
+                    font-size: 0.875rem;
+                    transition: all 0.2s ease;
+                    box-shadow: 0 4px 14px rgba(16, 185, 129, 0.4);
+                }
 
-            .btn-add:hover {
-                background-color: #27ae60;
-            }
+                .btn-add:hover {
+                    transform: translateY(-2px);
+                    box-shadow: 0 6px 20px rgba(16, 185, 129, 0.5);
+                    color: white;
+                }
 
-            .filter-container {
-                margin-bottom: 20px;
-                padding: 15px;
-                background: #fff;
-                border-radius: 8px;
-                box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
-            }
+                .filter-bar {
+                    display: flex;
+                    flex-wrap: wrap;
+                    gap: 1rem;
+                    align-items: flex-end;
+                    padding: 1.25rem 1.5rem;
+                    background: white;
+                    border-radius: 1rem;
+                    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+                    margin-bottom: 1.5rem;
+                    border: 1px solid #f1f5f9;
+                }
 
-            .filter-container form {
-                display: flex;
-                gap: 15px;
-                align-items: center;
-                flex-wrap: wrap;
-            }
+                .filter-group {
+                    display: flex;
+                    flex-direction: column;
+                    gap: 0.375rem;
+                }
 
-            .filter-container input[type="text"] {
-                padding: 8px 12px;
-                border: 1px solid #ddd;
-                border-radius: 6px;
-                width: 250px;
-                font-size: 14px;
-            }
+                .filter-group label {
+                    font-size: 0.6875rem;
+                    font-weight: 600;
+                    color: #64748b;
+                    text-transform: uppercase;
+                    letter-spacing: 0.5px;
+                }
 
-            .filter-container select {
-                padding: 8px 12px;
-                border: 1px solid #ddd;
-                border-radius: 6px;
-                font-size: 14px;
-            }
+                .filter-group input,
+                .filter-group select {
+                    padding: 0.625rem 1rem;
+                    font-size: 0.875rem;
+                    border: 2px solid #e2e8f0;
+                    border-radius: 0.5rem;
+                    background: white;
+                    outline: none;
+                    transition: all 0.2s ease;
+                    min-width: 200px;
+                }
 
-            .btn-search {
-                padding: 8px 16px;
-                background: #3498db;
-                color: white;
-                border: none;
-                border-radius: 6px;
-                cursor: pointer;
-                font-weight: 600;
-            }
+                .filter-group input:focus,
+                .filter-group select:focus {
+                    border-color: #667eea;
+                    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.15);
+                }
 
-            .btn-search:hover {
-                background: #2980b9;
-            }
+                .btn-search {
+                    padding: 0.625rem 1.25rem;
+                    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                    color: white;
+                    border: none;
+                    border-radius: 0.5rem;
+                    font-weight: 600;
+                    cursor: pointer;
+                    transition: all 0.2s ease;
+                }
 
-            .btn-clear {
-                padding: 8px 16px;
-                background: #e74c3c;
-                color: white;
-                text-decoration: none;
-                border-radius: 6px;
-                font-size: 13px;
-                font-weight: 600;
-            }
+                .btn-search:hover {
+                    transform: translateY(-1px);
+                    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+                }
 
-            .btn-clear:hover {
-                background: #c0392b;
-            }
+                .btn-clear {
+                    padding: 0.625rem 1.25rem;
+                    background: #ef4444;
+                    color: white;
+                    text-decoration: none;
+                    border-radius: 0.5rem;
+                    font-weight: 600;
+                    font-size: 0.875rem;
+                }
 
-            table {
-                width: 100%;
-                border-collapse: separate;
-                border-spacing: 0;
-                margin-top: 10px;
-                border-radius: 8px;
-                overflow: hidden;
-                box-shadow: 0 0 0 1px #e0e0e0;
-            }
+                .btn-clear:hover {
+                    background: #dc2626;
+                    color: white;
+                }
 
-            th {
-                background-color: #2c3e50;
-                color: white;
-                padding: 15px 12px;
-                text-align: left;
-                font-size: 14px;
-                text-transform: uppercase;
-                font-weight: 600;
-            }
+                .table-card {
+                    background: white;
+                    border-radius: 1rem;
+                    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+                    overflow: hidden;
+                    border: 1px solid #f1f5f9;
+                }
 
-            td {
-                padding: 15px 12px;
-                border-bottom: 1px solid #f0f0f0;
-                font-size: 14px;
-                vertical-align: middle;
-                background-color: white;
-            }
+                table {
+                    width: 100%;
+                    border-collapse: collapse;
+                }
 
-            tr:hover td {
-                background-color: #f8f9fa;
-            }
+                th {
+                    padding: 1rem 1.25rem;
+                    text-align: left;
+                    font-size: 0.6875rem;
+                    font-weight: 600;
+                    text-transform: uppercase;
+                    letter-spacing: 0.5px;
+                    color: #64748b;
+                    background: linear-gradient(135deg, #f8fafc 0%, white 100%);
+                    border-bottom: 2px solid #e2e8f0;
+                }
 
-            .status-badge {
-                padding: 5px 12px;
-                border-radius: 20px;
-                font-size: 11px;
-                font-weight: bold;
-                text-transform: uppercase;
-            }
+                td {
+                    padding: 1rem 1.25rem;
+                    font-size: 0.875rem;
+                    color: #475569;
+                    border-bottom: 1px solid #f1f5f9;
+                }
 
-            .status-active {
-                background: #e6f7ed;
-                color: #27ae60;
-                border: 1px solid #27ae60;
-            }
+                tbody tr {
+                    transition: all 0.2s ease;
+                    animation: fadeIn 0.3s ease-out backwards;
+                }
 
-            .status-inactive {
-                background: #fbebeb;
-                color: #e74c3c;
-                border: 1px solid #e74c3c;
-            }
+                tbody tr:nth-child(1) {
+                    animation-delay: 0.02s;
+                }
 
-            .btn-view {
-                background-color: #3498db;
-                color: white;
-                padding: 6px 12px;
-                border-radius: 4px;
-                text-decoration: none;
-                font-size: 12px;
-                font-weight: 600;
-                margin-right: 8px;
-            }
+                tbody tr:nth-child(2) {
+                    animation-delay: 0.04s;
+                }
 
-            .btn-view:hover {
-                background-color: #2980b9;
-            }
+                tbody tr:nth-child(3) {
+                    animation-delay: 0.06s;
+                }
 
-            .btn-block {
-                background-color: #e74c3c;
-                color: white;
-                padding: 6px 12px;
-                border-radius: 4px;
-                text-decoration: none;
-                font-size: 12px;
-                font-weight: 600;
-            }
+                tbody tr:nth-child(4) {
+                    animation-delay: 0.08s;
+                }
 
-            .btn-block:hover {
-                background-color: #c0392b;
-            }
+                tbody tr:nth-child(5) {
+                    animation-delay: 0.1s;
+                }
 
-            .btn-unblock {
-                background-color: #2ecc71;
-                color: white;
-                padding: 6px 12px;
-                border-radius: 4px;
-                text-decoration: none;
-                font-size: 12px;
-                font-weight: 600;
-            }
+                @keyframes fadeIn {
+                    from {
+                        opacity: 0;
+                        transform: translateY(10px);
+                    }
 
-            .btn-unblock:hover {
-                background-color: #27ae60;
-            }
+                    to {
+                        opacity: 1;
+                        transform: translateY(0);
+                    }
+                }
 
-            .empty-state {
-                text-align: center;
-                padding: 50px;
-                color: #95a5a6;
-            }
+                tbody tr:hover {
+                    background: linear-gradient(135deg, #f8fafc 0%, #f0fdf4 100%);
+                }
 
-            .empty-state i {
-                font-size: 48px;
-                margin-bottom: 15px;
-            }
+                .supplier-name {
+                    font-weight: 600;
+                    color: #1e293b;
+                }
 
-            .back-link {
-                color: #bab0b0;
-                font-style: italic;
-                text-decoration: none;
-                display: inline-block;
-                margin-top: 20px;
-            }
+                .contact-info {
+                    display: flex;
+                    flex-direction: column;
+                    gap: 0.125rem;
+                }
 
-            .back-link:hover {
-                color: #3498db;
-            }
-        </style>
-    </head>
+                .contact-email {
+                    color: #64748b;
+                    font-size: 0.8125rem;
+                }
 
-    <body>
-        <jsp:include page="header.jsp" />
+                .contact-phone {
+                    color: #94a3b8;
+                    font-size: 0.75rem;
+                }
 
-        <div class="container">
-            <h1>Supplier Management</h1>
+                .status-badge {
+                    display: inline-flex;
+                    align-items: center;
+                    gap: 0.25rem;
+                    padding: 0.375rem 0.875rem;
+                    border-radius: 2rem;
+                    font-size: 0.6875rem;
+                    font-weight: 600;
+                    text-transform: uppercase;
+                }
 
-            <div style="display: flex; justify-content: space-between; align-items: center;">
-                <a href="add-supplier" class="btn-add">+ Add New Supplier</a>
-            </div>
+                .status-active {
+                    background: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%);
+                    color: #16a34a;
+                }
 
-            <div class="filter-container">
-                <form action="supplier-list" method="get">
-                    <input type="text" name="keyword" placeholder="Search supplier name..."
-                           value="${param.keyword}">
-                    <select name="status" onchange="this.form.submit()">
-                        <option value="all" ${param.status=='all' ? 'selected' : '' }>All Status</option>
-                        <option value="active" ${param.status=='active' ? 'selected' : '' }>Active</option>
-                        <option value="inactive" ${param.status=='inactive' ? 'selected' : '' }>Inactive</option>
-                    </select>
-                    <button type="submit" class="btn-search">Search</button>
-                    <a href="supplier-list" class="btn-clear">Clear</a>
-                </form>
-            </div>
+                .status-inactive {
+                    background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+                    color: #dc2626;
+                }
 
-            <table>
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Supplier Name</th>
-                        <th>Email</th>
-                        <th>Phone</th>
-                        <th>Status</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <c:choose>
-                        <c:when test="${not empty supplierList}">
-                            <c:forEach items="${supplierList}" var="s">
-                                <tr>
-                                    <td>${s.partnerId}</td>
-                                    <td><strong>${s.partnerName}</strong></td>
-                                    <td>${s.partnerEmail}</td>
-                                    <td>${s.partnerPhone}</td>
-                                    <td>
-                                        <c:choose>
-                                            <c:when test="${s.status == 'active'}">
-                                                <span class="status-badge status-active">Active</span>
-                                            </c:when>
-                                            <c:otherwise>
-                                                <span class="status-badge status-inactive">Inactive</span>
-                                            </c:otherwise>
-                                        </c:choose>
-                                    </td>
-                                    <td>
-                                        <a href="supplier-detail?id=${s.partnerId}" class="btn-view">View</a>
-                                        <c:choose>
-                                            <c:when test="${s.status == 'active'}">
-                                                <a href="supplier-status?id=${s.partnerId}&status=active"
-                                                   class="btn-block"
-                                                   onclick="return confirm('Are you sure you want to block this supplier?')">Block</a>
-                                            </c:when>
-                                            <c:otherwise>
-                                                <a href="supplier-status?id=${s.partnerId}&status=inactive"
-                                                   class="btn-unblock"
-                                                   onclick="return confirm('Are you sure you want to unblock this supplier?')">Unblock</a>
-                                            </c:otherwise>
-                                        </c:choose>
-                                    </td>
-                                </tr>
-                            </c:forEach>
-                        </c:when>
-                        <c:otherwise>
+                .action-buttons {
+                    display: flex;
+                    gap: 0.5rem;
+                }
+
+                .btn-view {
+                    padding: 0.5rem 1rem;
+                    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                    color: white;
+                    text-decoration: none;
+                    border-radius: 0.5rem;
+                    font-size: 0.75rem;
+                    font-weight: 600;
+                    transition: all 0.2s ease;
+                }
+
+                .btn-view:hover {
+                    transform: translateY(-1px);
+                    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+                    color: white;
+                }
+
+                .btn-block {
+                    padding: 0.5rem 1rem;
+                    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+                    color: white;
+                    text-decoration: none;
+                    border-radius: 0.5rem;
+                    font-size: 0.75rem;
+                    font-weight: 600;
+                    transition: all 0.2s ease;
+                }
+
+                .btn-block:hover {
+                    transform: translateY(-1px);
+                    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4);
+                    color: white;
+                }
+
+                .btn-unblock {
+                    padding: 0.5rem 1rem;
+                    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+                    color: white;
+                    text-decoration: none;
+                    border-radius: 0.5rem;
+                    font-size: 0.75rem;
+                    font-weight: 600;
+                    transition: all 0.2s ease;
+                }
+
+                .btn-unblock:hover {
+                    transform: translateY(-1px);
+                    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
+                    color: white;
+                }
+
+                .empty-state {
+                    text-align: center;
+                    padding: 4rem 2rem;
+                    color: #94a3b8;
+                }
+
+                .empty-state-icon {
+                    font-size: 4rem;
+                    margin-bottom: 1rem;
+                    opacity: 0.5;
+                }
+
+                .back-link {
+                    display: inline-flex;
+                    align-items: center;
+                    gap: 0.5rem;
+                    margin-top: 1.5rem;
+                    font-size: 0.875rem;
+                    color: #94a3b8;
+                    text-decoration: none;
+                }
+
+                .back-link:hover {
+                    color: #64748b;
+                }
+
+                @media (max-width: 768px) {
+                    .page-container {
+                        padding: 1rem;
+                        margin: 1rem;
+                    }
+
+                    .page-header {
+                        flex-direction: column;
+                        gap: 1rem;
+                        align-items: flex-start;
+                    }
+
+                    .filter-bar {
+                        flex-direction: column;
+                    }
+
+                    .filter-group {
+                        width: 100%;
+                    }
+
+                    .filter-group input,
+                    .filter-group select {
+                        width: 100%;
+                    }
+
+                    .table-card {
+                        overflow-x: auto;
+                    }
+                }
+            </style>
+        </head>
+
+        <body>
+            <jsp:include page="header.jsp" />
+
+            <div class="page-container">
+                <div class="page-header">
+                    <h1 class="page-title">🏭 Supplier Management</h1>
+                    <a href="add-supplier" class="btn-add">+ Add New Supplier</a>
+                </div>
+
+                <div class="filter-bar">
+                    <form action="supplier-list" method="get" style="display: contents;">
+                        <div class="filter-group">
+                            <label>Search</label>
+                            <input type="text" name="keyword" placeholder="Supplier name..." value="${param.keyword}">
+                        </div>
+                        <div class="filter-group">
+                            <label>Status</label>
+                            <select name="status" onchange="this.form.submit()">
+                                <option value="all" ${param.status=='all' ? 'selected' : '' }>All Status</option>
+                                <option value="active" ${param.status=='active' ? 'selected' : '' }>Active</option>
+                                <option value="inactive" ${param.status=='inactive' ? 'selected' : '' }>Inactive
+                                </option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn-search">🔍 Search</button>
+                        <a href="supplier-list" class="btn-clear">✕ Clear</a>
+                    </form>
+                </div>
+
+                <div class="table-card">
+                    <table>
+                        <thead>
                             <tr>
-                                <td colspan="6" class="empty-state">
-                                    <div>📦</div>
-                                    <p>No suppliers found.</p>
-                                </td>
+                                <th>ID</th>
+                                <th>Supplier Name</th>
+                                <th>Contact</th>
+                                <th>Status</th>
+                                <th>Actions</th>
                             </tr>
-                        </c:otherwise>
-                    </c:choose>
-                </tbody>
-            </table>
+                        </thead>
+                        <tbody>
+                            <c:choose>
+                                <c:when test="${not empty supplierList}">
+                                    <c:forEach items="${supplierList}" var="s">
+                                        <tr>
+                                            <td><strong>#${s.partnerId}</strong></td>
+                                            <td><span class="supplier-name">${s.partnerName}</span></td>
+                                            <td>
+                                                <div class="contact-info">
+                                                    <span class="contact-email">📧 ${s.partnerEmail}</span>
+                                                    <span class="contact-phone">📱 ${s.partnerPhone}</span>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <c:choose>
+                                                    <c:when test="${s.status == 'active'}">
+                                                        <span class="status-badge status-active">● Active</span>
+                                                    </c:when>
+                                                    <c:otherwise>
+                                                        <span class="status-badge status-inactive">● Inactive</span>
+                                                    </c:otherwise>
+                                                </c:choose>
+                                            </td>
+                                            <td class="action-buttons">
+                                                <a href="supplier-detail?id=${s.partnerId}" class="btn-view">View</a>
+                                                <c:choose>
+                                                    <c:when test="${s.status == 'active'}">
+                                                        <a href="javascript:void(0)" class="btn-block"
+                                                            onclick="confirmStatusChange('supplier-status?id=${s.partnerId}&status=active', 'this supplier', true)">Block</a>
+                                                    </c:when>
+                                                    <c:otherwise>
+                                                        <a href="javascript:void(0)" class="btn-unblock"
+                                                            onclick="confirmStatusChange('supplier-status?id=${s.partnerId}&status=inactive', 'this supplier', false)">Unblock</a>
+                                                    </c:otherwise>
+                                                </c:choose>
+                                            </td>
+                                        </tr>
+                                    </c:forEach>
+                                </c:when>
+                                <c:otherwise>
+                                    <tr>
+                                        <td colspan="5">
+                                            <div class="empty-state">
+                                                <div class="empty-state-icon">📦</div>
+                                                <div>No suppliers found.</div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </c:otherwise>
+                            </c:choose>
+                        </tbody>
+                    </table>
+                </div>
 
-            <a href="<%= request.getContextPath()%>/dashboard" class="back-link">← Back to Dashboard</a>
-        </div>
+                <a href="<%= request.getContextPath()%>/dashboard" class="back-link">← Back to Dashboard</a>
+            </div>
 
-        <jsp:include page="footer.jsp" />
-    </body>
+            <%@include file="common-dialogs.jsp" %>
+                <jsp:include page="footer.jsp" />
+        </body>
 
-</html>
+        </html>

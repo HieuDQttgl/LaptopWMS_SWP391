@@ -1,125 +1,154 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
-<!DOCTYPE html>
-<html>
-    <jsp:include page="header.jsp" />
+    <!DOCTYPE html>
+    <html>
 
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Laptop Warehouse Management System</title>
+        <title>My Profile | Laptop WMS</title>
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+            rel="stylesheet">
         <style>
-            :root {
-                --primary-color: #2563eb;
-                --primary-hover: #1d4ed8;
-                --bg-color: #f3f4f6;
-                --card-bg: #ffffff;
-                --border-color: #e5e7eb;
-                --text-main: #111827;
-                --text-muted: #6b7280;
-                --radius-lg: 12px;
-                --shadow-soft: 0 10px 25px rgba(15, 23, 42, 0.12);
-            }
-
-            * {
-                box-sizing: border-box;
-            }
-
             body {
+                font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+                background: linear-gradient(135deg, #f0f4ff 0%, #f8fafc 50%, #f0fdf4 100%);
                 margin: 0;
-                font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-                background: radial-gradient(circle at top left, #dbeafe 0, #eff6ff 25%, #f9fafb 60%);
+                padding: 0;
                 min-height: 100vh;
-                color: var(--text-main);
             }
 
             .profile-wrapper {
                 display: flex;
                 align-items: center;
                 justify-content: center;
-                flex: 1;
-                padding: 40px 16px;
+                padding: 2rem;
+                min-height: calc(100vh - 200px);
             }
 
-            .profile-card-container {
+            .profile-card {
                 width: 100%;
-                max-width: 520px;
-                padding: 16px;
+                max-width: 500px;
+                background: white;
+                border-radius: 1rem;
+                box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+                border: 1px solid #f1f5f9;
+                animation: fadeIn 0.3s ease-out;
+                overflow: hidden;
             }
 
-            .card {
-                background: var(--card-bg);
-                border-radius: var(--radius-lg);
-                box-shadow: var(--shadow-soft);
-                padding: 28px 26px 26px;
-                border: 1px solid var(--border-color);
+            @keyframes fadeIn {
+                from {
+                    opacity: 0;
+                    transform: translateY(-10px);
+                }
+
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
             }
 
             .card-header {
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                color: white;
+                padding: 1.5rem 2rem;
                 display: flex;
                 justify-content: space-between;
                 align-items: center;
-                margin-bottom: 18px;
             }
 
-            .card-header-left h1 {
-                margin: 0 0 4px;
-                font-size: 22px;
-                font-weight: 600;
-            }
-
-            .card-header-left p {
+            .card-header h1 {
                 margin: 0;
-                font-size: 13px;
-                color: var(--text-muted);
+                font-size: 1.375rem;
+                font-weight: 700;
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+            }
+
+            .card-header p {
+                margin: 0.25rem 0 0;
+                font-size: 0.8125rem;
+                opacity: 0.85;
             }
 
             .badge {
-                padding: 4px 10px;
-                background-color: #e0f2fe;
-                color: #0369a1;
-                font-size: 12px;
-                border-radius: 999px;
-                border: 1px solid #bae6fd;
+                padding: 0.375rem 0.875rem;
+                background: rgba(255, 255, 255, 0.2);
+                border-radius: 2rem;
+                font-size: 0.75rem;
+                font-weight: 600;
             }
 
-            .profile-body {
-                margin-top: 6px;
+            .card-body {
+                padding: 2rem;
+            }
+
+            .message {
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+                padding: 1rem 1.25rem;
+                border-radius: 0.75rem;
+                margin-bottom: 1.5rem;
+                font-weight: 500;
+            }
+
+            .message.success {
+                background: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%);
+                color: #16a34a;
+                border: 1px solid #86efac;
+            }
+
+            .message.error {
+                background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+                color: #dc2626;
+                border: 1px solid #fca5a5;
             }
 
             .field-group {
                 display: flex;
                 justify-content: space-between;
-                padding: 8px 0;
-                border-bottom: 1px solid #f3f4f6;
-                font-size: 14px;
+                align-items: center;
+                padding: 0.875rem 0;
+                border-bottom: 1px solid #f1f5f9;
+            }
+
+            .field-group:last-child {
+                border-bottom: none;
             }
 
             .field-label {
-                color: var(--text-muted);
-            }
-
-            .field-value {
+                font-size: 0.875rem;
+                color: #64748b;
                 font-weight: 500;
             }
 
+            .field-value {
+                font-size: 0.9375rem;
+                font-weight: 600;
+                color: #1e293b;
+            }
+
             .field-value.muted {
-                color: var(--text-muted);
+                color: #94a3b8;
                 font-weight: 400;
             }
 
             .field-input {
                 width: 200px;
-                padding: 6px 10px;
-                border: 1px solid var(--border-color);
-                border-radius: 6px;
-                font-size: 14px;
+                padding: 0.625rem 0.875rem;
+                border: 2px solid #e2e8f0;
+                border-radius: 0.5rem;
+                font-size: 0.875rem;
                 font-family: inherit;
+                outline: none;
+                transition: all 0.2s ease;
             }
 
             .field-input:focus {
-                outline: none;
-                border-color: var(--primary-color);
-                box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+                border-color: #667eea;
+                box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.15);
             }
 
             .edit-mode {
@@ -130,224 +159,211 @@
                 display: flex;
             }
 
-            .message {
-                padding: 12px 16px;
-                border-radius: 8px;
-                margin-bottom: 16px;
-                font-size: 14px;
-            }
-
-            .message.success {
-                background-color: #d1fae5;
-                color: #065f46;
-                border: 1px solid #6ee7b7;
-            }
-
-            .message.error {
-                background-color: #fee2e2;
-                color: #991b1b;
-                border: 1px solid #fca5a5;
-            }
-
             .actions {
-                margin-top: 18px;
+                margin-top: 1.5rem;
+                padding-top: 1rem;
                 display: flex;
                 justify-content: flex-end;
-                gap: 8px;
+                gap: 0.75rem;
+                flex-wrap: wrap;
+            }
+
+            .btn {
+                padding: 0.625rem 1.25rem;
+                border-radius: 2rem;
+                font-weight: 600;
+                font-size: 0.8125rem;
+                cursor: pointer;
+                transition: all 0.2s ease;
+                text-decoration: none;
+                border: none;
+                display: inline-flex;
+                align-items: center;
+                gap: 0.375rem;
             }
 
             .btn-secondary {
-                padding: 7px 14px;
-                border-radius: 999px;
-                border: 1px solid var(--border-color);
-                background: white;
-                color: var(--text-main);
-                font-weight: 500;
-                font-size: 13px;
-                cursor: pointer;
-                transition: background 0.15s ease;
+                background: #e2e8f0;
+                color: #475569;
             }
 
             .btn-secondary:hover {
-                background: var(--bg-color);
+                background: #cbd5e1;
             }
 
             .btn-link {
-                border: none;
                 background: transparent;
-                color: var(--text-muted);
-                font-size: 13px;
-                cursor: pointer;
-                padding: 6px 10px;
+                color: #64748b;
+                padding: 0.625rem 0.875rem;
+            }
+
+            .btn-link:hover {
+                color: #1e293b;
             }
 
             .btn-primary {
-                padding: 7px 14px;
-                border-radius: 999px;
-                border: none;
-                background: linear-gradient(135deg, var(--primary-color), #3b82f6);
-                color: #ffffff;
-                font-weight: 500;
-                font-size: 13px;
-                cursor: pointer;
-                transition: background 0.15s ease, transform 0.05s ease, box-shadow 0.05s ease;
-                box-shadow: 0 8px 18px rgba(37, 99, 235, 0.3);
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                color: white;
+                box-shadow: 0 4px 14px rgba(102, 126, 234, 0.4);
             }
 
             .btn-primary:hover {
-                background: linear-gradient(135deg, var(--primary-hover), #2563eb);
                 transform: translateY(-1px);
+                box-shadow: 0 6px 18px rgba(102, 126, 234, 0.5);
             }
 
-            .btn-primary:active {
-                transform: translateY(0);
-                box-shadow: 0 6px 14px rgba(37, 99, 235, 0.25);
+            .btn-danger {
+                background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+                color: white;
+                box-shadow: 0 4px 14px rgba(239, 68, 68, 0.4);
+            }
+
+            .btn-danger:hover {
+                transform: translateY(-1px);
+                box-shadow: 0 6px 18px rgba(239, 68, 68, 0.5);
             }
 
             @media (max-width: 540px) {
-                .card {
-                    padding: 22px 18px 20px;
+                .profile-wrapper {
+                    padding: 1rem;
+                }
+
+                .card-body {
+                    padding: 1.5rem;
+                }
+
+                .field-group {
+                    flex-direction: column;
+                    align-items: flex-start;
+                    gap: 0.5rem;
+                }
+
+                .field-input {
+                    width: 100%;
+                }
+
+                .actions {
+                    flex-direction: column;
+                }
+
+                .btn {
+                    width: 100%;
+                    justify-content: center;
                 }
             }
         </style>
+    </head>
+
+    <body>
+        <jsp:include page="header.jsp" />
+
+        <div class="profile-wrapper">
+            <div class="profile-card">
+                <div class="card-header">
+                    <div>
+                        <h1>👤 My Profile</h1>
+                        <p>Manage your account information</p>
+                    </div>
+                    <span class="badge">Signed in</span>
+                </div>
+
+                <div class="card-body">
+                    <% String successMsg=(String) request.getAttribute("success"); String errorMsg=(String)
+                        request.getAttribute("error"); Model.Users currentUser=(Model.Users)
+                        request.getSession().getAttribute("currentUser"); String fullName=currentUser !=null ?
+                        (currentUser.getFullName() !=null ? currentUser.getFullName() : "" ) : "" ; String
+                        email=currentUser !=null ? (currentUser.getEmail() !=null ? currentUser.getEmail() : "" ) : "" ;
+                        %>
+
+                        <% if (successMsg !=null) { %>
+                            <div class="message success">✓ <%= successMsg %>
+                            </div>
+                            <% } %>
+                                <% if (errorMsg !=null) { %>
+                                    <div class="message error">⚠ <%= errorMsg %>
+                                    </div>
+                                    <% } %>
+
+                                        <form method="post" action="<%= request.getContextPath() %>/profile"
+                                            id="profileForm">
+                                            <div class="field-group view-mode">
+                                                <span class="field-label">Full name</span>
+                                                <span class="field-value">
+                                                    <%= fullName.isEmpty() ? "—" : fullName %>
+                                                </span>
+                                            </div>
+                                            <div class="field-group edit-mode">
+                                                <span class="field-label">Full name</span>
+                                                <input type="text" name="fullName" class="field-input"
+                                                    value="<%= fullName %>" required>
+                                            </div>
+
+                                            <div class="field-group">
+                                                <span class="field-label">Username</span>
+                                                <span class="field-value">
+                                                    <%= request.getSession().getAttribute("username") %>
+                                                </span>
+                                            </div>
+
+                                            <div class="field-group view-mode">
+                                                <span class="field-label">Email</span>
+                                                <span class="field-value">
+                                                    <%= email.isEmpty() ? "—" : email %>
+                                                </span>
+                                            </div>
+                                            <div class="field-group edit-mode">
+                                                <span class="field-label">Email</span>
+                                                <input type="email" name="email" class="field-input"
+                                                    value="<%= email %>" required>
+                                            </div>
+
+                                            <div class="actions edit-mode" style="display: none;">
+                                                <button type="button" onclick="cancelEdit()"
+                                                    class="btn btn-secondary">Cancel</button>
+                                                <button type="submit" class="btn btn-primary">Save Changes</button>
+                                            </div>
+                                        </form>
+
+                                        <div class="actions view-mode">
+                                            <a href="<%= request.getContextPath() %>/dashboard" class="btn btn-link">←
+                                                Dashboard</a>
+                                            <button type="button" onclick="enableEditMode()"
+                                                class="btn btn-primary">Edit Profile</button>
+                                            <a href="<%= request.getContextPath() %>/change-password"
+                                                class="btn btn-secondary">Change Password</a>
+                                            <a href="<%= request.getContextPath() %>/logout" class="btn btn-danger">Sign
+                                                Out</a>
+                                        </div>
+                </div>
+            </div>
+        </div>
+
         <script>
             function enableEditMode() {
                 document.querySelectorAll('.view-mode').forEach(el => el.style.display = 'none');
                 document.querySelectorAll('.edit-mode').forEach(el => {
-                    if (el.classList.contains('field-group')) {
-                        el.style.display = 'flex';
-                    } else {
-                        el.style.display = 'block';
-                    }
+                    el.style.display = el.classList.contains('field-group') ? 'flex' : 'block';
                 });
             }
 
             function cancelEdit() {
                 document.querySelectorAll('.edit-mode').forEach(el => el.style.display = 'none');
                 document.querySelectorAll('.view-mode').forEach(el => {
-                    if (el.classList.contains('field-group')) {
-                        el.style.display = 'flex';
-                    } else {
-                        el.style.display = 'block';
-                    }
+                    el.style.display = el.classList.contains('field-group') ? 'flex' : 'block';
                 });
             }
-        </script>
-    </head>
 
-    <body>
-        <div class="profile-wrapper">
-            <div class="card">
-                <div class="card-header">
-                    <div class="card-header-left">
-                        <h1>My profile</h1>
-                        <p>Basic information about your account</p>
-                    </div>
-                    <span class="badge">Signed in</span>
-                </div>
-
-                <% String successMsg = (String) request.getAttribute("success");
-                    String errorMsg = (String) request.getAttribute("error");
-                    Model.Users currentUser = (Model.Users) request.getSession().getAttribute("currentUser");
-                    String fullName = currentUser != null
-                            ? (currentUser.getFullName() != null ? currentUser.getFullName() : "") : "";
-                    String email = currentUser
-                            != null ? (currentUser.getEmail() != null ? currentUser.getEmail() : "") : ""; %>
-
-                <% if (successMsg != null) {%>
-                <div class="message success">
-                    <%= successMsg%>
-                </div>
-                <% } %>
-                <% if (errorMsg != null) {%>
-                <div class="message error">
-                    <%= errorMsg%>
-                </div>
-                <% }%>
-
-                <form method="post" action="<%= request.getContextPath()%>/profile"
-                      id="profileForm">
-                    <div class="profile-body">
-                        <div class="field-group view-mode">
-                            <span class="field-label">Full name</span>
-                            <span class="field-value">
-                                <%= fullName.isEmpty() ? "—" : fullName%>
-                            </span>
-                        </div>
-                        <div class="field-group edit-mode">
-                            <span class="field-label">Full name</span>
-                            <input type="text" name="fullName" class="field-input"
-                                   value="<%= fullName%>" required>
-                        </div>
-
-                        <div class="field-group">
-                            <span class="field-label">Username</span>
-                            <span class="field-value">
-                                <%= request.getSession().getAttribute("username")%>
-                            </span>
-                        </div>
-
-                        <div class="field-group view-mode">
-                            <span class="field-label">Email</span>
-                            <span class="field-value">
-                                <%= email.isEmpty() ? "—" : email%>
-                            </span>
-                        </div>
-                        <div class="field-group edit-mode">
-                            <span class="field-label">Email</span>
-                            <input type="email" name="email" class="field-input" value="<%= email%>"
-                                   required>
-                        </div>
-                    </div>
-
-                    <div class="actions edit-mode" style="display: none;">
-                        <button type="button" onclick="cancelEdit()"
-                                class="btn-secondary">Cancel</button>
-                        <button type="submit" class="btn-primary">Save Changes</button>
-                    </div>
-                </form>
-
-                <div class="actions view-mode">
-                    <form method="get" action="<%= request.getContextPath()%>/landing"
-                          style="display: inline;">
-                        <button type="submit" class="btn-link">Back to home</button>
-                    </form>
-                    <button type="button" onclick="enableEditMode()" class="btn-primary">Edit
-                        Profile</button>
-                    <form method="get" action="<%= request.getContextPath()%>/change-password"
-                          style="display: inline;">
-                        <button type="submit" class="btn-primary">Change password</button>
-                    </form>
-                    <form method="get" action="<%= request.getContextPath()%>/logout"
-                          style="display: inline;">
-                        <button type="submit" class="btn-primary">Sign out</button>
-                    </form>
-                </div>
-            </div>
-        </div>
-
-        <script>
-            function validateProfileForm(event) {
+            document.getElementById('profileForm').addEventListener('submit', function (e) {
                 const email = document.querySelector('input[name="email"]').value.trim();
-
-                // Email regex (RFC-compliant simplified)
-                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-                // Validate email
-                if (!emailRegex.test(email)) {
-                    alert("❌ Invalid email format.");
-                    event.preventDefault();
-                    return false;
+                if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+                    showToast('error', 'Invalid Email', 'Please enter a valid email address.');
+                    e.preventDefault();
                 }
-
-                return true;
-            }
-
-            window.onload = function () {
-                document.getElementById("profileForm").addEventListener("submit", validateProfileForm);
-            };
+            });
         </script>
-        <jsp:include page="footer.jsp" />
+
+        <%@include file="common-dialogs.jsp" %>
+            <jsp:include page="footer.jsp" />
     </body>
 
-</html>
+    </html>

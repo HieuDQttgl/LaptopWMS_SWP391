@@ -1,332 +1,396 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
-<!DOCTYPE html>
-<html>
-    <head>
-        <jsp:include page="header.jsp" />
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Export Report - WMS</title>
-        <style>
-            :root {
-                --primary: #2563eb;
-                --primary-hover: #1d4ed8;
-                --success: #10b981;
-                --danger: #ef4444;
-                --warning: #f59e0b;
-                --bg: #f1f5f9;
-                --card-bg: #ffffff;
-                --border: #e2e8f0;
-                --text: #1e293b;
-                --text-muted: #64748b;
-            }
+    <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+        <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+            <!DOCTYPE html>
+            <html>
 
-            body {
-                font-family: 'Segoe UI', system-ui, sans-serif;
-                background: var(--bg);
-                margin: 0;
-                color: var(--text);
-            }
+            <head>
+                <meta charset="UTF-8">
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <title>Export Report | Laptop WMS</title>
+                <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+                    rel="stylesheet">
+                <style>
+                    body {
+                        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+                        background: linear-gradient(135deg, #f0f4ff 0%, #f8fafc 50%, #f0fdf4 100%);
+                        margin: 0;
+                        padding: 0;
+                        min-height: 100vh;
+                    }
 
-            .container {
-                max-width: 1400px;
-                margin: 0 auto;
-                padding: 30px 20px;
-            }
+                    .page-container {
+                        max-width: 1400px;
+                        margin: 0 auto;
+                        padding: 2rem;
+                    }
 
-            .page-header {
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-                margin-bottom: 24px;
-            }
+                    .page-header {
+                        display: flex;
+                        justify-content: space-between;
+                        align-items: center;
+                        margin-bottom: 1.5rem;
+                    }
 
-            .page-header h1 {
-                margin: 0;
-                font-size: 28px;
-                font-weight: 700;
-            }
+                    .page-title {
+                        font-size: 1.75rem;
+                        font-weight: 700;
+                        color: #1e293b;
+                        display: flex;
+                        align-items: center;
+                        gap: 0.75rem;
+                    }
 
-            /* Filter Section */
-            .filter-card {
-                background: var(--card-bg);
-                border-radius: 12px;
-                padding: 20px;
-                margin-bottom: 24px;
-                border: 1px solid var(--border);
-            }
+                    .btn {
+                        padding: 0.625rem 1.25rem;
+                        border-radius: 0.5rem;
+                        font-weight: 600;
+                        font-size: 0.875rem;
+                        cursor: pointer;
+                        transition: all 0.2s ease;
+                        text-decoration: none;
+                        display: inline-flex;
+                        align-items: center;
+                        gap: 0.5rem;
+                        border: none;
+                    }
 
-            .filter-row {
-                display: flex;
-                gap: 16px;
-                flex-wrap: wrap;
-                align-items: flex-end;
-            }
+                    .btn-outline {
+                        background: white;
+                        color: #475569;
+                        border: 1px solid #e2e8f0;
+                    }
 
-            .filter-group {
-                display: flex;
-                flex-direction: column;
-                gap: 6px;
-            }
+                    .btn-outline:hover {
+                        background: #f1f5f9;
+                    }
 
-            .filter-group label {
-                font-size: 13px;
-                font-weight: 600;
-                color: var(--text-muted);
-            }
+                    .btn-success {
+                        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+                        color: white;
+                        box-shadow: 0 4px 14px rgba(16, 185, 129, 0.3);
+                    }
 
-            .filter-group input, .filter-group select {
-                padding: 10px 14px;
-                border: 1px solid var(--border);
-                border-radius: 8px;
-                font-size: 14px;
-                min-width: 180px;
-            }
+                    .btn-success:hover {
+                        transform: translateY(-1px);
+                        box-shadow: 0 6px 18px rgba(16, 185, 129, 0.4);
+                    }
 
-            /* Summary Cards */
-            .summary-grid {
-                display: grid;
-                grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-                gap: 20px;
-                margin-bottom: 24px;
-            }
+                    .filter-card {
+                        background: white;
+                        border-radius: 1rem;
+                        padding: 1.5rem;
+                        margin-bottom: 1.5rem;
+                        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+                        border: 1px solid #f1f5f9;
+                    }
 
-            .summary-card {
-                background: var(--card-bg);
-                border-radius: 12px;
-                padding: 24px;
-                border: 1px solid var(--border);
-                text-align: center;
-                border-left: 4px solid var(--primary);
-            }
+                    .filter-row {
+                        display: flex;
+                        gap: 1rem;
+                        flex-wrap: wrap;
+                        align-items: flex-end;
+                    }
 
-            .summary-card.pending {
-                border-left-color: var(--warning);
-            }
+                    .filter-group {
+                        display: flex;
+                        flex-direction: column;
+                        gap: 0.375rem;
+                    }
 
-            .summary-card .value {
-                font-size: 32px;
-                font-weight: 700;
-                color: var(--text);
-            }
+                    .filter-group label {
+                        font-size: 0.75rem;
+                        font-weight: 600;
+                        color: #64748b;
+                        text-transform: uppercase;
+                        letter-spacing: 0.5px;
+                    }
 
-            .summary-card .label {
-                font-size: 13px;
-                color: var(--text-muted);
-                margin-top: 4px;
-                font-weight: 600;
-                text-transform: uppercase;
-            }
+                    .filter-group input,
+                    .filter-group select {
+                        padding: 0.625rem 0.875rem;
+                        border: 2px solid #e2e8f0;
+                        border-radius: 0.5rem;
+                        font-size: 0.875rem;
+                        min-width: 160px;
+                        outline: none;
+                        transition: all 0.2s ease;
+                    }
 
-            /* Table Style */
-            .table-card {
-                background: var(--card-bg);
-                border-radius: 12px;
-                border: 1px solid var(--border);
-                overflow: hidden;
-            }
+                    .filter-group input:focus,
+                    .filter-group select:focus {
+                        border-color: #ef4444;
+                        box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.15);
+                    }
 
-            .table-header {
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-                padding: 16px 20px;
-                border-bottom: 1px solid var(--border);
-            }
+                    .summary-grid {
+                        display: grid;
+                        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+                        gap: 1.5rem;
+                        margin-bottom: 1.5rem;
+                    }
 
-            table {
-                width: 100%;
-                border-collapse: collapse;
-            }
+                    .summary-card {
+                        background: white;
+                        border-radius: 1rem;
+                        padding: 1.5rem;
+                        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+                        border: 1px solid #f1f5f9;
+                        text-align: center;
+                        border-left: 4px solid #ef4444;
+                    }
 
-            thead th {
-                background: #f8fafc;
-                padding: 14px 16px;
-                text-align: left;
-                font-size: 11px;
-                font-weight: 700;
-                text-transform: uppercase;
-                color: var(--text-muted);
-                border-bottom: 1px solid var(--border);
-                letter-spacing: 0.05em;
-            }
+                    .summary-card.pending {
+                        border-left-color: #f59e0b;
+                    }
 
-            tbody td {
-                padding: 14px 16px;
-                font-size: 14px;
-                border-bottom: 1px solid #f1f5f9;
-            }
+                    .summary-card .stat-value {
+                        font-size: 2.5rem;
+                        font-weight: 800;
+                        background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+                        -webkit-background-clip: text;
+                        -webkit-text-fill-color: transparent;
+                        background-clip: text;
+                    }
 
-            .badge {
-                display: inline-block;
-                padding: 4px 10px;
-                border-radius: 20px;
-                font-size: 11px;
-                font-weight: 700;
-                text-transform: uppercase;
-            }
+                    .summary-card.pending .stat-value {
+                        background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+                        -webkit-background-clip: text;
+                        -webkit-text-fill-color: transparent;
+                        background-clip: text;
+                    }
 
-            .badge-completed {
-                background: #dcfce7;
-                color: #166534;
-            }
-            .badge-pending {
-                background: #fef3c7;
-                color: #92400e;
-            }
-            .badge-cancelled {
-                background: #fee2e2;
-                color: #991b1b;
-            }
+                    .summary-card .stat-label {
+                        font-size: 0.75rem;
+                        color: #64748b;
+                        margin-top: 0.25rem;
+                        font-weight: 600;
+                        text-transform: uppercase;
+                        letter-spacing: 0.5px;
+                    }
 
-            .btn {
-                padding: 10px 20px;
-                border: none;
-                border-radius: 8px;
-                font-size: 14px;
-                font-weight: 600;
-                cursor: pointer;
-                text-decoration: none;
-                display: inline-flex;
-                align-items: center;
-                gap: 8px;
-            }
+                    .table-card {
+                        background: white;
+                        border-radius: 1rem;
+                        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+                        border: 1px solid #f1f5f9;
+                        overflow: hidden;
+                    }
 
-            .btn-primary {
-                background: var(--primary);
-                color: white;
-            }
-            .btn-success {
-                background: var(--success);
-                color: white;
-            }
-            .btn-outline {
-                border: 1px solid var(--border);
-                color: var(--text);
-                background: white;
-            }
+                    .table-header {
+                        display: flex;
+                        justify-content: space-between;
+                        align-items: center;
+                        padding: 1rem 1.5rem;
+                        border-bottom: 1px solid #f1f5f9;
+                    }
 
-            @media print {
-                .filter-card, .btn, .page-header .btn {
-                    display: none !important;
-                }
-            }
-        </style>
-    </head>
-    <body>
-        <div class="container">
-            <div class="page-header">
-                <h1>Export Report</h1>
-                <button class="btn btn-outline" onclick="window.print()">Print Report</button>
-            </div>
+                    .table-header h3 {
+                        margin: 0;
+                        font-size: 1rem;
+                        font-weight: 600;
+                        color: #1e293b;
+                    }
 
-            <div class="filter-card">
-                <form method="GET" action="report-export">
-                    <div class="filter-row">
-                        <div class="filter-group">
-                            <label>Start Date</label>
-                            <input type="date" name="fromDate" value="${selectedFrom}" onchange="this.form.submit()">
-                        </div>
-                        <div class="filter-group">
-                            <label>End Date</label>
-                            <input type="date" name="toDate" value="${selectedTo}" onchange="this.form.submit()">
-                        </div>
-                        <div class="filter-group">
-                            <label>Customer</label>
-                            <select name="partnerId" onchange="this.form.submit()">
-                                <option value="">All Customers</option>
-                                <c:forEach items="${partners}" var="p">
-                                    <option value="${p.partnerId}" ${selectedSupplier == p.partnerId ? 'selected' : ''}>
-                                        ${p.partnerName}
-                                    </option>
-                                </c:forEach>
-                            </select>
-                        </div>
-                        <div class="filter-group">
-                            <label>Status</label>
-                            <select name="status" onchange="this.form.submit()">
-                                <option value="">All Statuses</option>
-                                <option value="COMPLETED" ${selectedStatus == 'COMPLETED' ? 'selected' : ''}>COMPLETED</option>
-                                <option value="PENDING" ${selectedStatus == 'PENDING' ? 'selected' : ''}>PENDING</option>
-                                <option value="CANCELLED" ${selectedStatus == 'CANCELLED' ? 'selected' : ''}>CANCELLED</option>
-                            </select>
-                        </div>
-                        <a href="report-export" class="btn btn-outline">Reset Filters</a>
+                    table {
+                        width: 100%;
+                        border-collapse: collapse;
+                    }
+
+                    thead th {
+                        background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+                        color: white;
+                        padding: 1rem;
+                        text-align: left;
+                        font-size: 0.75rem;
+                        font-weight: 700;
+                        text-transform: uppercase;
+                        letter-spacing: 0.5px;
+                    }
+
+                    tbody td {
+                        padding: 1rem;
+                        font-size: 0.875rem;
+                        border-bottom: 1px solid #f1f5f9;
+                        color: #475569;
+                    }
+
+                    tbody tr:hover td {
+                        background: #f8fafc;
+                    }
+
+                    .badge {
+                        display: inline-flex;
+                        align-items: center;
+                        padding: 0.375rem 0.75rem;
+                        border-radius: 2rem;
+                        font-size: 0.6875rem;
+                        font-weight: 700;
+                        text-transform: uppercase;
+                    }
+
+                    .badge-completed {
+                        background: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%);
+                        color: #16a34a;
+                    }
+
+                    .badge-pending {
+                        background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+                        color: #d97706;
+                    }
+
+                    .badge-cancelled {
+                        background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+                        color: #dc2626;
+                    }
+
+                    .empty-state {
+                        text-align: center;
+                        padding: 3rem;
+                        color: #94a3b8;
+                    }
+
+                    @media print {
+
+                        .filter-card,
+                        .btn,
+                        .page-header .btn {
+                            display: none !important;
+                        }
+                    }
+
+                    @media (max-width: 768px) {
+                        .page-container {
+                            padding: 1rem;
+                        }
+
+                        .filter-row {
+                            flex-direction: column;
+                        }
+
+                        .filter-group input,
+                        .filter-group select {
+                            min-width: 100%;
+                        }
+                    }
+                </style>
+            </head>
+
+            <body>
+                <jsp:include page="header.jsp" />
+
+                <div class="page-container">
+                    <div class="page-header">
+                        <h1 class="page-title">📤 Export Report</h1>
+                        <button class="btn btn-outline" onclick="window.print()">🖨️ Print Report</button>
                     </div>
-                </form>
-            </div>
 
-            <div class="summary-grid">
-                <div class="summary-card">
-                    <div class="value">${totalTickets}</div>
-                    <div class="label">Total Export Tickets</div>
+                    <div class="filter-card">
+                        <form method="GET" action="report-export">
+                            <div class="filter-row">
+                                <div class="filter-group">
+                                    <label>Start Date</label>
+                                    <input type="date" name="fromDate" value="${selectedFrom}"
+                                        onchange="this.form.submit()">
+                                </div>
+                                <div class="filter-group">
+                                    <label>End Date</label>
+                                    <input type="date" name="toDate" value="${selectedTo}"
+                                        onchange="this.form.submit()">
+                                </div>
+                                <div class="filter-group">
+                                    <label>Customer</label>
+                                    <select name="partnerId" onchange="this.form.submit()">
+                                        <option value="">All Customers</option>
+                                        <c:forEach items="${partners}" var="p">
+                                            <option value="${p.partnerId}" ${selectedSupplier==p.partnerId ? 'selected'
+                                                : '' }>${p.partnerName}</option>
+                                        </c:forEach>
+                                    </select>
+                                </div>
+                                <div class="filter-group">
+                                    <label>Status</label>
+                                    <select name="status" onchange="this.form.submit()">
+                                        <option value="">All Statuses</option>
+                                        <option value="COMPLETED" ${selectedStatus=='COMPLETED' ? 'selected' : '' }>
+                                            Completed</option>
+                                        <option value="PENDING" ${selectedStatus=='PENDING' ? 'selected' : '' }>Pending
+                                        </option>
+                                        <option value="CANCELLED" ${selectedStatus=='CANCELLED' ? 'selected' : '' }>
+                                            Cancelled</option>
+                                    </select>
+                                </div>
+                                <a href="report-export" class="btn btn-outline">↺ Reset</a>
+                            </div>
+                        </form>
+                    </div>
+
+                    <div class="summary-grid">
+                        <div class="summary-card">
+                            <div class="stat-value">${totalTickets}</div>
+                            <div class="stat-label">Total Export Tickets</div>
+                        </div>
+                        <div class="summary-card pending">
+                            <div class="stat-value">${pendingCount}</div>
+                            <div class="stat-label">Pending Tickets</div>
+                        </div>
+                    </div>
+
+                    <div class="table-card">
+                        <div class="table-header">
+                            <h3>Transaction Details</h3>
+                            <button type="button" onclick="exportCSV()" class="btn btn-success">📥 Export CSV</button>
+                        </div>
+                        <div style="overflow-x: auto;">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Ticket Code</th>
+                                        <th>Processed Date</th>
+                                        <th>Created By</th>
+                                        <th>Assigned By</th>
+                                        <th>Customer</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <c:forEach items="${exportData}" var="item">
+                                        <tr>
+                                            <td><strong>${item.ticketCode}</strong></td>
+                                            <td>
+                                                <fmt:formatDate value="${item.processedAt}" pattern="dd/MM/yyyy" />
+                                            </td>
+                                            <td>${item.creatorName}</td>
+                                            <td>${item.confirmedBy}</td>
+                                            <td>${item.partnerName}</td>
+                                            <td><span
+                                                    class="badge badge-${item.status.toLowerCase()}">${item.status}</span>
+                                            </td>
+                                        </tr>
+                                    </c:forEach>
+                                    <c:if test="${empty exportData}">
+                                        <tr>
+                                            <td colspan="6" class="empty-state">No transaction data found for the
+                                                selected period.</td>
+                                        </tr>
+                                    </c:if>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
                 </div>
-                <div class="summary-card pending">
-                    <div class="value" style="color: var(--warning)">${pendingCount}</div>
-                    <div class="label">Pending Tickets</div>
-                </div>
-            </div>
 
-            <div class="table-card">
-                <div class="table-header">
-                    <h3>Transaction Details</h3>
-                    <button type="button" onclick="exportCSV()" style="background:#1d6f42; color:white; border:none; padding:8px 15px; border-radius:4px; cursor:pointer;">
-                        Export CSV
-                    </button>
-                </div>
-                <div style="overflow-x: auto;">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Ticket Code</th>
-                                <th>Processed Date</th>
-                                <th>Created By</th>
-                                <th>Assigned By</th>
-                                <th>Customer</th>
-                                <th>Status</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <c:forEach items="${exportData}" var="item">
-                                <tr>
-                                    <td><strong>${item.ticketCode}</strong></td>
-                                    <td><fmt:formatDate value="${item.processedAt}" pattern="dd/MM/yyyy"/></td>
-                                    <td>${item.creatorName}</td>
-                                    <td>${item.confirmedBy}</td>
-                                    <td>${item.partnerName}</td>
-                                    <td>
-                                        <span class="badge badge-${item.status.toLowerCase()}">
-                                            ${item.status}
-                                        </span>
-                                    </td>
-                                </tr>
-                            </c:forEach>
-                            <c:if test="${empty exportData}">
-                                <tr>
-                                    <td colspan="6" style="text-align: center; padding: 40px; color: var(--text-muted);">
-                                        No transaction data found for the selected period.
-                                    </td>
-                                </tr>
-                            </c:if>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-        <jsp:include page="footer.jsp" />
+                <jsp:include page="footer.jsp" />
 
-        <script>
-            function exportCSV() {
-                const fromDate = document.querySelector('input[name="fromDate"]').value;
-                const toDate = document.querySelector('input[name="toDate"]').value;
-                const partnerId = document.querySelector('select[name="partnerId"]').value;
-                const status = document.querySelector('select[name="status"]').value;
+                <script>
+                    function exportCSV() {
+                        const fromDate = document.querySelector('input[name="fromDate"]').value;
+                        const toDate = document.querySelector('input[name="toDate"]').value;
+                        const partnerId = document.querySelector('select[name="partnerId"]').value;
+                        const status = document.querySelector('select[name="status"]').value;
+                        window.location.href = `report-export?action=export&fromDate=${fromDate}&toDate=${toDate}&partnerId=${partnerId}&status=${status}`;
+                    }
+                </script>
+            </body>
 
-                const url = `report-export?action=export&fromDate=${fromDate}&toDate=${toDate}&partnerId=${partnerId}&status=${status}`;
-
-                window.location.href = url;
-            }
-        </script>
-    </body>
-</html>
+            </html>

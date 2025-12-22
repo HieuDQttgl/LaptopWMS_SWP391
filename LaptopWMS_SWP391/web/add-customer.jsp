@@ -1,153 +1,225 @@
 <%@ page contentType="text/html" pageEncoding="UTF-8" %>
+    <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
-<!DOCTYPE html>
-<html>
+        <!DOCTYPE html>
+        <html>
 
-    <head>
-        <title>Add New Customer - WMS</title>
+        <head>
+            <meta charset="UTF-8">
+            <title>Add Customer | Laptop WMS</title>
+            <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+                rel="stylesheet">
+            <style>
+                body {
+                    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+                    background: linear-gradient(135deg, #f0f4ff 0%, #f8fafc 50%, #f0fdf4 100%);
+                    margin: 0;
+                    padding: 0;
+                    min-height: 100vh;
+                }
 
-        <style>
-            body {
-                font-family: "Segoe UI", Arial, sans-serif;
-                background-color: #f5f6fa;
-                margin: 0;
-                padding: 0;
-                color: #2c3e50;
-            }
+                .page-container {
+                    max-width: 600px;
+                    margin: 2rem auto;
+                    padding: 2rem;
+                }
 
-            .container {
-                max-width: 600px;
-                margin: 40px auto;
-                background-color: white;
-                padding: 30px;
-                border-radius: 12px;
-                box-shadow: 0 4px 20px rgba(0, 0, 0, 0.07);
-            }
+                .form-card {
+                    background: white;
+                    border-radius: 1rem;
+                    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+                    overflow: hidden;
+                    border: 1px solid #f1f5f9;
+                    animation: fadeIn 0.3s ease-out;
+                }
 
-            .card-header {
-                background-color: #2ecc71;
-                color: white;
-                padding: 20px 25px;
-                border-radius: 10px 10px 0 0;
-                margin: -30px -30px 25px -30px;
-            }
+                @keyframes fadeIn {
+                    from {
+                        opacity: 0;
+                        transform: translateY(-10px);
+                    }
 
-            .card-header h2 {
-                margin: 0;
-                font-weight: 600;
-            }
+                    to {
+                        opacity: 1;
+                        transform: translateY(0);
+                    }
+                }
 
-            .form-group {
-                margin-bottom: 20px;
-            }
+                .card-header {
+                    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                    color: white;
+                    padding: 1.5rem 2rem;
+                }
 
-            .form-group label {
-                display: block;
-                font-weight: 600;
-                color: #2c3e50;
-                margin-bottom: 8px;
-                font-size: 14px;
-            }
+                .card-header h2 {
+                    margin: 0;
+                    font-size: 1.375rem;
+                    font-weight: 700;
+                    display: flex;
+                    align-items: center;
+                    gap: 0.5rem;
+                }
 
-            .form-group input {
-                width: 100%;
-                padding: 12px 15px;
-                border: 1px solid #ddd;
-                border-radius: 6px;
-                font-size: 14px;
-                transition: border-color 0.2s;
-                box-sizing: border-box;
-            }
+                .card-body {
+                    padding: 2rem;
+                }
 
-            .form-group input:focus {
-                outline: none;
-                border-color: #3498db;
-                box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
-            }
+                .form-group {
+                    margin-bottom: 1.5rem;
+                }
 
-            .form-group input::placeholder {
-                color: #bdc3c7;
-            }
+                .form-group label {
+                    display: block;
+                    font-weight: 600;
+                    color: #475569;
+                    margin-bottom: 0.5rem;
+                    font-size: 0.875rem;
+                }
 
-            .actions {
-                margin-top: 30px;
-                padding-top: 20px;
-                border-top: 1px solid #eee;
-                display: flex;
-                justify-content: flex-end;
-                gap: 10px;
-            }
+                .form-group label.required::after {
+                    content: " *";
+                    color: #dc2626;
+                }
 
-            .btn-cancel {
-                background-color: #95a5a6;
-                color: white;
-                padding: 12px 24px;
-                border-radius: 6px;
-                text-decoration: none;
-                font-weight: 600;
-                transition: background-color 0.2s;
-                border: none;
-                cursor: pointer;
-            }
+                .form-group input {
+                    width: 100%;
+                    padding: 0.875rem 1rem;
+                    border: 2px solid #e2e8f0;
+                    border-radius: 0.5rem;
+                    font-size: 0.9375rem;
+                    transition: all 0.2s ease;
+                    box-sizing: border-box;
+                    outline: none;
+                }
 
-            .btn-cancel:hover {
-                background-color: #7f8c8d;
-            }
+                .form-group input:focus {
+                    border-color: #667eea;
+                    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.15);
+                }
 
-            .btn-save {
-                background-color: #2ecc71;
-                color: white;
-                padding: 12px 24px;
-                border-radius: 6px;
-                font-weight: 600;
-                transition: background-color 0.2s;
-                border: none;
-                cursor: pointer;
-            }
+                .form-group input::placeholder {
+                    color: #94a3b8;
+                }
 
-            .btn-save:hover {
-                background-color: #27ae60;
-            }
+                .form-actions {
+                    display: flex;
+                    justify-content: flex-end;
+                    gap: 1rem;
+                    margin-top: 2rem;
+                    padding-top: 1.5rem;
+                    border-top: 1px solid #f1f5f9;
+                }
 
-            .required::after {
-                content: " *";
-                color: #e74c3c;
-            }
-        </style>
-    </head>
+                .btn {
+                    padding: 0.875rem 1.75rem;
+                    border-radius: 0.5rem;
+                    font-weight: 600;
+                    font-size: 0.9375rem;
+                    border: none;
+                    cursor: pointer;
+                    transition: all 0.2s ease;
+                    text-decoration: none;
+                    display: inline-flex;
+                    align-items: center;
+                    gap: 0.5rem;
+                }
 
-    <body>
-        <jsp:include page="header.jsp" />
+                .btn-cancel {
+                    background: #94a3b8;
+                    color: white;
+                }
 
-        <div class="container">
-            <div class="card-header">
-                <h2>Add New Customer</h2>
+                .btn-cancel:hover {
+                    background: #64748b;
+                    color: white;
+                }
+
+                .btn-save {
+                    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                    color: white;
+                    box-shadow: 0 4px 14px rgba(102, 126, 234, 0.4);
+                }
+
+                .btn-save:hover {
+                    transform: translateY(-2px);
+                    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.5);
+                }
+
+                .back-link {
+                    display: inline-flex;
+                    align-items: center;
+                    gap: 0.5rem;
+                    margin-bottom: 1.5rem;
+                    font-size: 0.875rem;
+                    color: #64748b;
+                    text-decoration: none;
+                    font-weight: 500;
+                }
+
+                .back-link:hover {
+                    color: #667eea;
+                }
+
+                @media (max-width: 640px) {
+                    .page-container {
+                        padding: 1rem;
+                        margin: 1rem;
+                    }
+
+                    .card-body {
+                        padding: 1.5rem;
+                    }
+
+                    .form-actions {
+                        flex-direction: column;
+                    }
+
+                    .btn {
+                        width: 100%;
+                        justify-content: center;
+                    }
+                }
+            </style>
+        </head>
+
+        <body>
+            <jsp:include page="header.jsp" />
+
+            <div class="page-container">
+                <a href="customer-list" class="back-link">← Back to Customers</a>
+
+                <div class="form-card">
+                    <div class="card-header">
+                        <h2>🛒 Add New Customer</h2>
+                    </div>
+
+                    <div class="card-body">
+                        <form action="add-customer" method="POST">
+                            <div class="form-group">
+                                <label class="required">Full Name</label>
+                                <input type="text" name="name" placeholder="Enter customer name" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Email</label>
+                                <input type="email" name="email" placeholder="Enter email address">
+                            </div>
+
+                            <div class="form-group">
+                                <label>Phone Number</label>
+                                <input type="text" name="phone" placeholder="Enter phone number">
+                            </div>
+
+                            <div class="form-actions">
+                                <a href="customer-list" class="btn btn-cancel">Cancel</a>
+                                <button type="submit" class="btn btn-save">Save Customer</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
             </div>
 
-            <form action="add-customer" method="POST">
-                <div class="form-group">
-                    <label class="required">Full Name</label>
-                    <input type="text" name="name" placeholder="Enter customer name" required>
-                </div>
+            <jsp:include page="footer.jsp" />
+        </body>
 
-                <div class="form-group">
-                    <label>Email</label>
-                    <input type="email" name="email" placeholder="Enter email address">
-                </div>
-
-                <div class="form-group">
-                    <label>Phone Number</label>
-                    <input type="text" name="phone" placeholder="Enter phone number">
-                </div>
-
-                <div class="actions">
-                    <a href="customer-list" class="btn-cancel">Cancel</a>
-                    <button type="submit" class="btn-save">Save Customer</button>
-                </div>
-            </form>
-        </div>
-
-        <jsp:include page="footer.jsp" />
-    </body>
-
-</html>
+        </html>

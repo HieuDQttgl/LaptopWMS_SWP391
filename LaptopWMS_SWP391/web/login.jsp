@@ -1,233 +1,378 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
-<!DOCTYPE html>
-<html>
+    <!DOCTYPE html>
+    <html>
 
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Laptop Warehouse Management System</title>
+        <title>Sign In | Laptop WMS</title>
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+            rel="stylesheet">
         <style>
-            :root {
-                --primary-color: #2563eb;
-                --primary-hover: #1d4ed8;
-                --danger-color: #dc2626;
-                --bg-color: #f3f4f6;
-                --card-bg: #ffffff;
-                --border-color: #e5e7eb;
-                --text-main: #111827;
-                --text-muted: #6b7280;
-                --radius-lg: 12px;
-                --shadow-soft: 0 10px 25px rgba(15, 23, 42, 0.12);
-            }
-
             * {
+                margin: 0;
+                padding: 0;
                 box-sizing: border-box;
             }
 
             body {
-                margin: 0;
-                font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-                background: radial-gradient(circle at top left, #dbeafe 0, #eff6ff 25%, #f9fafb 60%);
+                font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+                min-height: 100vh;
                 display: flex;
                 align-items: center;
                 justify-content: center;
-                min-height: 100vh;
-                color: var(--text-main);
-            }
-
-            .auth-wrapper {
-                width: 100%;
-                max-width: 420px;
-                padding: 16px;
-            }
-
-            .card {
-                background: var(--card-bg);
-                border-radius: var(--radius-lg);
-                box-shadow: var(--shadow-soft);
-                padding: 28px 26px 26px;
-                border: 1px solid var(--border-color);
-            }
-
-            .card-header {
-                margin-bottom: 20px;
-                text-align: center;
-            }
-
-            .card-header h1 {
-                margin: 0 0 6px;
-                font-size: 24px;
-                font-weight: 600;
-            }
-
-            .card-header p {
-                margin: 0;
-                font-size: 14px;
-                color: var(--text-muted);
-            }
-
-            .form-group {
-                margin-bottom: 14px;
-            }
-
-            label {
-                display: block;
-                margin-bottom: 4px;
-                font-size: 13px;
-                font-weight: 500;
-                color: var(--text-muted);
-            }
-
-            .input-field {
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+                background-size: 400% 400%;
+                animation: gradientBG 15s ease infinite;
                 position: relative;
+                overflow: hidden;
             }
 
-            .input-field input[type="text"],
-            .input-field input[type="password"] {
+            @keyframes gradientBG {
+                0% {
+                    background-position: 0% 50%;
+                }
+
+                50% {
+                    background-position: 100% 50%;
+                }
+
+                100% {
+                    background-position: 0% 50%;
+                }
+            }
+
+            /* Animated Background Shapes */
+            .bg-shape {
+                position: absolute;
+                border-radius: 50%;
+                background: rgba(255, 255, 255, 0.1);
+                animation: float 6s ease-in-out infinite;
+            }
+
+            .bg-shape:nth-child(1) {
+                width: 400px;
+                height: 400px;
+                top: -10%;
+                left: -10%;
+                animation-delay: 0s;
+            }
+
+            .bg-shape:nth-child(2) {
+                width: 300px;
+                height: 300px;
+                bottom: -5%;
+                right: -5%;
+                animation-delay: 2s;
+            }
+
+            .bg-shape:nth-child(3) {
+                width: 200px;
+                height: 200px;
+                bottom: 30%;
+                left: 10%;
+                animation-delay: 4s;
+            }
+
+            @keyframes float {
+
+                0%,
+                100% {
+                    transform: translateY(0) rotate(0deg);
+                }
+
+                50% {
+                    transform: translateY(-20px) rotate(5deg);
+                }
+            }
+
+            /* Login Card */
+            .login-wrapper {
                 width: 100%;
-                padding: 9px 10px;
-                border-radius: 8px;
-                border: 1px solid var(--border-color);
-                font-size: 14px;
-                outline: none;
-                transition: border-color 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease;
-                background-color: #f9fafb;
+                max-width: 440px;
+                padding: 1.5rem;
+                position: relative;
+                z-index: 10;
             }
 
-            .input-field input:focus {
-                border-color: var(--primary-color);
-                box-shadow: 0 0 0 1px rgba(37, 99, 235, 0.14);
-                background-color: #ffffff;
+            .login-card {
+                background: rgba(255, 255, 255, 0.9);
+                backdrop-filter: blur(20px);
+                -webkit-backdrop-filter: blur(20px);
+                border-radius: 1.5rem;
+                box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+                border: 1px solid rgba(255, 255, 255, 0.3);
+                padding: 2.5rem;
+                animation: slideUp 0.5s ease-out;
             }
 
-            .error-message {
-                margin-bottom: 12px;
-                padding: 8px 10px;
-                border-radius: 8px;
-                background-color: #fee2e2;
-                border: 1px solid #fecaca;
-                color: var(--danger-color);
-                font-size: 13px;
+            @keyframes slideUp {
+                from {
+                    opacity: 0;
+                    transform: translateY(30px);
+                }
+
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
             }
 
-            .success-message {
-                margin-bottom: 12px;
-                padding: 8px 10px;
-                border-radius: 8px;
-                background-color: #dcfce7;
-                border: 1px solid #bbf7d0;
-                color: #16a34a;
-                font-size: 13px;
-            }
-
-            .actions {
-                margin-top: 6px;
-            }
-
-            .btn-primary {
-                width: 100%;
-                padding: 9px 12px;
-                border-radius: 8px;
-                border: none;
-                background: linear-gradient(135deg, var(--primary-color), #3b82f6);
-                color: #ffffff;
-                font-weight: 600;
-                font-size: 14px;
-                cursor: pointer;
-                transition: background 0.15s ease, transform 0.05s ease, box-shadow 0.05s ease;
-                box-shadow: 0 8px 18px rgba(37, 99, 235, 0.35);
-            }
-
-            .btn-primary:hover {
-                background: linear-gradient(135deg, var(--primary-hover), #2563eb);
-                transform: translateY(-1px);
-                box-shadow: 0 10px 22px rgba(37, 99, 235, 0.4);
-            }
-
-            .btn-primary:active {
-                transform: translateY(0);
-                box-shadow: 0 6px 14px rgba(37, 99, 235, 0.3);
-            }
-
-            .meta {
-                margin-top: 10px;
+            /* Brand */
+            .brand {
                 text-align: center;
-                font-size: 12px;
-                color: var(--text-muted);
+                margin-bottom: 2rem;
             }
 
+            .brand-icon {
+                font-size: 3rem;
+                margin-bottom: 0.75rem;
+                display: block;
+            }
+
+            .brand-name {
+                font-size: 1.75rem;
+                font-weight: 800;
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-clip: text;
+            }
+
+            .brand-tagline {
+                font-size: 0.875rem;
+                color: #64748b;
+                margin-top: 0.25rem;
+            }
+
+            /* Header */
+            .login-header {
+                text-align: center;
+                margin-bottom: 1.5rem;
+            }
+
+            .login-header h1 {
+                font-size: 1.5rem;
+                font-weight: 700;
+                color: #1e293b;
+                margin-bottom: 0.25rem;
+            }
+
+            .login-header p {
+                font-size: 0.875rem;
+                color: #64748b;
+            }
+
+            /* Messages */
+            .message {
+                padding: 0.875rem 1rem;
+                border-radius: 0.75rem;
+                margin-bottom: 1.25rem;
+                font-size: 0.875rem;
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+                animation: fadeIn 0.3s ease-out;
+            }
+
+            @keyframes fadeIn {
+                from {
+                    opacity: 0;
+                }
+
+                to {
+                    opacity: 1;
+                }
+            }
+
+            .message-error {
+                background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+                border: 1px solid #fca5a5;
+                color: #dc2626;
+            }
+
+            .message-success {
+                background: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%);
+                border: 1px solid #86efac;
+                color: #16a34a;
+            }
+
+            /* Form */
+            .form-group {
+                margin-bottom: 1.25rem;
+            }
+
+            .form-label {
+                display: block;
+                font-size: 0.8125rem;
+                font-weight: 600;
+                color: #475569;
+                margin-bottom: 0.5rem;
+            }
+
+            .form-input {
+                width: 100%;
+                padding: 0.875rem 1rem;
+                font-size: 0.9375rem;
+                font-family: inherit;
+                color: #1e293b;
+                background: #f8fafc;
+                border: 2px solid #e2e8f0;
+                border-radius: 0.75rem;
+                outline: none;
+                transition: all 0.2s ease;
+            }
+
+            .form-input:focus {
+                border-color: #667eea;
+                background: white;
+                box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.15);
+            }
+
+            .form-input::placeholder {
+                color: #94a3b8;
+            }
+
+            /* Submit Button */
+            .btn-submit {
+                width: 100%;
+                padding: 0.9375rem 1.5rem;
+                font-size: 0.9375rem;
+                font-weight: 600;
+                font-family: inherit;
+                color: white;
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                border: none;
+                border-radius: 0.75rem;
+                cursor: pointer;
+                transition: all 0.2s ease;
+                box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+                margin-top: 0.5rem;
+            }
+
+            .btn-submit:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 15px 35px rgba(102, 126, 234, 0.5);
+            }
+
+            .btn-submit:active {
+                transform: translateY(0);
+            }
+
+            /* Footer Links */
+            .login-footer {
+                text-align: center;
+                margin-top: 1.5rem;
+                padding-top: 1.5rem;
+                border-top: 1px solid #e2e8f0;
+            }
+
+            .login-footer a {
+                font-size: 0.875rem;
+                color: #667eea;
+                text-decoration: none;
+                font-weight: 500;
+                transition: color 0.2s ease;
+            }
+
+            .login-footer a:hover {
+                color: #764ba2;
+            }
+
+            /* Copyright */
+            .copyright {
+                text-align: center;
+                margin-top: 1.5rem;
+                font-size: 0.75rem;
+                color: rgba(255, 255, 255, 0.7);
+            }
+
+            /* Responsive */
             @media (max-width: 480px) {
-                .card {
-                    padding: 22px 18px 20px;
+                .login-card {
+                    padding: 1.75rem 1.5rem;
+                }
+
+                .brand-name {
+                    font-size: 1.5rem;
                 }
             }
         </style>
     </head>
 
     <body>
-        <div class="auth-wrapper">
-            <div class="card">
-                <div class="card-header">
+        <!-- Background Shapes -->
+        <div class="bg-shape"></div>
+        <div class="bg-shape"></div>
+        <div class="bg-shape"></div>
+
+        <div class="login-wrapper">
+            <div class="login-card">
+                <!-- Brand -->
+                <div class="brand">
+                    <span class="brand-icon">📦</span>
+                    <div class="brand-name">Laptop WMS</div>
+                    <div class="brand-tagline">Warehouse Management System</div>
+                </div>
+
+                <!-- Header -->
+                <div class="login-header">
                     <h1>Welcome back</h1>
-                    <p>Please sign in to continue</p>
+                    <p>Please sign in to your account</p>
                 </div>
 
-                <% String error = (String) request.getAttribute("error");
-                    String usernameVal = (String) request.getAttribute("username");
-                    String successMsg = (String) session.getAttribute("message");
-                    String urlMsg = request.getParameter("msg"); // NEW: Get message from URL if (successMsg !=null) {
-                    session.removeAttribute("message");
-                %>
+                <% String error=(String) request.getAttribute("error"); String usernameVal=(String)
+                    request.getAttribute("username"); String successMsg=(String) session.getAttribute("message"); String
+                    urlMsg=request.getParameter("msg"); if (successMsg !=null) { session.removeAttribute("message"); }
+                    %>
 
-                <% if (successMsg != null) {%>
-                <div class="success-message">
-                    <%= successMsg%>
-                </div>
-                <% } %>
-
-                <% if (urlMsg != null && !urlMsg.isEmpty()) {%>
-                <div class="success-message">
-                    <%= urlMsg%>
-                </div>
-                <% } %>
-
-                <% if (error != null) {%>
-                <div class="error-message">
-                    <%= error%>
-                </div>
-                <% }%>
-
-                <form method="post" action="<%= request.getContextPath()%>/login">
-                    <div class="form-group">
-                        <label for="username">Username</label>
-                        <div class="input-field">
-                            <input type="text" id="username" name="username"
-                                   value="<%= usernameVal != null ? usernameVal : ""%>"
-                                   required>
+                    <% if (successMsg !=null) {%>
+                        <div class="message message-success">
+                            ✓ <%= successMsg%>
                         </div>
-                    </div>
+                        <% } %>
 
-                    <div class="form-group">
-                        <label for="password">Password</label>
-                        <div class="input-field">
-                            <input type="password" id="password" name="password" required>
-                        </div>
-                    </div>
+                            <% if (urlMsg !=null && !urlMsg.isEmpty()) {%>
+                                <div class="message message-success">
+                                    ✓ <%= urlMsg%>
+                                </div>
+                                <% } %>
 
-                    <div class="actions">
-                        <button type="submit" class="btn-primary">Sign in</button>
-                    </div>
-                    <div class="meta">
-                        <a href="<%= request.getContextPath()%>/forgot"
-                           style="color: var(--primary-color); text-decoration: none;">
-                            Forgot password?
-                        </a>
-                    </div>
+                                    <% if (error !=null) {%>
+                                        <div class="message message-error">
+                                            ⚠ <%= error%>
+                                        </div>
+                                        <% }%>
 
+                                            <form method="post" action="<%= request.getContextPath()%>/login">
+                                                <div class="form-group">
+                                                    <label class="form-label" for="username">Username</label>
+                                                    <input type="text" id="username" name="username" class="form-input"
+                                                        value="<%= usernameVal != null ? usernameVal : ""%>"
+                                                        placeholder="Enter your username" required>
+                                                </div>
 
-                </form>
+                                                <div class="form-group">
+                                                    <label class="form-label" for="password">Password</label>
+                                                    <input type="password" id="password" name="password"
+                                                        class="form-input" placeholder="Enter your password" required>
+                                                </div>
+
+                                                <button type="submit" class="btn-submit">
+                                                    Sign In →
+                                                </button>
+                                            </form>
+
+                                            <div class="login-footer">
+                                                <a href="<%= request.getContextPath()%>/forgot">Forgot your
+                                                    password?</a>
+                                            </div>
+            </div>
+
+            <div class="copyright">
+                © 2025 Laptop WMS — All rights reserved
             </div>
         </div>
     </body>
 
-</html>
+    </html>

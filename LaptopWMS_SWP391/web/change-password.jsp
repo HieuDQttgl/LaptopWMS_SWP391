@@ -1,176 +1,218 @@
 <%@ page contentType="text/html;charset=UTF-8" %>
-<!DOCTYPE html>
-<html>
-    <jsp:include page="header.jsp" />
+    <!DOCTYPE html>
+    <html>
 
     <head>
-        <title>Laptop Warehouse Management System</title>
-
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Change Password | Laptop WMS</title>
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+            rel="stylesheet">
         <style>
-            :root {
-                --primary-color: #2563eb;
-                --primary-hover: #1d4ed8;
-                --bg-color: #f3f4f6;
-                --card-bg: #ffffff;
-                --border-color: #e5e7eb;
-                --text-main: #111827;
-                --text-muted: #6b7280;
-                --radius-lg: 12px;
-                --shadow-soft: 0 10px 25px rgba(15, 23, 42, 0.12);
-            }
-
-            * {
-                box-sizing: border-box;
-            }
-
             body {
+                font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+                background: linear-gradient(135deg, #f0f4ff 0%, #f8fafc 50%, #f0fdf4 100%);
                 margin: 0;
-                font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-                background: radial-gradient(circle at top left, #dbeafe 0, #eff6ff 25%, #f9fafb 60%);
+                padding: 0;
                 min-height: 100vh;
-                color: var(--text-main);
             }
 
-            .change-password-wrapper {
+            .page-wrapper {
                 display: flex;
                 align-items: center;
                 justify-content: center;
-                flex: 1;
-                padding: 40px 16px;
+                padding: 2rem;
+                min-height: calc(100vh - 200px);
             }
 
-            .container {
-                background: var(--card-bg);
-                padding: 35px 40px;
-                border-radius: var(--radius-lg);
-                box-shadow: var(--shadow-soft);
+            .form-card {
                 width: 100%;
-                max-width: 400px;
-                border: 1px solid var(--border-color);
+                max-width: 420px;
+                background: white;
+                border-radius: 1rem;
+                box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+                border: 1px solid #f1f5f9;
+                overflow: hidden;
+                animation: fadeIn 0.3s ease-out;
             }
 
-            h2 {
-                margin: 0 0 20px;
-                font-size: 22px;
-                font-weight: 600;
-                color: #1e3a8a;
+            @keyframes fadeIn {
+                from {
+                    opacity: 0;
+                    transform: translateY(-10px);
+                }
+
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+
+            .card-header {
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                color: white;
+                padding: 1.5rem 2rem;
                 text-align: center;
             }
 
-            label {
-                font-size: 14px;
-                font-weight: 500;
-                color: #374151;
+            .card-header h2 {
+                margin: 0;
+                font-size: 1.375rem;
+                font-weight: 700;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 0.5rem;
+            }
+
+            .card-body {
+                padding: 2rem;
+            }
+
+            .form-group {
+                margin-bottom: 1.25rem;
+            }
+
+            .form-group label {
                 display: block;
-                margin-bottom: 6px;
-            }
-
-            input[type="password"] {
-                width: 100%;
-                padding: 10px 12px;
-                margin-bottom: 18px;
-                border: 1px solid var(--border-color);
-                border-radius: 8px;
-                font-size: 14px;
-                outline: none;
-                transition: .2s ease;
-                box-sizing: border-box;
-            }
-
-            input[type="password"]:focus {
-                border-color: var(--primary-color);
-                box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
-            }
-
-            button {
-                width: 100%;
-                padding: 10px;
-                border-radius: 8px;
-                border: none;
-                background: linear-gradient(135deg, var(--primary-color), #3b82f6);
-                color: white;
-                font-size: 15px;
                 font-weight: 600;
-                cursor: pointer;
-                transition: .2s ease;
-                box-shadow: 0 8px 18px rgba(37, 99, 235, 0.3);
+                color: #475569;
+                margin-bottom: 0.5rem;
+                font-size: 0.875rem;
             }
 
-            button:hover {
-                background: linear-gradient(135deg, var(--primary-hover), #2563eb);
-                transform: translateY(-1px);
+            .form-group input {
+                width: 100%;
+                padding: 0.875rem 1rem;
+                border: 2px solid #e2e8f0;
+                border-radius: 0.5rem;
+                font-size: 0.9375rem;
+                transition: all 0.2s ease;
+                box-sizing: border-box;
+                outline: none;
+            }
+
+            .form-group input:focus {
+                border-color: #667eea;
+                box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.15);
+            }
+
+            .btn-submit {
+                width: 100%;
+                padding: 1rem;
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                color: white;
+                border: none;
+                border-radius: 0.5rem;
+                font-weight: 600;
+                font-size: 1rem;
+                cursor: pointer;
+                transition: all 0.2s ease;
+                box-shadow: 0 4px 14px rgba(102, 126, 234, 0.4);
+            }
+
+            .btn-submit:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 6px 20px rgba(102, 126, 234, 0.5);
             }
 
             .back-link {
                 display: block;
                 text-align: center;
-                margin-top: 15px;
-                color: var(--text-muted);
+                margin-top: 1rem;
+                color: #64748b;
                 text-decoration: none;
-                font-size: 14px;
+                font-size: 0.875rem;
+                font-weight: 500;
             }
 
             .back-link:hover {
-                color: var(--primary-color);
-                text-decoration: underline;
+                color: #667eea;
+            }
+
+            .message {
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+                padding: 1rem 1.25rem;
+                border-radius: 0.75rem;
+                margin-bottom: 1.5rem;
+                font-weight: 500;
             }
 
             .msg-success {
-                margin-top: 15px;
-                background: #d1fae5;
-                padding: 12px 16px;
-                border-radius: 8px;
-                color: #065f46;
-                font-size: 14px;
-                border: 1px solid #6ee7b7;
+                background: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%);
+                color: #16a34a;
+                border: 1px solid #86efac;
             }
 
             .msg-error {
-                margin-top: 15px;
-                background: #fee2e2;
-                padding: 12px 16px;
-                border-radius: 8px;
-                color: #991b1b;
-                font-size: 14px;
+                background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+                color: #dc2626;
                 border: 1px solid #fca5a5;
+            }
+
+            @media (max-width: 480px) {
+                .page-wrapper {
+                    padding: 1rem;
+                }
+
+                .card-body {
+                    padding: 1.5rem;
+                }
             }
         </style>
     </head>
 
     <body>
-        <div class="change-password-wrapper">
-            <div class="container">
-                <h2>Change Password</h2>
+        <jsp:include page="header.jsp" />
 
-                <form method="post" action="<%= request.getContextPath()%>/change-password">
-
-                    <label>Current Password:</label>
-                    <input type="password" name="currentPassword" placeholder="Enter current password" required>
-
-                    <label>New Password:</label>
-                    <input type="password" name="newPassword" placeholder="Enter new password" required>
-
-                    <label>Confirm New Password:</label>
-                    <input type="password" name="confirmPassword" placeholder="Re-enter new password" required>
-
-                    <button type="submit">Update Password</button>
-                </form>
-                <a href="<%= request.getContextPath()%>/landing" class="back-link">Back to Home</a>
-
-                <% if (request.getAttribute("error") != null) {%>
-                <div class="msg-error">
-                    <%= request.getAttribute("error")%>
+        <div class="page-wrapper">
+            <div class="form-card">
+                <div class="card-header">
+                    <h2>🔐 Change Password</h2>
                 </div>
-                <% } %>
 
-                <% if (request.getAttribute("msg") != null) {%>
-                <div class="msg-success">
-                    <%= request.getAttribute("msg")%>
+                <div class="card-body">
+                    <% if (request.getAttribute("msg") !=null) { %>
+                        <div class="message msg-success">✓ <%= request.getAttribute("msg") %>
+                        </div>
+                        <% } %>
+
+                            <% if (request.getAttribute("error") !=null) { %>
+                                <div class="message msg-error">⚠ <%= request.getAttribute("error") %>
+                                </div>
+                                <% } %>
+
+                                    <form method="post" action="<%= request.getContextPath() %>/change-password">
+                                        <div class="form-group">
+                                            <label>Current Password</label>
+                                            <input type="password" name="currentPassword"
+                                                placeholder="Enter current password" required>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label>New Password</label>
+                                            <input type="password" name="newPassword" placeholder="Enter new password"
+                                                required>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label>Confirm New Password</label>
+                                            <input type="password" name="confirmPassword"
+                                                placeholder="Re-enter new password" required>
+                                        </div>
+
+                                        <button type="submit" class="btn-submit">Update Password</button>
+                                    </form>
+
+                                    <a href="<%= request.getContextPath() %>/profile" class="back-link">← Back to
+                                        Profile</a>
                 </div>
-                <% }%>
             </div>
         </div>
+
         <jsp:include page="footer.jsp" />
     </body>
 
-</html>
+    </html>
