@@ -278,7 +278,6 @@
         padding: 5px 0;
     }
 
-    /* Show dropdown on hover */
     .dropdown:hover .dropdown-content {
         display: block;
     }
@@ -308,9 +307,16 @@
     </div>
 
     <div class="header-right">
-        <a href="#features">Features</a>
-        <a href="#hero">About</a>
         <% if (currentUser != null) {%>
+
+        <% if (roleId == 1 || roleId == 2) { %> 
+        <div class="dropdown">
+            <a href="#" style="cursor: default">Partners ▼</a>
+            <div class="dropdown-content">
+                <a href="<%= request.getContextPath()%>/customer-list">Customer</a>
+                <a href="<%= request.getContextPath()%>/supplier-list">Supplier</a>
+            </div>
+        </div>
         <div class="dropdown">
             <a href="#" style="cursor: default">Reports ▼</a>
             <div class="dropdown-content">
@@ -319,17 +325,10 @@
                 <a href="<%= request.getContextPath()%>/report-inventory">Inventory</a>
             </div>
         </div>
+        <% } %>
 
         <% if (roleId == 1) {%>
-        
         <div class="dropdown">
-            <a href="#" style="cursor: default">Partners ▼</a>
-            <div class="dropdown-content">
-                <a href="<%= request.getContextPath()%>/customer-list">Customer</a>
-                <a href="<%= request.getContextPath()%>/supplier-list">Supplier</a>
-            </div>
-        </div>
-            <div class="dropdown">
             <a href="#" style="cursor: default">Admin ▼</a>
             <div class="dropdown-content">
                 <a href="<%= request.getContextPath()%>/dashboard">Dashboard</a>
@@ -337,28 +336,15 @@
                 <a href="<%= request.getContextPath()%>/role">Roles</a>
             </div>
         </div>
-        <a href="<%= request.getContextPath()%>/product-list">Products</a>
-        <a href="<%= request.getContextPath()%>/ticket-list">Tickets</a>
         <% } %>
 
-        <% if (roleId == 2) {%>
-
-        <div class="dropdown">
-            <a href="#" style="cursor: default">Partners ▼</a>
-            <div class="dropdown-content">
-                <a href="<%= request.getContextPath()%>/customer-list">Customer</a>
-                <a href="<%= request.getContextPath()%>/supplier-list">Supplier</a>
-            </div>
-        </div>
         <a href="<%= request.getContextPath()%>/product-list">Products</a>
-        <a href="<%= request.getContextPath()%>/ticket-list">Tickets</a>
-        <% }%>
-
         <% if (roleId == 3) {%>
-        <a href="<%= request.getContextPath()%>/product-list">Products</a>
+        <a href="<%= request.getContextPath()%>/report-inventory">Inventory Report</a>
         <a href="<%= request.getContextPath()%>/ticket-list">My Tickets</a>
-        <% }%>
-
+        <% } else { %>
+        <a href="<%= request.getContextPath()%>/ticket-list">Tickets</a>
+        <% } %>
         <div class="notification-wrapper">
             <div class="notification-bell" id="notificationBell"
                  onclick="toggleNotificationDropdown()">
