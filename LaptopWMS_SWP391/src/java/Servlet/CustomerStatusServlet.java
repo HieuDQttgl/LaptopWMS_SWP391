@@ -17,7 +17,7 @@ import jakarta.servlet.http.HttpServletResponse;
  *
  * @author Admin
  */
-@WebServlet(name = "CustomerStatusServlet", urlPatterns = {"/customer-status"})
+@WebServlet(name = "CustomerStatusServlet", urlPatterns = {"/change-status"})
 public class CustomerStatusServlet extends HttpServlet {
 
     /**

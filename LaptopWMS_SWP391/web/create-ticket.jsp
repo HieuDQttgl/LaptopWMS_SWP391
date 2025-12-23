@@ -357,7 +357,7 @@
                                                         </select>
                                                     </div>
 
-                                                    <div class="form-group" id="partnerSection">
+                                                    <div class="form-group" id="partnerSection" style="display: none;">
                                                         <label for="partnerId" id="partnerLabel">Partner</label>
                                                         <select id="partnerId" name="partnerId">
                                                             <option value="">-- Select Partner --</option>
