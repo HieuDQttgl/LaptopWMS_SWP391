@@ -8,9 +8,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * UserDAO - updated for laptop_wms_lite database
- * Simplified schema: user_id, username, password, full_name, email, role_id,
- * status
+ * UserDAO - updated for laptop_wms_lite database Simplified schema: user_id,
+ * username, password, full_name, email, role_id, status
  */
 public class UserDAO extends DBContext {
 
@@ -31,8 +30,8 @@ public class UserDAO extends DBContext {
         List<Object> params = new ArrayList<>();
         StringBuilder sql = new StringBuilder(
                 "SELECT u.*, r.role_name "
-                        + "FROM users u JOIN roles r ON u.role_id = r.role_id "
-                        + "WHERE 1=1 ");
+                + "FROM users u JOIN roles r ON u.role_id = r.role_id "
+                + "WHERE 1=1 ");
 
         if (keyword != null && !keyword.trim().isEmpty()) {
             sql.append("AND (u.full_name LIKE ? OR u.email LIKE ? OR u.username LIKE ?) ");
@@ -94,8 +93,8 @@ public class UserDAO extends DBContext {
         List<Object> params = new ArrayList<>();
         StringBuilder sql = new StringBuilder(
                 "SELECT COUNT(*) "
-                        + "FROM users u JOIN roles r ON u.role_id = r.role_id "
-                        + "WHERE 1=1 ");
+                + "FROM users u JOIN roles r ON u.role_id = r.role_id "
+                + "WHERE 1=1 ");
 
         if (keyword != null && !keyword.trim().isEmpty()) {
             sql.append("AND (u.full_name LIKE ? OR u.email LIKE ? OR u.username LIKE ?) ");
@@ -148,12 +147,11 @@ public class UserDAO extends DBContext {
         return false;
     }
 
-    public Users findByUsernameAndPassword(String username, String password) {
-        String sql = "SELECT * FROM users WHERE username = ? AND password = ?";
+    public Users getUserByUsername(String username) {
+        String sql = "SELECT * FROM users WHERE username = ?";
 
         try (Connection conn = getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, username);
-            ps.setString(2, password);
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
                     Users u = new Users();
@@ -367,8 +365,8 @@ public class UserDAO extends DBContext {
     }
 
     /**
-     * Update password_changed_at timestamp when password changes
-     * Used to invalidate all active sessions
+     * Update password_changed_at timestamp when password changes Used to
+     * invalidate all active sessions
      */
     public boolean updatePasswordChangedAt(int userId) {
         String sql = "UPDATE users SET password_changed_at = CURRENT_TIMESTAMP WHERE user_id = ?";

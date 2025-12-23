@@ -40,7 +40,7 @@ public class ChangePasswordServlet extends HttpServlet {
         String confirm = request.getParameter("confirmPassword");
 
         // Validation 1: Check current password is correct
-        if (!currentUser.getPassword().equals(currentPass)) {
+        if (!Utils.PasswordUtils.checkPassword(currentPass, currentUser.getPassword())) {
             request.setAttribute("error", "Current password is incorrect.");
             request.getRequestDispatcher("change-password.jsp").forward(request, response);
             return;
@@ -62,7 +62,8 @@ public class ChangePasswordServlet extends HttpServlet {
 
         // Update password in database
         UserDAO dao = new UserDAO();
-        boolean success = dao.updatePassword(currentUser.getUserId(), newPass);
+        String hashedPass = Utils.PasswordUtils.hashPassword(newPass);
+        boolean success = dao.updatePassword(currentUser.getUserId(), hashedPass);
 
         if (success) {
             // NEW: Update password_changed_at timestamp to invalidate all old sessions

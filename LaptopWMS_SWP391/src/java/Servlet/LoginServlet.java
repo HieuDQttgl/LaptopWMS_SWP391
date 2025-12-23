@@ -34,9 +34,9 @@ public class LoginServlet extends HttpServlet {
         String password = request.getParameter("password");
 
         UserDAO userDao = new UserDAO();
-        Model.Users user = userDao.findByUsernameAndPassword(username, password);
+        Model.Users user = userDao.getUserByUsername(username);
         RoleDAO dao = new RoleDAO();
-        if (user != null) {
+        if (user != null && Utils.PasswordUtils.checkPassword(password, user.getPassword())) {
             try {
                 Role role = dao.getRoleById(user.getRoleId());
                 if (role.getStatus().toLowerCase().equals("inactive")) {

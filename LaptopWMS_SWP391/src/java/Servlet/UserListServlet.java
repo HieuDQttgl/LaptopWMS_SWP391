@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.HashMap;
 
-@WebServlet(name = "UserListServlet", urlPatterns = { "/user-list" })
+@WebServlet(name = "UserListServlet", urlPatterns = {"/user-list"})
 public class UserListServlet extends HttpServlet {
 
     private static final int ADMIN_ROLE_ID = 1;
@@ -195,7 +195,8 @@ public class UserListServlet extends HttpServlet {
         }
 
         try {
-            Users newUser = new Users(0, username, password, fullName, email, roleId, "active");
+            String hashedPassword = Utils.PasswordUtils.hashPassword(password);
+            Users newUser = new Users(0, username, hashedPassword, fullName, email, roleId, "active");
 
             if (userDAO.addNew(newUser)) {
                 session.setAttribute("message", "User " + username + " added successfully!");
