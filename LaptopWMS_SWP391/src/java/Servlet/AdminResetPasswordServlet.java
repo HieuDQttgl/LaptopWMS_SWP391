@@ -12,7 +12,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
-@WebServlet(name = "AdminResetPasswordServlet", urlPatterns = { "/admin-reset-password" })
+@WebServlet(name = "AdminResetPasswordServlet", urlPatterns = {"/admin-reset-password"})
 public class AdminResetPasswordServlet extends HttpServlet {
 
     private static final int ADMIN_ROLE_ID = 1;
@@ -74,7 +74,8 @@ public class AdminResetPasswordServlet extends HttpServlet {
             String newPassword = generateRandomPassword();
 
             // Update password in database
-            boolean passwordUpdated = userDAO.updatePassword(userId, newPassword);
+            String hashedPassword = Utils.PasswordUtils.hashPassword(newPassword);
+            boolean passwordUpdated = userDAO.updatePassword(userId, hashedPassword);
 
             if (!passwordUpdated) {
                 request.setAttribute("error", "Failed to update password in database.");
@@ -97,8 +98,8 @@ public class AdminResetPasswordServlet extends HttpServlet {
             } else {
                 // Password was changed but email failed - warn admin
                 request.setAttribute("success",
-                        "Password reset successfully, but email could not be sent. " +
-                                "Please manually inform the user. New password: " + newPassword);
+                        "Password reset successfully, but email could not be sent. "
+                        + "Please manually inform the user. New password: " + newPassword);
             }
 
             forwardToUserDetail(request, response, userId);
