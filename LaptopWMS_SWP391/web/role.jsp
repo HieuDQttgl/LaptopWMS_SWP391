@@ -297,7 +297,6 @@
                                         <th>Role Name</th>
                                         <th>Description</th>
                                         <th>Status</th>
-                                        <th>Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -320,10 +319,6 @@
                                                         <% } else { %>
                                                             <span class="status-badge status-inactive">● Inactive</span>
                                                             <% }%>
-                                                </td>
-                                                <td>
-                                                    <a href="edit-role?id=<%= role.getRoleId()%>"
-                                                        class="action-link">Edit</a>
                                                 </td>
                                             </tr>
                                             <% } } else { %>
