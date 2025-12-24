@@ -214,7 +214,7 @@
 <!-- Confirmation Modal -->
 <div class="confirm-overlay" id="confirmOverlay" onclick="closeConfirm(event)">
     <div class="confirm-dialog" onclick="event.stopPropagation()">
-        <div class="confirm-icon" id="confirmIcon">⚠️</div>
+        <div class="confirm-icon" id="confirmIcon">&#9888;</div>
         <h3 class="confirm-title" id="confirmTitle">Confirm Action</h3>
         <p class="confirm-message" id="confirmMessage">Are you sure you want to proceed?</p>
         <div class="confirm-actions">
@@ -232,16 +232,15 @@
         const toast = document.createElement('div');
         toast.className = 'toast ' + type;
 
-        const icons = { success: '✓', error: '✗', warning: '⚠', info: 'ℹ' };
+        const icons = { success: '\u2713', error: '\u2717', warning: '\u26A0', info: '\u2139' };
 
-        toast.innerHTML = `
-        <span class="toast-icon">${icons[type] || icons.info}</span>
-        <div class="toast-content">
-            <div class="toast-title">${title}</div>
-            ${message ? '<div class="toast-message">' + message + '</div>' : ''}
-        </div>
-        <button class="toast-close" onclick="this.parentElement.remove()">×</button>
-    `;
+        toast.innerHTML =
+            '<span class="toast-icon">' + (icons[type] || icons.info) + '</span>' +
+            '<div class="toast-content">' +
+            '<div class="toast-title">' + title + '</div>' +
+            (message ? '<div class="toast-message">' + message + '</div>' : '') +
+            '</div>' +
+            '<button class="toast-close" onclick="this.parentElement.remove()">&times;</button>';
 
         container.appendChild(toast);
 
@@ -262,7 +261,7 @@
         const message = document.getElementById('confirmMessage');
         const actionBtn = document.getElementById('confirmAction');
 
-        icon.textContent = options.icon || '⚠️';
+        icon.textContent = options.icon || '\u26A0';
         title.textContent = options.title || 'Confirm Action';
         message.textContent = options.message || 'Are you sure you want to proceed?';
         actionBtn.textContent = options.confirmText || 'Confirm';
@@ -278,7 +277,8 @@
     }
 
     function closeConfirm(event) {
-        if (event && event.target !== document.getElementById('confirmOverlay')) return;
+        if (event && event.target !== document.getElementById('confirmOverlay'))
+            return;
         document.getElementById('confirmOverlay').classList.remove('show');
         document.body.style.overflow = '';
         pendingConfirmCallback = null;
@@ -296,13 +296,14 @@
 
     // Keyboard support
     document.addEventListener('keydown', function (e) {
-        if (e.key === 'Escape') closeConfirm();
+        if (e.key === 'Escape')
+            closeConfirm();
     });
 
     // Helper function for status toggles
     function confirmStatusChange(url, itemName, isActive) {
         const action = isActive ? 'deactivate' : 'activate';
-        const icon = isActive ? '🔒' : '🔓';
+        const icon = isActive ? '\uD83D\uDD12' : '\uD83D\uDD13';
 
         showConfirm({
             icon: icon,

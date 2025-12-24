@@ -301,11 +301,11 @@
                                     Tickets</a>
 
                                 <div class="card">
-                                    <h1>📝 Create New Ticket</h1>
+                                    <h1>&#128221; Create New Ticket</h1>
 
                                     <% String error=(String) request.getAttribute("error"); %>
                                         <% if (error !=null) {%>
-                                            <div class="error-message">⚠ <%= error%>
+                                            <div class="error-message">&#9888; <%= error%>
                                             </div>
                                             <% } %>
 
@@ -315,18 +315,18 @@
                                                         <div class="type-selector">
                                                             <div class="type-option" onclick="selectType('IMPORT')"
                                                                 id="type-import">
-                                                                <div class="type-icon">📥</div>
+                                                                <div class="type-icon">&#128229;</div>
                                                                 <div class="type-label">IMPORT</div>
                                                                 <div class="type-desc">Nhập hàng vào kho</div>
                                                             </div>
                                                             <div class="type-option" onclick="selectType('EXPORT')"
                                                                 id="type-export">
-                                                                <div class="type-icon">📤</div>
+                                                                <div class="type-icon">&#128228;</div>
                                                                 <div class="type-label">EXPORT</div>
                                                                 <div class="type-desc">Xuất hàng ra kho</div>
                                                             </div>
                                                         </div>
-                                                        <input type="hidden" name="type" id="ticketType" required>
+                                                        <input type="hidden" name="type" id="ticketType">
                                                     </div>
 
                                                     <div class="form-group">
@@ -348,10 +348,10 @@
                                                             <% List<Users> keepers = (List<Users>)
                                                                     request.getAttribute("keepers");
                                                                     if (keepers != null) {
-                                                                    for (Users keeper : keepers) { %>
+                                                                    for (Users keeper : keepers) {%>
                                                                     <option value="<%= keeper.getUserId()%>">
-                                                                        <%= keeper.getFullName()%> (<%=
-                                                                                keeper.getUsername()%>)
+                                                                        <%= keeper.getFullName()%> (
+                                                                            <%=keeper.getUsername()%>)
                                                                     </option>
                                                                     <% } } %>
                                                         </select>
@@ -366,7 +366,7 @@
                                                             <% List<Partners> suppliers = (List<Partners>)
                                                                     request.getAttribute("suppliers");
                                                                     if (suppliers != null) {
-                                                                    for (Partners supplier : suppliers) { %>
+                                                                    for (Partners supplier : suppliers) {%>
                                                                     <option value="<%= supplier.getPartnerId()%>"
                                                                         data-type="supplier">
                                                                         <%= supplier.getPartnerName()%>
@@ -377,7 +377,7 @@
                                                             <% List<Partners> customers = (List<Partners>)
                                                                     request.getAttribute("customers");
                                                                     if (customers != null) {
-                                                                    for (Partners customer : customers) { %>
+                                                                    for (Partners customer : customers) {%>
                                                                     <option value="<%= customer.getPartnerId()%>"
                                                                         data-type="customer">
                                                                         <%= customer.getPartnerName()%>
@@ -387,7 +387,7 @@
                                                     </div>
 
                                                     <div class="products-section">
-                                                        <h3>📦 Products</h3>
+                                                        <h3>&#128230; Products</h3>
                                                         <div id="productRows">
                                                             <div class="product-row">
                                                                 <select name="productDetailId" required
@@ -396,14 +396,14 @@
                                                                     <% List<TicketItem> products = (List<TicketItem>)
                                                                             request.getAttribute("products");
                                                                             if (products != null) {
-                                                                            for (TicketItem p : products) { %>
+                                                                            for (TicketItem p : products) {%>
                                                                             <option value="<%= p.getProductDetailId()%>"
                                                                                 data-stock="<%= p.getCurrentStock()%>">
-                                                                                <%= p.getProductName()%> - <%=
-                                                                                        p.getProductConfig()%> (Stock:
+                                                                                <%= p.getProductName()%> -
+                                                                                    <%=p.getProductConfig()%> (Stock:
                                                                                         <%= p.getCurrentStock()%>)
                                                                             </option>
-                                                                            <% } } %>
+                                                                            <% } }%>
                                                                 </select>
                                                                 <input type="number" name="quantity" placeholder="Qty"
                                                                     min="1" value="1" required>
@@ -483,7 +483,10 @@
                                 function updateProductOptions() {
                                     const selects = document.querySelectorAll('select[name="productDetailId"]');
                                     const selected = [];
-                                    selects.forEach(s => { if (s.value) selected.push(s.value); });
+                                    selects.forEach(s => {
+                                        if (s.value)
+                                            selected.push(s.value);
+                                    });
 
                                     selects.forEach(select => {
                                         const current = select.value;
@@ -498,7 +501,8 @@
                                     const values = [];
                                     for (let s of selects) {
                                         if (s.value) {
-                                            if (values.includes(s.value)) return true;
+                                            if (values.includes(s.value))
+                                                return true;
                                             values.push(s.value);
                                         }
                                     }
@@ -508,7 +512,7 @@
                                 document.getElementById('ticketForm').addEventListener('submit', function (e) {
                                     if (!document.getElementById('ticketType').value) {
                                         e.preventDefault();
-                                        showToast('warning', 'Missing Field', 'Please select a ticket type');
+                                        showToast('warning', 'Type Required', 'Please select a ticket type');
                                         return;
                                     }
                                     if (!document.getElementById('keeperId').value) {

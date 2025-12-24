@@ -77,7 +77,7 @@ public class CreateTicketServlet extends HttpServlet {
             String[] productIds = request.getParameterValues("productDetailId");
             String[] quantities = request.getParameterValues("quantity");
 
-            if (type == null || title == null || title.trim().isEmpty()) {
+            if (type == null || type.trim().isEmpty() || title == null || title.trim().isEmpty()) {
                 request.setAttribute("error", "Please fill in all required fields");
                 doGet(request, response);
                 return;
