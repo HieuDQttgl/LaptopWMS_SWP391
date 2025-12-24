@@ -12,7 +12,7 @@ import jakarta.servlet.http.HttpServletResponse;
 /**
  * EditProductDetailServlet - Logic updated to IGNORE Quantity changes
  */
-@WebServlet(name = "EditProductDetailServlet", urlPatterns = { "/edit-product-detail" })
+@WebServlet(name = "EditProductDetailServlet", urlPatterns = {"/edit-product-detail"})
 public class EditProductDetailServlet extends HttpServlet {
 
     @Override
@@ -46,15 +46,19 @@ public class EditProductDetailServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-
         try {
-            int id = Integer.parseInt(request.getParameter("id"));     
-            int productId = Integer.parseInt(request.getParameter("productId")); 
-
+            int id = Integer.parseInt(request.getParameter("id"));
+            int productId = Integer.parseInt(request.getParameter("productId"));
             String cpu = request.getParameter("cpu");
             String gpu = request.getParameter("gpu");
-            String ram = request.getParameter("ram");
-            String storage = request.getParameter("storage");
+
+            String ramValue = request.getParameter("ram");
+            String ram = ramValue + "GB";
+
+            String storageValue = request.getParameter("storageValue");
+            String storageUnit = request.getParameter("storageUnit");
+            String storage = storageValue + storageUnit;
+
             String unit = request.getParameter("unit");
 
             ProductDetail d = new ProductDetail();
@@ -67,10 +71,8 @@ public class EditProductDetailServlet extends HttpServlet {
             d.setUnit(unit);
 
             ProductDAO dao = new ProductDAO();
-            dao.updateProductDetail(d); 
-
+            dao.updateProductDetail(d);
             response.sendRedirect("product-list");
-
         } catch (Exception e) {
             e.printStackTrace();
             response.sendRedirect("product-list?error=EditFailed");

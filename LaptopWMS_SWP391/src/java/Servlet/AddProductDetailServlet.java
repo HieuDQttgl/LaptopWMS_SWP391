@@ -12,7 +12,7 @@ import jakarta.servlet.http.HttpServletResponse;
 /**
  * AddProductDetailServlet - updated for laptop_wms_lite database
  */
-@WebServlet(name = "AddProductDetailServlet", urlPatterns = { "/add-product-detail" })
+@WebServlet(name = "AddProductDetailServlet", urlPatterns = {"/add-product-detail"})
 public class AddProductDetailServlet extends HttpServlet {
 
     @Override
@@ -44,21 +44,19 @@ public class AddProductDetailServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-
         try {
             int productId = Integer.parseInt(request.getParameter("productId"));
-
             String cpu = request.getParameter("cpu");
             String gpu = request.getParameter("gpu");
-            String ram = request.getParameter("ram");
-            String storage = request.getParameter("storage");
-            String unit = request.getParameter("unit");
 
-            int quantity = 0;
-            String quantityRaw = request.getParameter("quantity");
-            if (quantityRaw != null && !quantityRaw.isEmpty()) {
-                quantity = Integer.parseInt(quantityRaw);
-            }
+            String ramValue = request.getParameter("ram");
+            String ram = ramValue + "GB";
+
+            String storageValue = request.getParameter("storageValue");
+            String storageUnit = request.getParameter("storageUnit");
+            String storage = storageValue + storageUnit;
+
+            String unit = request.getParameter("unit");
 
             ProductDetail d = new ProductDetail();
             d.setProductId(productId);
@@ -71,9 +69,7 @@ public class AddProductDetailServlet extends HttpServlet {
 
             ProductDAO dao = new ProductDAO();
             dao.addProductDetail(d);
-
             response.sendRedirect("product-list");
-
         } catch (Exception e) {
             e.printStackTrace();
             response.sendRedirect("product-list?error=AddDetailFailed");
