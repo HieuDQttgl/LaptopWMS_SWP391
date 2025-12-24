@@ -98,8 +98,8 @@ public class AddSupplierServlet extends HttpServlet {
         // Validate phone format (if provided)
         if (phone != null && !phone.trim().isEmpty()) {
             String cleanPhone = phone.replaceAll("[\\s\\-]", "");
-            if (!cleanPhone.matches("^[0-9]{10,15}$")) {
-                errorMsg.append("Phone number must be 10-15 digits. ");
+            if (!cleanPhone.matches("(03|05|07|08|09|01[2|6|8|9])+([0-9]{8})")) {
+                errorMsg.append("Phone number must be a valid Vietnamese phone number. ");
             }
         }
 
