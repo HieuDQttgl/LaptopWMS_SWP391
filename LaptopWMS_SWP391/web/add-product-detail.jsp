@@ -1,12 +1,12 @@
 <%@ page contentType="text/html" pageEncoding="UTF-8" %>
-    <!DOCTYPE html>
-    <html>
+<!DOCTYPE html>
+<html>
 
     <head>
         <meta charset="UTF-8">
         <title>Add Configuration | Laptop WMS</title>
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
-            rel="stylesheet">
+              rel="stylesheet">
         <style>
             body {
                 font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
@@ -155,6 +155,39 @@
                 gap: 1rem;
             }
 
+            .input-with-unit {
+                display: flex;
+                gap: 0.5rem;
+            }
+
+            .input-with-unit input {
+                flex: 1;
+            }
+
+            .input-with-unit select {
+                width: 85px;
+                flex-shrink: 0;
+            }
+
+            .input-suffix {
+                position: relative;
+            }
+
+            .input-suffix input {
+                padding-right: 3rem;
+            }
+
+            .input-suffix::after {
+                content: 'GB';
+                position: absolute;
+                right: 1rem;
+                top: 50%;
+                transform: translateY(-50%);
+                color: #94a3b8;
+                font-weight: 500;
+                pointer-events: none;
+            }
+
             @media (max-width: 640px) {
                 .page-container {
                     padding: 1rem;
@@ -200,13 +233,21 @@
                             </div>
 
                             <div class="form-group">
-                                <label>RAM *</label>
-                                <input type="text" name="ram" placeholder="e.g. 16GB" required>
+                                <label>RAM (GB) *</label>
+                                <div class="input-suffix">
+                                    <input type="number" name="ram" placeholder="e.g. 16" min="1" step="any" required>
+                                </div>
                             </div>
 
                             <div class="form-group">
                                 <label>Storage *</label>
-                                <input type="text" name="storage" placeholder="e.g. 512GB SSD" required>
+                                <div class="input-with-unit">
+                                    <input type="number" name="storageValue" placeholder="e.g. 512" min="1" step="any" required>
+                                    <select name="storageUnit">
+                                        <option value="GB" selected>GB</option>
+                                        <option value="TB">TB</option>
+                                    </select>
+                                </div>
                             </div>
                         </div>
 
@@ -231,4 +272,4 @@
         <jsp:include page="footer.jsp" />
     </body>
 
-    </html>
+</html>
