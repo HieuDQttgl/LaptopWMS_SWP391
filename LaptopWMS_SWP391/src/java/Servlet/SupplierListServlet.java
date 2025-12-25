@@ -64,18 +64,57 @@ public class SupplierListServlet extends HttpServlet {
         String keyword = request.getParameter("keyword");
         String status = request.getParameter("status");
 
+        if (status == null) {
+            status = "all";
+        }
+
         PartnerDAO dao = new PartnerDAO();
-        List<Partners> list;
+        List<Partners> fullList;
 
         // If filters are provided, use search method
         if ((keyword != null && !keyword.trim().isEmpty()) ||
                 (status != null && !status.equals("all") && !status.isEmpty())) {
-            list = dao.searchSuppliers(keyword, status);
+            fullList = dao.searchSuppliers(keyword, status);
         } else {
-            list = dao.getAllSuppliers();
+            fullList = dao.getAllSuppliers();
         }
 
-        request.setAttribute("supplierList", list);
+        // Pagination logic
+        int page = 1;
+        int pageSize = 5;
+        if (request.getParameter("page") != null) {
+            try {
+                page = Integer.parseInt(request.getParameter("page"));
+            } catch (NumberFormatException e) {
+                page = 1;
+            }
+        }
+
+        int totalItems = fullList.size();
+        int totalPages = (int) Math.ceil((double) totalItems / pageSize);
+
+        if (page < 1) {
+            page = 1;
+        }
+        if (page > totalPages && totalPages > 0) {
+            page = totalPages;
+        }
+
+        int start = (page - 1) * pageSize;
+        int end = Math.min(start + pageSize, totalItems);
+
+        List<Partners> pageList = new java.util.ArrayList<>();
+        if (totalItems > 0 && start < totalItems) {
+            pageList = fullList.subList(start, end);
+        }
+
+        request.setAttribute("supplierList", pageList);
+        request.setAttribute("totalPages", totalPages);
+        request.setAttribute("currentPage", page);
+        request.setAttribute("totalItems", totalItems);
+        request.setAttribute("currentKeyword", keyword);
+        request.setAttribute("currentStatus", status);
+
         request.getRequestDispatcher("supplier-list.jsp").forward(request, response);
     }
 
