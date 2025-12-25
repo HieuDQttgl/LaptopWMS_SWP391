@@ -442,7 +442,7 @@ public class TicketDAO extends DBContext {
      * Cancel a ticket
      */
     public boolean cancelTicket(int ticketId, String keeperNote) {
-        String sql = "UPDATE tickets SET status = 'CANCELLED', processed_at = NOW(), keeper_note = ? WHERE ticket_id = ? AND status = 'PENDING'";
+        String sql = "UPDATE tickets SET status = 'REJECTED', processed_at = NOW(), keeper_note = ? WHERE ticket_id = ? AND status = 'PENDING'";
 
         try (PreparedStatement ps = getConnection().prepareStatement(sql)) {
             ps.setString(1, keeperNote);

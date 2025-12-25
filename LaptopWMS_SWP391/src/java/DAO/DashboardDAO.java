@@ -81,6 +81,31 @@ public class DashboardDAO extends DBContext {
         return list;
     }
 
+    
+    public List<Ticket> getPendingTicketsByKeeper(int keeperId) {
+    List<Ticket> list = new ArrayList<>();
+    // Thêm điều kiện assign_to_keeper_id = ? vào câu lệnh SQL
+    String sql = "SELECT * FROM tickets WHERE status = 'PENDING' AND assigned_keeper = ? ORDER BY created_at ASC LIMIT 5";
+    
+    try (PreparedStatement ps = getConnection().prepareStatement(sql)) {
+        ps.setInt(1, keeperId);
+        
+        try (ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) {
+                Ticket t = new Ticket();
+                t.setTicketId(rs.getInt("ticket_id"));
+                t.setTicketCode(rs.getString("ticket_code"));
+                t.setType(rs.getString("type"));
+                t.setTitle(rs.getString("title"));
+                t.setStatus(rs.getString("status"));
+                list.add(t);
+            }
+        }
+    } catch (Exception e) {
+        e.printStackTrace();
+    }
+    return list;
+}
     public List<ProductDetail> getLowStockAlerts(int threshold) {
         List<ProductDetail> list = new ArrayList<>();
         String sql = """

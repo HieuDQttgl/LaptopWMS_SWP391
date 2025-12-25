@@ -35,7 +35,7 @@ public class DashboardServlet extends HttpServlet {
         AnnouncementDAO aDao = new AnnouncementDAO();
         
         request.setAttribute("announcementList", aDao.getAnnouncements(4));
-
+        
         int roleId = currentUser.getRoleId();
 
         request.setAttribute("totalProducts", dao.getTotalProducts());
@@ -55,7 +55,7 @@ public class DashboardServlet extends HttpServlet {
                 request.setAttribute("lowStock", dao.getLowStockAlerts(10));
                 break;
             case 3: // Keeper
-                request.setAttribute("pendingTickets", dao.getPendingTickets());
+                request.setAttribute("pendingTickets", dao.getPendingTicketsByKeeper(currentUser.getUserId()));
                 request.setAttribute("lowStock", dao.getLowStockAlerts(5));
                 request.setAttribute("keeperHistory", dao.getKeeperHistory(currentUser.getUserId()));
                 break;
