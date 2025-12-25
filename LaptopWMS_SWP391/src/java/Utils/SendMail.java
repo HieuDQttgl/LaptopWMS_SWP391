@@ -12,7 +12,7 @@ import javax.mail.internet.MimeMessage;
 public class SendMail {
 
     // Email configuration
-    private static final String FROM_EMAIL = "luuminhtuan008@gmail.com";
+    private static final String FROM_EMAIL = "phamquangtien1810@gmail.com";
     private static final String APP_PASSWORD = "ixiy wzlr rqru qhkg";
 
     /**
