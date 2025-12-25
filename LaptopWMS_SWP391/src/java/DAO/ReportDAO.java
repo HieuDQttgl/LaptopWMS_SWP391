@@ -20,6 +20,7 @@ public class ReportDAO extends DBContext {
 
         StringBuilder sql = new StringBuilder();
         sql.append("SELECT ");
+        sql.append("    pd.product_detail_id, ");
         sql.append("    p.product_name, ");
         sql.append("    CONCAT(pd.cpu, ' / ', pd.ram, ' / ', pd.storage) as config, ");
         sql.append("    pd.unit, ");
@@ -33,18 +34,16 @@ public class ReportDAO extends DBContext {
         sql.append("LEFT JOIN stock_ledger sl ON pd.product_detail_id = sl.product_detail_id ");
 
         List<Object> params = new ArrayList<>();
-        boolean hasDateFilter = false;
+        boolean hasStartDate = startDate != null && !startDate.isEmpty();
 
         // Add date filters
-        if (startDate != null && !startDate.isEmpty()) {
+        if (hasStartDate) {
             sql.append("AND sl.created_at >= ? ");
             params.add(startDate + " 00:00:00");
-            hasDateFilter = true;
         }
         if (endDate != null && !endDate.isEmpty()) {
             sql.append("AND sl.created_at <= ? ");
             params.add(endDate + " 23:59:59");
-            hasDateFilter = true;
         }
         if (type != null && !type.isEmpty() && !"all".equals(type)) {
             sql.append("AND sl.type = ? ");
@@ -64,6 +63,7 @@ public class ReportDAO extends DBContext {
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
                     ReportItem item = new ReportItem();
+                    item.productDetailId = rs.getInt("product_detail_id");
                     item.productName = rs.getString("product_name");
                     item.config = rs.getString("config");
                     item.unit = rs.getString("unit");
@@ -77,7 +77,57 @@ public class ReportDAO extends DBContext {
             e.printStackTrace();
         }
 
+        // If startDate is provided, calculate opening stock for each product
+        if (hasStartDate && !report.isEmpty()) {
+            calculateOpeningStock(report, startDate);
+        }
+
         return report;
+    }
+
+    /**
+     * Calculate opening stock (stock before startDate) for each product
+     * Opening stock = current stock - (imports after startDate) + (exports after
+     * startDate)
+     */
+    private void calculateOpeningStock(List<ReportItem> report, String startDate) {
+        // Get net change from startDate to now for each product
+        String sql = "SELECT product_detail_id, " +
+                "COALESCE(SUM(CASE WHEN type = 'IMPORT' THEN quantity_change ELSE 0 END), 0) as import_after, " +
+                "COALESCE(SUM(CASE WHEN type = 'EXPORT' THEN quantity_change ELSE 0 END), 0) as export_after " +
+                "FROM stock_ledger " +
+                "WHERE created_at >= ? " +
+                "GROUP BY product_detail_id";
+
+        try (Connection conn = getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, startDate + " 00:00:00");
+
+            java.util.Map<Integer, int[]> netChanges = new java.util.HashMap<>();
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    int productDetailId = rs.getInt("product_detail_id");
+                    int importAfter = rs.getInt("import_after");
+                    int exportAfter = rs.getInt("export_after");
+                    netChanges.put(productDetailId, new int[] { importAfter, exportAfter });
+                }
+            }
+
+            // Calculate opening stock for each item
+            for (ReportItem item : report) {
+                int[] changes = netChanges.get(item.productDetailId);
+                if (changes != null) {
+                    // Opening stock = current stock - imports after + exports after
+                    item.openingStock = item.currentStock - changes[0] + changes[1];
+                } else {
+                    // No transactions after startDate, opening stock = current stock
+                    item.openingStock = item.currentStock;
+                }
+                item.hasOpeningStock = true;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -201,12 +251,15 @@ public class ReportDAO extends DBContext {
     }
 
     public static class ReportItem {
+        public int productDetailId;
         public String productName;
         public String config;
         public String unit;
         public int currentStock;
         public int totalImport;
         public int totalExport;
+        public int openingStock;
+        public boolean hasOpeningStock;
     }
 
     public static class LedgerEntry {

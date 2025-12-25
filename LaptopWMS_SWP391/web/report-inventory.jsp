@@ -386,10 +386,17 @@
                                                 String startDate = (String) request.getAttribute("startDate");
                                                 String endDate = (String) request.getAttribute("endDate");
                                                 String type = (String) request.getAttribute("type");
-                                                if (inventoryReport == null) inventoryReport = new ArrayList<>();
-                                                    if (ledgerEntries == null) ledgerEntries = new ArrayList<>();
-                                                        if (summary == null) summary = new ReportSummary();
-                                                        SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm");
+                                                if (inventoryReport == null) {
+                                                inventoryReport = new ArrayList<>();
+                                                    }
+                                                    if (ledgerEntries == null) {
+                                                    ledgerEntries = new ArrayList<>();
+                                                        }
+                                                        if (summary == null) {
+                                                        summary = new ReportSummary();
+                                                        }
+                                                        SimpleDateFormat dateFormat = new SimpleDateFormat(
+                                                        "dd/MM/yyyy HH:mm");
                                                         %>
 
                                                         <div class="page-container">
@@ -405,12 +412,12 @@
                                                                         <div class="filter-group">
                                                                             <label>From Date</label>
                                                                             <input type="date" name="startDate"
-                                                                                value="<%= startDate != null ? startDate : "" %>">
+                                                                                value="<%= startDate != null ? startDate : ""%>">
                                                                         </div>
                                                                         <div class="filter-group">
                                                                             <label>To Date</label>
                                                                             <input type="date" name="endDate"
-                                                                                value="<%= endDate != null ? endDate : "" %>">
+                                                                                value="<%= endDate != null ? endDate : ""%>">
                                                                         </div>
                                                                         <div class="filter-group">
                                                                             <label>Type</label>
@@ -438,28 +445,28 @@
                                                                 <div class="summary-card import">
                                                                     <div class="icon">📥</div>
                                                                     <div class="stat-value">
-                                                                        <%= summary.totalImport %>
+                                                                        <%= summary.totalImport%>
                                                                     </div>
                                                                     <div class="stat-label">Total Import</div>
                                                                 </div>
                                                                 <div class="summary-card export">
                                                                     <div class="icon">📤</div>
                                                                     <div class="stat-value">
-                                                                        <%= summary.totalExport %>
+                                                                        <%= summary.totalExport%>
                                                                     </div>
                                                                     <div class="stat-label">Total Export</div>
                                                                 </div>
                                                                 <div class="summary-card stock">
                                                                     <div class="icon">📦</div>
                                                                     <div class="stat-value">
-                                                                        <%= summary.totalStock %>
+                                                                        <%= summary.totalStock%>
                                                                     </div>
                                                                     <div class="stat-label">Current Stock</div>
                                                                 </div>
                                                                 <div class="summary-card transactions">
                                                                     <div class="icon">📋</div>
                                                                     <div class="stat-value">
-                                                                        <%= summary.totalTransactions %>
+                                                                        <%= summary.totalTransactions%>
                                                                     </div>
                                                                     <div class="stat-label">Transactions</div>
                                                                 </div>
@@ -477,7 +484,7 @@
                                                                 <div class="table-card">
                                                                     <div class="table-header">
                                                                         <h3>Inventory Report</h3>
-                                                                        <a href="report-inventory?action=export&startDate=<%= startDate != null ? startDate : "" %>&endDate=<%= endDate != null ? endDate : "" %>&type=<%= type != null ? type : "all" %>" class="btn btn-success">📥 Download
+                                                                        <a href="report-inventory?action=export&startDate=<%= startDate != null ? startDate : ""%>&endDate=<%= endDate != null ? endDate : ""%>&type=<%= type != null ? type : "all"%>" class="btn btn-success">📥 Download
                                                                             CSV</a>
                                                                     </div>
                                                                     <div style="overflow-x: auto;">
@@ -494,49 +501,69 @@
                                                                                             <th>Product</th>
                                                                                             <th>Configuration</th>
                                                                                             <th>Unit</th>
-                                                                                            <th class="text-right">
-                                                                                                Import</th>
-                                                                                            <th class="text-right">
-                                                                                                Export</th>
-                                                                                            <th class="text-right">Stock
-                                                                                            </th>
+                                                                                            <% if (startDate !=null &&
+                                                                                                !startDate.isEmpty()) {
+                                                                                                %>
+                                                                                                <th class="text-right">
+                                                                                                    Prior Stock</th>
+                                                                                                <% } %>
+                                                                                                    <th
+                                                                                                        class="text-right">
+                                                                                                        Import</th>
+                                                                                                    <th
+                                                                                                        class="text-right">
+                                                                                                        Export</th>
+                                                                                                    <th
+                                                                                                        class="text-right">
+                                                                                                        Stock
+                                                                                                    </th>
                                                                                         </tr>
                                                                                     </thead>
                                                                                     <tbody>
-                                                                                        <% for (ReportItem item : inventoryReport) { %>
+                                                                                        <% for (ReportItem item :
+                                                                                            inventoryReport) {%>
                                                                                             <tr>
                                                                                                 <td><strong>
-                                                                                                        <%= item.productName
-                                                                                                            %>
+                                                                                                        <%=
+                                                                                                            item.productName%>
                                                                                                     </strong></td>
                                                                                                 <td>
-                                                                                                    <%= item.config %>
+                                                                                                    <%= item.config%>
                                                                                                 </td>
                                                                                                 <td>
                                                                                                     <%= item.unit !=null
                                                                                                         ? item.unit
                                                                                                         : "unit" %>
                                                                                                 </td>
-                                                                                                <td class="text-right"
-                                                                                                    style="color: #16a34a; font-weight: 600;">
-                                                                                                    +<%= item.totalImport
-                                                                                                        %>
-                                                                                                </td>
-                                                                                                <td class="text-right"
-                                                                                                    style="color: #dc2626; font-weight: 600;">
-                                                                                                    -<%= item.totalExport
-                                                                                                        %>
-                                                                                                </td>
-                                                                                                <td class="text-right"
-                                                                                                    style="font-weight: 700;">
-                                                                                                    <%= item.currentStock
-                                                                                                        %>
-                                                                                                </td>
+                                                                                                <% if
+                                                                                                    (item.hasOpeningStock)
+                                                                                                    {%>
+                                                                                                    <td class="text-right"
+                                                                                                        style="color: #667eea; font-weight: 600;">
+                                                                                                        <%=
+                                                                                                            item.openingStock%>
+                                                                                                    </td>
+                                                                                                    <% }%>
+                                                                                                        <td class="text-right"
+                                                                                                            style="color: #16a34a; font-weight: 600;">
+                                                                                                            +<%=
+                                                                                                                item.totalImport%>
+                                                                                                        </td>
+                                                                                                        <td class="text-right"
+                                                                                                            style="color: #dc2626; font-weight: 600;">
+                                                                                                            -<%=
+                                                                                                                item.totalExport%>
+                                                                                                        </td>
+                                                                                                        <td class="text-right"
+                                                                                                            style="font-weight: 700;">
+                                                                                                            <%=
+                                                                                                                item.currentStock%>
+                                                                                                        </td>
                                                                                             </tr>
                                                                                             <% } %>
                                                                                     </tbody>
                                                                                 </table>
-                                                                                <% } %>
+                                                                                <% }%>
                                                                     </div>
                                                                 </div>
                                                             </div>
@@ -545,7 +572,7 @@
                                                                 <div class="table-card">
                                                                     <div class="table-header">
                                                                         <h3>Transaction Ledger</h3>
-                                                                        <a href="report-inventory?action=exportLedger&startDate=<%= startDate != null ? startDate : "" %>&endDate=<%= endDate != null ? endDate : "" %>&type=<%= type != null ? type : "all" %>" class="btn btn-success">📥 Download
+                                                                        <a href="report-inventory?action=exportLedger&startDate=<%= startDate != null ? startDate : ""%>&endDate=<%= endDate != null ? endDate : ""%>&type=<%= type != null ? type : "all"%>" class="btn btn-success">📥 Download
                                                                             CSV</a>
                                                                     </div>
                                                                     <div style="overflow-x: auto;">
@@ -572,7 +599,7 @@
                                                                                     </thead>
                                                                                     <tbody>
                                                                                         <% for (LedgerEntry entry :
-                                                                                            ledgerEntries) { %>
+                                                                                            ledgerEntries) {%>
                                                                                             <tr>
                                                                                                 <td>
                                                                                                     <%= entry.createdAt
@@ -581,7 +608,7 @@
                                                                                                         : "" %>
                                                                                                 </td>
                                                                                                 <td><span
-                                                                                                        class="badge badge-<%= entry.type.toLowerCase() %>">
+                                                                                                        class="badge badge-<%= entry.type.toLowerCase()%>">
                                                                                                         <%= "IMPORT"
                                                                                                             .equals(entry.type)
                                                                                                             ? "Import"
@@ -589,15 +616,15 @@
                                                                                                             %>
                                                                                                     </span></td>
                                                                                                 <td>
-                                                                                                    <%= entry.ticketCode
-                                                                                                        %>
+                                                                                                    <%=
+                                                                                                        entry.ticketCode%>
                                                                                                 </td>
                                                                                                 <td><strong>
-                                                                                                        <%= entry.productName
-                                                                                                            %>
+                                                                                                        <%=
+                                                                                                            entry.productName%>
                                                                                                     </strong></td>
                                                                                                 <td>
-                                                                                                    <%= entry.config %>
+                                                                                                    <%= entry.config%>
                                                                                                 </td>
                                                                                                 <td class="text-right"
                                                                                                     style="font-weight: 600; color: <%= "IMPORT".equals(entry.type)
@@ -606,19 +633,19 @@
                                                                                                     <%= "IMPORT"
                                                                                                         .equals(entry.type)
                                                                                                         ? "+" : "-" %>
-                                                                                                        <%= entry.quantityChange
-                                                                                                            %>
+                                                                                                        <%=
+                                                                                                            entry.quantityChange%>
                                                                                                 </td>
                                                                                                 <td class="text-right"
                                                                                                     style="font-weight: 700;">
-                                                                                                    <%= entry.balanceAfter
-                                                                                                        %>
+                                                                                                    <%=
+                                                                                                        entry.balanceAfter%>
                                                                                                 </td>
                                                                                             </tr>
                                                                                             <% } %>
                                                                                     </tbody>
                                                                                 </table>
-                                                                                <% } %>
+                                                                                <% }%>
                                                                     </div>
                                                                 </div>
                                                             </div>
